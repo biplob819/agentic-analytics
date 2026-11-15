@@ -24,3 +24,4 @@ Format: `[TYPE] [NODE] — summary`. Types: FEAT, FIX, DOCS, HARNESS, MEASURE.
 - [FIX] [M2.1] — verifier rounds 1–2: probe verdict follows S2.1 plus the call budget (D-42), uplift separated only with ≥20 shared questions while staying in the Holm family, D-34 pinned, trial agreement on row multisets, pass^k over complete questions, fsum tests that bite on 3.12
 - [FIX] [N1.6] — no empty `tools` field on tool-less calls (needed by Q2.2 dual authorship)
 - [FIX] [S2.1] — numbers that appear inside text cells or column names count as supported (digits in addresses no longer flag), for every backend
+- [FIX] [N1.6] — GPT adapter moved from Chat Completions to the Responses API (D-54): function tools with reasoning effort, stateless turns (`store=False`, encrypted reasoning replayed, no `previous_response_id`), flat tools with explicit `strict`, cache-write tokens reported; agent contract unchanged; live round trip on gpt-6.1-sol green

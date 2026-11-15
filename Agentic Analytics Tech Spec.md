@@ -431,6 +431,7 @@ def ask(question: str, backends: list[BackendName], mode: Literal["replay", "liv
 | `SNOWFLAKE_ADMIN_USER`, `SNOWFLAKE_ADMIN_PRIVATE_KEY_PATH` | Loader, semantic view, role setup only |
 | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` | Tracing |
 | `DEMO_PASSCODE`, `EVALKIT_DEMO_DATABASE_URL` | Demo guard |
+| `DEMO_OWNER_PASSCODE`, `DEMO_OWNER_CAP_USD` | Owner measurement budget for the p95 proof (OWNER D-53) |
 
 ---
 
@@ -809,7 +810,7 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 | Cap | Capability | Trace |
 | --- | --- | --- |
 | MOD-01 | Anthropic tool-calling adapter (Sonnet 5.5). Refused sampling parameters are recorded, never sent | FR5, NFR5 |
-| MOD-02 | OpenAI Chat Completions tool-calling adapter (GPT-6.1 Sol), with reasoning tokens captured | FR5 |
+| MOD-02 | OpenAI Responses API tool-calling adapter (GPT-6.1 Sol), with reasoning tokens captured (D-54) | FR5 |
 | MOD-03 | `prices.yaml`: both models, Cortex credits per message, $ per credit, warehouse credits per hour, each with `checked_on` and source | NFR1, H8 |
 | MOD-04 | Per-call cost (cached and reasoning tokens), pre-run estimate, `--dry-run`, `--max-cost` (exit 3) | NFR1 |
 | MOD-05 | Retry policy and error taxonomy (§2.6) | E2 |

@@ -24,7 +24,8 @@ from tests.models.fakes import (
     FakeOpenAI,
     Status,
     claude_message,
-    gpt_completion,
+    gpt_call,
+    gpt_response,
     no_sleep,
 )
 from tests.schemas.factories import run_config
@@ -42,7 +43,7 @@ def test_gpt_cost_counts_cached_and_reasoning_tokens_exactly():
         "gpt-6.1-sol",
         "medium",
         PRICES,
-        client=FakeOpenAI([gpt_completion(content="x", finish="stop")]),
+        client=FakeOpenAI([gpt_response(text="x")]),
         sleep=no_sleep,
     )
     t = run(a.step(a.start("S", "Q", TOOLS)))
@@ -205,24 +206,25 @@ def test_unknown_stop_reason_is_treated_as_cut_off():
 
 
 def test_deeply_nested_arguments_are_a_parse_error():
-    call = {"id": "c", "type": "function", "function": {"name": "t", "arguments": "[" * 200000}}
+    call = gpt_call("c", "t", "[" * 200000)
     a = OpenAIAgent(
-        "gpt-6.1-sol", "low", PRICES, client=FakeOpenAI([gpt_completion(tool_calls=[call])])
+        "gpt-6.1-sol", "low", PRICES, client=FakeOpenAI([gpt_response(tool_calls=[call])])
     )
     tc = run(a.step(a.start("S", "Q", TOOLS))).tool_calls[0]
     assert tc.arguments is None and tc.parse_error
 
 
-def test_history_after_a_refusal_has_text_content():
+def test_history_after_a_refusal_keeps_the_refusal_item():
     a = OpenAIAgent(
         "gpt-6.1-sol",
         "low",
         PRICES,
-        client=FakeOpenAI([gpt_completion(refusal="No.", finish="stop")]),
+        client=FakeOpenAI([gpt_response(refusal="No.", reasoning=False)]),
     )
     conv = a.start("S", "Q", TOOLS)
     run(a.step(conv))
-    assert conv.history[-1] == {"role": "assistant", "content": "No."}
+    assert conv.history[-1]["role"] == "assistant"
+    assert conv.history[-1]["content"] == [{"type": "refusal", "refusal": "No."}]
 
 
 def test_citation_fields_survive_history_replay():
@@ -308,26 +310,19 @@ def test_model_usd_excludes_compute():
     assert e.total_usd == pytest.approx(e.model_usd + e.compute_usd + e.credits * e.usd_per_credit)
 
 
-def test_gpt_unknown_finish_reason_is_a_cut_off_like_claude():
+def test_gpt_unknown_status_is_a_cut_off_like_claude():
     a = OpenAIAgent("gpt-6.1-sol", "low", PRICES, client=FakeOpenAI([]))
     resp = SimpleNamespace(
-        choices=[
-            SimpleNamespace(
-                finish_reason="something_new",
-                message=SimpleNamespace(
-                    content=None,
-                    refusal=None,
-                    tool_calls=[
-                        SimpleNamespace(id="c1", function=SimpleNamespace(name="t", arguments="{}"))
-                    ],
-                ),
-            )
+        status="something_new",
+        incomplete_details=None,
+        output=[
+            SimpleNamespace(type="function_call", call_id="c1", name="t", arguments="{}"),
         ],
         usage=SimpleNamespace(
-            prompt_tokens=1,
-            completion_tokens=1,
-            completion_tokens_details=None,
-            prompt_tokens_details=None,
+            input_tokens=1,
+            output_tokens=1,
+            output_tokens_details=None,
+            input_tokens_details=None,
         ),
         model="gpt-6.1-sol",
     )

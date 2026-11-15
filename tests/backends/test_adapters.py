@@ -7,7 +7,14 @@ from agentic_analytics.backends import ask_mcp, render_system_prompt
 from agentic_analytics.cost import model_prices
 from agentic_analytics.models import AnthropicAgent, OpenAIAgent
 from tests.backends.fakes import AS_OF, toolbox
-from tests.models.fakes import FakeAnthropic, FakeOpenAI, claude_message, gpt_completion, no_sleep
+from tests.models.fakes import (
+    FakeAnthropic,
+    FakeOpenAI,
+    claude_message,
+    gpt_call,
+    gpt_response,
+    no_sleep,
+)
 
 SQL = "SELECT count() AS n FROM uk.uk_price_paid LIMIT 2"
 FINAL = {"sql": SQL, "answer": "There were 2 rows.", "clarification": None, "suggestions": []}
@@ -26,8 +33,7 @@ def claude_tool(id_, name, args):
 
 
 def gpt_tool(id_, name, args):
-    fn = {"name": name, "arguments": json.dumps(args)}
-    return gpt_completion(tool_calls=[{"id": id_, "type": "function", "function": fn}])
+    return gpt_response(tool_calls=[gpt_call(id_, name, json.dumps(args))])
 
 
 def test_claude_adapter_end_to_end():
@@ -65,11 +71,14 @@ def test_gpt_adapter_end_to_end():
     a = run.answer
     assert (a.backend, a.sql, a.error) == ("gpt_mcp", SQL, None)
     first, second = fake.rec.calls
-    assert first["messages"][0] == {"role": "system", "content": render_system_prompt(AS_OF)}
-    fns = {t["function"]["name"]: t["function"] for t in first["tools"]}
+    assert first["instructions"] == render_system_prompt(AS_OF)
+    fns = {t["name"]: t for t in first["tools"]}
     assert fns["final_answer"]["strict"] is True
-    tool_msg = second["messages"][-1]
-    assert tool_msg["role"] == "tool" and tool_msg["tool_call_id"] == "call_1"
+    assert list(fns) == ["list_databases", "list_tables", "run_select_query", "final_answer"]
+    tool_out = second["input"][-1]
+    assert tool_out["type"] == "function_call_output" and tool_out["call_id"] == "call_1"
+    assert json.loads(tool_out["output"])["rows_total"] == 2
+    assert run.cost_usd > 0 and a.steps[0].rows_returned == 2
 
 
 def test_claude_self_check_feedback_joins_the_tool_result_turn():
@@ -91,7 +100,7 @@ def test_claude_self_check_feedback_joins_the_tool_result_turn():
 
 
 def test_gpt_refusal_maps_to_refusal():
-    fake = FakeOpenAI([gpt_completion(refusal="I can't help with that.", finish="stop")])
+    fake = FakeOpenAI([gpt_response(refusal="I can't help with that.")])
     agent = OpenAIAgent("gpt-6.1-sol", "medium", model_prices(), client=fake, sleep=no_sleep)
     run = run_agent(agent)
     assert run.answer.error == "refusal" and run.answer.answer == "I can't help with that."
