@@ -90,13 +90,15 @@ class OpenAIAgent:
         )
 
     def request(self, conv: Conversation) -> dict[str, Any]:
-        return {
+        params: dict[str, Any] = {
             "model": self.model,
             "messages": list(conv.history),
-            "tools": [tool_param(t) for t in conv.tools],
             "max_completion_tokens": self.max_tokens,
             "reasoning_effort": self.effort,
         }
+        if conv.tools:  # an empty tools list is not sent (the API may reject it)
+            params["tools"] = [tool_param(t) for t in conv.tools]
+        return params
 
     async def step(self, conv: Conversation) -> ModelTurn:
         params = self.request(conv)

@@ -332,3 +332,13 @@ def test_gpt_unknown_finish_reason_is_a_cut_off_like_claude():
         model="gpt-6.1-sol",
     )
     assert a.parse(resp, 0).stop == "max_tokens"
+
+
+def test_no_tools_means_no_tools_field():
+    from agentic_analytics.models import AnthropicAgent
+
+    o = OpenAIAgent("gpt-6.1-sol", "low", PRICES, client=FakeOpenAI([]))
+    a = AnthropicAgent("claude-sonnet-5-5", "low", PRICES, client=FakeAnthropic([]))
+    assert "tools" not in o.request(o.start("S", "Q", ()))
+    assert "tools" not in a.request(a.start("S", "Q", ()))
+    assert o.request(o.start("S", "Q", TOOLS))["tools"]

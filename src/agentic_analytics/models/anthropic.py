@@ -89,11 +89,12 @@ class AnthropicAgent:
             "model": self.model,
             "max_tokens": self.max_tokens,
             "system": conv.system,
-            "tools": [tool_param(t) for t in conv.tools],
             "messages": list(conv.history),
             "cache_control": {"type": "ephemeral"},
             "output_config": {"effort": self.effort},
         }
+        if conv.tools:  # no empty tools list
+            params["tools"] = [tool_param(t) for t in conv.tools]
         assert not FORBIDDEN_PARAMS & params.keys()
         return params
 
