@@ -20,3 +20,5 @@ Format: `[TYPE] [NODE] — summary`. Types: FEAT, FIX, DOCS, HARNESS, MEASURE.
 - [FIX] [N1.1] — an errored answer carries no clarification or suggestions (D-40)
 - [FIX] [S2.1] — verifier: column mapping for renamed/reordered columns, per-column tolerance (exact counts), dates in words, more number forms, percent/ratio rules, numeric injection markers; isolating tests for surviving mutants
 - [FIX] [N1.1] — `Tolerance.columns` and default rel 1e-9 (D-41)
+- [FEAT] [M2.1] — aggregate and statistics on evalkit.stats: two-level bootstrap accuracy and category CIs, paired uplift with Holm (D-34), clarification and false-clarification rates, pass^k over questions only (EK L-36), trial agreement, cost per correct with cost status, probe summary, deterministic summary.json
+- [FIX] [M2.1] — verifier rounds 1–2: probe verdict follows S2.1 plus the call budget (D-42), uplift separated only with ≥20 shared questions while staying in the Holm family, D-34 pinned, trial agreement on row multisets, pass^k over complete questions, fsum tests that bite on 3.12
