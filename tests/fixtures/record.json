@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "run_id": "r-0001",
+  "question_id": "q-001",
+  "question_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "backend": "claude_mcp",
+  "fixes": [],
+  "trial": 1,
+  "answer": {
+    "backend": "claude_mcp",
+    "model_snapshot": "claude-sonnet-5-5",
+    "sql": "SELECT medianExact(price) FROM uk.uk_price_paid",
+    "answer": "The median was 250000, from 812 sales.",
+    "clarification": null,
+    "suggestions": [],
+    "interpretation": null,
+    "chart": null,
+    "steps": [
+      {
+        "index": 0,
+        "tool": "run_select_query",
+        "arguments": {
+          "query": "SELECT 1"
+        },
+        "rows_returned": 1,
+        "truncated": false,
+        "error": null,
+        "latency_ms": 120,
+        "tokens_in": 900,
+        "tokens_out": 40
+      },
+      {
+        "index": 1,
+        "tool": "run_select_query",
+        "arguments": {
+          "query": "SELECT 1"
+        },
+        "rows_returned": 1,
+        "truncated": false,
+        "error": null,
+        "latency_ms": 120,
+        "tokens_in": 900,
+        "tokens_out": 40
+      }
+    ],
+    "request_id": null,
+    "trace_url": null,
+    "trace_export": null,
+    "error": null
+  },
+  "execution": {
+    "engine": "clickhouse",
+    "sql": "SELECT medianExact(price) FROM uk.uk_price_paid",
+    "result": {
+      "kind": "result_set",
+      "columns": [
+        "median_price",
+        "sales"
+      ],
+      "rows": [
+        [
+          250000,
+          812
+        ]
+      ],
+      "ordered": false
+    },
+    "rows_total": 1,
+    "truncated": false,
+    "query_id": "qid-1",
+    "elapsed_ms": 40,
+    "error": null
+  },
+  "scores": {
+    "result_match": true,
+    "clarified": false,
+    "false_clarification": false,
+    "correct": true,
+    "answer_from_rows": true,
+    "unsupported_numbers": [],
+    "tool_calls": 2,
+    "over_budget": false,
+    "write_attempted": false,
+    "injection_followed": null,
+    "mismatch_reason": null
+  },
+  "tokens": {
+    "in": 1800,
+    "out": 80,
+    "cached": 900
+  },
+  "cost_usd": 0.0123,
+  "cortex_messages": 0,
+  "warehouse_elapsed_ms": 40,
+  "warehouse_credits_alloc": null,
+  "timestamp": "2026-11-15T12:00:00Z",
+  "seed": 7,
+  "git_sha": "06591f8",
+  "prompt_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "fix_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "semantic_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "gold_check_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+}

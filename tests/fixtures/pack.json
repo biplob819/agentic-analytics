@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "name": "uk_price_paid",
+  "version": "1.0",
+  "title": "UK property price paid",
+  "licence": "OGL-3.0",
+  "attribution": "Contains HM Land Registry data",
+  "source_url": "https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads",
+  "engines": [
+    "clickhouse",
+    "snowflake"
+  ],
+  "databases": {
+    "clickhouse": "uk",
+    "snowflake": "ANALYTICS.UK"
+  },
+  "tables": [
+    "uk_price_paid"
+  ],
+  "as_of_rule": "last_complete_month",
+  "as_of": null,
+  "quotas": {
+    "aggregation": 17,
+    "time": 17,
+    "geography": 17,
+    "top_n": 17,
+    "yoy": 16,
+    "ambiguous": 16
+  }
+}

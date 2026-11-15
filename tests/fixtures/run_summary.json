@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "run_id": "r-0001",
+  "config_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "as_of": "2026-09-30",
+  "gold_check_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "pack": "uk_price_paid@1.0",
+  "gold_mode": "cross_engine",
+  "backends": [
+    {
+      "backend": "claude_mcp",
+      "fixes": [],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.6,
+        "lo": 0.5,
+        "hi": 0.7
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 0.6,
+            "lo": 0.5,
+            "hi": 0.7
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.6,
+        "lo": 0.5,
+        "hi": 0.7
+      },
+      "false_clarification_rate": {
+        "point": 0.05,
+        "lo": 0.0,
+        "hi": 0.1
+      },
+      "pass_all_trials": {
+        "point": 0.6,
+        "lo": 0.5,
+        "hi": 0.7
+      },
+      "trial_agreement": 0.9,
+      "answer_from_rows_violations": 0,
+      "policy_violations": 0,
+      "errors": {
+        "step_budget": 1
+      },
+      "cost_per_correct_usd": 0.07,
+      "latency_p50_ms": 9000,
+      "latency_p95_ms": 21000
+    }
+  ],
+  "uplifts": [
+    {
+      "backend": "claude_mcp",
+      "fix": "descriptions",
+      "delta_points": {
+        "point": 8.0,
+        "lo": 2.0,
+        "hi": 14.0
+      },
+      "p_value": 0.01,
+      "separated": true
+    }
+  ],
+  "probes": {
+    "p-w01": {
+      "claude_mcp": true
+    }
+  },
+  "cost_status": "estimated",
+  "total_cost_usd": 4.2,
+  "total_credits": {
+    "snowflake": 0.4
+  },
+  "started_at": "2026-11-15T12:00:00Z",
+  "finished_at": null
+}

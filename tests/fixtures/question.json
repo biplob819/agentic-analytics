@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "id": "q-001",
+  "text": "What was the median price of a detached house in Manchester in 2024?",
+  "category": "aggregation",
+  "expected": "answer",
+  "gold_sql": {
+    "clickhouse": "SELECT medianExact(price) FROM uk.uk_price_paid",
+    "snowflake": "SELECT 1"
+  },
+  "interpretations": [],
+  "tolerance": {
+    "rel": 1e-6,
+    "abs": 1e-9
+  },
+  "ordered": false,
+  "top_n": null,
+  "expects_empty": false,
+  "author": "claude",
+  "owner_reviewed": false
+}

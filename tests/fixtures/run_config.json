@@ -1,0 +1,22 @@
+{
+  "backends": [
+    "claude_mcp",
+    "gpt_mcp",
+    "cortex_analyst"
+  ],
+  "models": {
+    "claude_mcp": "claude-sonnet-5-5",
+    "gpt_mcp": "gpt-6.1-sol"
+  },
+  "fixes": [],
+  "trials": 3,
+  "max_tool_calls": 6,
+  "max_turns": 10,
+  "row_cap_model": 50,
+  "row_cap_exec": 10000,
+  "as_of": "2026-09-30",
+  "effort": "medium",
+  "seed": 0,
+  "max_cost_usd": null,
+  "concurrency": {}
+}
