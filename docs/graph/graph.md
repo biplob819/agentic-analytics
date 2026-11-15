@@ -19,7 +19,7 @@ Generated from Agentic Analytics Tech Spec §12.2 on 2026-11-15; edit here from 
 | **N1.2** | Read-only executors | N1.1 | node_converge + verifier | SQL guard, ClickHouse and Snowflake executors, role SQL, `agentic-analytics doctor` | US9 |
 | **N1.3** | Loaders, parity and data card | N1.2 | node_converge + verifier | Both loaders, parity fingerprints, probes database, `DATA_CARD.md`, as-of date | US9 |
 | **N1.4** | Semantic layer | N1.3 | node_converge + verifier | `packs/uk_price_paid/semantic.yaml`, generated semantic view and descriptions block, parity test | US2 |
-| **N1.5** | MCP client | N1.1 | node_converge + verifier | Streamable-HTTP client, allow-list, `serviceId` injection, row cap, call counter, fake server | US1 |
+| **N1.5** | MCP client | N1.1, N1.6 | node_converge + verifier | Streamable-HTTP client, allow-list, `serviceId` injection, row cap, call counter, fake server | US1 |
 | **N1.6** | Model adapters and cost | N1.1 | node_converge + verifier | Claude and GPT tool-calling adapters, `prices.yaml`, estimate, `--dry-run`, `--max-cost`, spend ledger | US5 |
 
 ## Wave 2 — questions and gold

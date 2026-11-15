@@ -617,7 +617,7 @@ Status vocabulary: `not-started | spec | building | green`. Changelog lines read
 | **N1.2** | Read-only executors | N1.1 | SQL guard, ClickHouse and Snowflake executors, role SQL, `agentic-analytics doctor` | US9 |
 | **N1.3** | Loaders, parity and data card | N1.2 | Both loaders, parity fingerprints, probes database, `DATA_CARD.md`, as-of date | US9 |
 | **N1.4** | Semantic layer | N1.3 | `packs/uk_price_paid/semantic.yaml`, generated semantic view and descriptions block, parity test | US2 |
-| **N1.5** | MCP client | N1.1 | Streamable-HTTP client, allow-list, `serviceId` injection, row cap, call counter, fake server | US1 |
+| **N1.5** | MCP client | N1.1, N1.6 | Streamable-HTTP client, allow-list, `serviceId` injection, row cap, call counter, fake server | US1 |
 | **N1.6** | Model adapters and cost | N1.1 | Claude and GPT tool-calling adapters, `prices.yaml`, estimate, `--dry-run`, `--max-cost`, spend ledger | US5 |
 | **Q2.1** | Question bank and probes | N1.1, N1.3 | 120 drafted questions, lints, dual authorship, owner review, 20 probes | US1, US3, US8 |
 | **Q2.2** | Gold check | Q2.1, N1.2 | `agentic-analytics gold`, cross-engine match, tie check, the selected 100, `gold_check_id` | US9 |
@@ -645,6 +645,7 @@ graph LR
   W01[W0.1 Harness] --> N11[N1.1 Schemas]
   N11 --> N12[N1.2 Read-only executors]
   N11 --> N15[N1.5 MCP client]
+  N16 --> N15
   N11 --> N16[N1.6 Models + cost]
   N12 --> N13[N1.3 Loaders + parity]
   N13 --> N14[N1.4 Semantic layer]
@@ -688,9 +689,9 @@ graph LR
 | --- | --- |
 | 0 | W0.1 |
 | 1 | N1.1 |
-| 2 | N1.2, N1.5, N1.6 |
-| 3 | N1.3, A2.1, S2.1 |
-| 4 | N1.4, Q2.1, M2.1 |
+| 2 | N1.2, N1.6 |
+| 3 | N1.3, N1.5, S2.1 |
+| 4 | N1.4, Q2.1, M2.1, A2.1 |
 | 5 | A2.2, Q2.2 |
 | 6 | A2.3, F3.1 |
 | 7 | R3.1, B3.1 |
@@ -807,7 +808,7 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 | Cap | Capability | Trace |
 | --- | --- | --- |
 | MOD-01 | Anthropic tool-calling adapter (Sonnet 5.5). Refused sampling parameters are recorded, never sent | FR5, NFR5 |
-| MOD-02 | OpenAI Responses tool-calling adapter (GPT-6.1 Sol), with reasoning tokens captured | FR5 |
+| MOD-02 | OpenAI Chat Completions tool-calling adapter (GPT-6.1 Sol), with reasoning tokens captured | FR5 |
 | MOD-03 | `prices.yaml`: both models, Cortex credits per message, $ per credit, warehouse credits per hour, each with `checked_on` and source | NFR1, H8 |
 | MOD-04 | Per-call cost (cached and reasoning tokens), pre-run estimate, `--dry-run`, `--max-cost` (exit 3) | NFR1 |
 | MOD-05 | Retry policy and error taxonomy (§2.6) | E2 |

@@ -1,0 +1,17 @@
+# Warehouse and Cortex rates (Tech Spec §9). Credits come from trial balances, not cash.
+cortex_analyst_credits_per_message:
+  value: 0.067
+  verified: true
+  source: "Snowflake Service Consumption Table, effective 2026-11-12: 67 Platform Credits per 1,000 messages (Cortex Analyst API)"
+snowflake_xs_credits_per_hour:
+  value: 1.0
+  verified: true
+  source: "Snowflake Service Consumption Table, effective 2026-11-12, Table 1(a) standard warehouse; 60 s minimum per resume, then per second"
+snowflake_usd_per_credit:
+  value: 3.00
+  verified: false
+  source: "planning figure for Enterprise edition on AWS US; confirm on the trial account's billing page"
+clickhouse_usd_per_hour:
+  value: 0.50
+  verified: false
+  source: "planning figure for the smallest trial service; reconciled from get_organization_cost (BAS-03)"

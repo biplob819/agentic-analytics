@@ -1,0 +1,12 @@
+# USD per 1M tokens, first-party list prices, in EvalKit's Price format (evalkit.cost).
+# Check against the provider pages before each real run (Tech Spec §9).
+claude-sonnet-5-5:
+  # Cache reads are $0.10/M for Sonnet 5.5; EvalKit's prices.yaml (2026-11-14) still says $0.20.
+  {input: 2.00, output: 10.00, cache_read: 0.10, cache_write: 2.50, batch_discount: 0.5,
+   checked_on: 2026-11-15, source: "claude-api skill model table (cached 2026-11-03)"}
+gpt-6.1-sol:
+  {long_threshold: 272000, long_input: 4.00, long_output: 15.00, long_cache_read: 0.20, input: 2.00, output: 10.00, cache_read: 0.10, cache_write: 2.00, batch_discount: 0.5,
+   checked_on: 2026-11-14, source: "developers.openai.com/api/docs/pricing.md (via EvalKit prices.yaml)"}
+claude-opus-5-5:
+  {input: 4.00, output: 20.00, cache_read: 0.20, cache_write: 5.00, batch_discount: 0.5,
+   checked_on: 2026-11-15, source: "claude-api skill model table (cached 2026-11-03)"}

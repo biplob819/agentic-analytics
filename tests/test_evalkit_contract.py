@@ -12,8 +12,10 @@ from harness_lib import ROOT
 USED = {
     "evalkit.scorers": ["sql_match"],
     "evalkit.schemas": ["ResultSet", "Interval"],
-    "evalkit.stats": ["Resamples", "interval", "paired", "holm", "percentile_ms"],
+    "evalkit.stats": ["Resamples", "interval", "interval_from", "paired", "holm", "percentile_ms"],
     "evalkit.demo.guard": ["Guard", "GuardRefused", "PostgresSpend", "SqliteSpend"],
+    "evalkit.cost": ["Price", "call_cost", "load_prices", "price_for", "UnknownPrice"],
+    "evalkit.retry": ["with_retries", "is_retryable"],
 }
 
 
