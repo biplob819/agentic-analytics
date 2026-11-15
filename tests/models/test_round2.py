@@ -306,3 +306,29 @@ def test_model_usd_excludes_compute():
     assert e.compute_usd > 0
     assert e.model_usd == pytest.approx(sum(ln.usd for ln in e.lines if ln.backend != "clickhouse"))
     assert e.total_usd == pytest.approx(e.model_usd + e.compute_usd + e.credits * e.usd_per_credit)
+
+
+def test_gpt_unknown_finish_reason_is_a_cut_off_like_claude():
+    a = OpenAIAgent("gpt-6.1-sol", "low", PRICES, client=FakeOpenAI([]))
+    resp = SimpleNamespace(
+        choices=[
+            SimpleNamespace(
+                finish_reason="something_new",
+                message=SimpleNamespace(
+                    content=None,
+                    refusal=None,
+                    tool_calls=[
+                        SimpleNamespace(id="c1", function=SimpleNamespace(name="t", arguments="{}"))
+                    ],
+                ),
+            )
+        ],
+        usage=SimpleNamespace(
+            prompt_tokens=1,
+            completion_tokens=1,
+            completion_tokens_details=None,
+            prompt_tokens_details=None,
+        ),
+        model="gpt-6.1-sol",
+    )
+    assert a.parse(resp, 0).stop == "max_tokens"

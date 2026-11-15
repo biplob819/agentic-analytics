@@ -158,7 +158,8 @@ class OpenAIAgent:
         )
         refusal = _get(msg, "refusal")
         finish = _get(choice, "finish_reason") or "stop"
-        stop: Stop = "refusal" if refusal else STOP_MAP.get(finish, "end")
+        # unknown finish reasons are cut-off turns, as for Claude: their tool calls never run
+        stop: Stop = "refusal" if refusal else STOP_MAP.get(finish, "max_tokens")
         if calls and stop == "end":
             stop = "tool_use"
         message: dict[str, Any] = {
