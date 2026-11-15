@@ -189,6 +189,27 @@ def test_planted_hallucination_is_caught_among_supported_numbers():
     assert unsupported_numbers(planted, ROWS, Q) == ("912",)
 
 
+TEXTY = ResultSet(
+    columns=("paon", "street", "n"),
+    rows=(("FLAT 12", "10 DOWNING STREET", 3),),
+)
+
+
+@pytest.mark.parametrize(
+    ("text", "rs", "expected"),
+    [
+        ("PAON: FLAT 12, N: 3", ResultSet(columns=("paon", "n"), rows=(("FLAT 12", 3),)), ()),
+        ("Sold at 10 DOWNING STREET for 3.", TEXTY, ()),
+        ("SALES 5000: 7", ResultSet(columns=("SALES 5000",), rows=((7,),)), ()),
+        ("Flat 12 at 10 Downing Street, 3 sales, 45 rooms.", TEXTY, ("45",)),  # planted
+        ("FLAT 13", TEXTY, ("13",)),  # near a text number is not enough
+    ],
+    ids=["paon", "address", "column-name", "planted", "near-miss"],
+)
+def test_numbers_written_in_text_cells_and_column_names(text, rs, expected):
+    assert unsupported_numbers(text, rs, Q) == expected
+
+
 def test_percent_matches_fractions_only_in_ratio_columns():
     unnamed = ResultSet(columns=("district", "v"), rows=(("LEEDS", 0.125),))
     assert unsupported_numbers("Leeds rose 12.5%", unnamed, Q) == ("12.5%",)

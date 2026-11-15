@@ -22,3 +22,5 @@ Format: `[TYPE] [NODE] — summary`. Types: FEAT, FIX, DOCS, HARNESS, MEASURE.
 - [FIX] [N1.1] — `Tolerance.columns` and default rel 1e-9 (D-41)
 - [FEAT] [M2.1] — aggregate and statistics on evalkit.stats: two-level bootstrap accuracy and category CIs, paired uplift with Holm (D-34), clarification and false-clarification rates, pass^k over questions only (EK L-36), trial agreement, cost per correct with cost status, probe summary, deterministic summary.json
 - [FIX] [M2.1] — verifier rounds 1–2: probe verdict follows S2.1 plus the call budget (D-42), uplift separated only with ≥20 shared questions while staying in the Holm family, D-34 pinned, trial agreement on row multisets, pass^k over complete questions, fsum tests that bite on 3.12
+- [FIX] [N1.6] — no empty `tools` field on tool-less calls (needed by Q2.2 dual authorship)
+- [FIX] [S2.1] — numbers that appear inside text cells or column names count as supported (digits in addresses no longer flag), for every backend

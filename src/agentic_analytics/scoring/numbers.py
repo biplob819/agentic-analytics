@@ -16,7 +16,9 @@ when one of these holds:
 2. **It appears in the question** (same value after scaling).
 3. **It is a year in the data range**: a bare four-digit integer (no currency, separator,
    decimals or suffix) inside ``year_range``, or a decade that overlaps it ("late 1990s").
-4. **It is the N of a top-N question** or **the number of rows returned**. Both apply to
+4. **It is written inside a text cell or a column name** of the result, read with the same
+   rules as the answer ("FLAT 12", "10 DOWNING STREET", a column "SALES 5000"), same value.
+5. **It is the N of a top-N question** or **the number of rows returned**. Both apply to
    plain integers only (no currency, sign, decimals, suffix or percent).
 
 What is not a number claim and is skipped: digits after letters (postcodes ``M1``, ``SW1A``,
@@ -412,6 +414,8 @@ class _Cells:
     every: list[float] = field(default_factory=list)  # all numeric cells (absolute values)
     percent_units: list[float] = field(default_factory=list)  # cells read as percent units
     fractions: list[float] = field(default_factory=list)  # cells read as fractions (<= 1)
+    # numbers written inside text cells and column names ("FLAT 12", "SALES 5000")
+    in_text: list[float] = field(default_factory=list)
 
 
 def _cell_number(cell: object) -> float | None:
@@ -434,10 +438,13 @@ def _cells(rs: ResultSet | None) -> _Cells:
         return out
     fraction_col = [bool(_FRACTION_NAMES.search(c)) for c in rs.columns]
     percent_col = [bool(_PERCENT_NAMES.search(c)) for c in rs.columns]
+    texts: set[str] = set(rs.columns)
     for row in rs.rows:
         for j, cell in enumerate(row):
             v = _cell_number(cell)
             if v is None:
+                if isinstance(cell, str):
+                    texts.add(cell)
                 continue
             out.every.append(v)
             if v <= 1 and (fraction_col[j] or percent_col[j]):
@@ -446,9 +453,22 @@ def _cells(rs: ResultSet | None) -> _Cells:
                     out.percent_units.append(v)
             else:
                 out.percent_units.append(v)
-    for vals in (out.every, out.percent_units, out.fractions):
+    for text in texts:
+        for n in extract_numbers(text):
+            out.in_text.extend(_values(n))
+    for vals in (out.every, out.percent_units, out.fractions, out.in_text):
         vals.sort()
     return out
+
+
+def _in_text(n: Number, cells: _Cells) -> bool:
+    """The number is written, token for token, inside a text cell or a column name."""
+    for x in _values(n):
+        eps = 1e-9 * max(1.0, x)
+        i = bisect.bisect_left(cells.in_text, x - eps)
+        if i < len(cells.in_text) and cells.in_text[i] <= x + eps:
+            return True
+    return False
 
 
 def _near(x: float, half: float, cells: list[float]) -> bool:
@@ -519,7 +539,7 @@ def unsupported_numbers(
             continue
         if any(_same_value(n, q) for q in asked):
             continue
-        if _matches_cells(n, cells):
+        if _matches_cells(n, cells) or _in_text(n, cells):
             continue
         if n.text not in left:
             left.append(n.text)
