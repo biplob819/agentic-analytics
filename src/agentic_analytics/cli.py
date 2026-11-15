@@ -1,0 +1,66 @@
+"""The `agentic-analytics` command line (alias `aa`; stdlib argparse, D-25, OWNER D-28).
+
+Each subcommand is listed with the build node that makes it real. Until that node is green the
+subcommand exits 2 and names the node, so `make` targets fail loudly instead of doing nothing.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+
+from agentic_analytics import __version__
+
+PROG = "agentic-analytics"
+
+# subcommand -> (help, node that builds it)
+COMMANDS: dict[str, tuple[str, str]] = {
+    "init": ("write run.yaml and .env.example into the current folder", "B3.3"),
+    "pack": ("validate a dataset pack: `pack check [--pack PATH]`", "Q2.1"),
+    "doctor": ("check env vars, engine reach and read-only roles", "N1.2"),
+    "load": ("load the engines and run the parity check", "N1.3"),
+    "gold": ("run the gold check", "Q2.2"),
+    "smoke": ("12-question smoke run on every configured backend", "R3.1"),
+    "run": ("run the benchmark", "R3.1"),
+    "report": ("build the dashboard", "R3.1"),
+    "reconcile": ("pull metered warehouse credits into a run", "R3.1"),
+    "demo-cache": ("save answered questions for demo replay", "D4.1"),
+}
+
+EXIT_OK, EXIT_FAILED, EXIT_ERROR, EXIT_COST_CAP = 0, 1, 2, 3
+
+
+def build_parser() -> argparse.ArgumentParser:
+    ap = argparse.ArgumentParser(prog=PROG, description=__doc__)
+    ap.add_argument("--version", action="version", version=f"{PROG} {__version__}")
+    ap.add_argument("--json", action="store_true", help="machine-readable output")
+    sub = ap.add_subparsers(dest="command")
+    for name, (help_text, _node) in COMMANDS.items():
+        p = sub.add_parser(name, help=help_text)
+        # SUPPRESS keeps a top-level --json from being reset by the subparser default
+        p.add_argument("--json", action="store_true", default=argparse.SUPPRESS)
+    return ap
+
+
+def main(argv: list[str] | None = None) -> int:
+    ap = build_parser()
+    # Subcommand options are defined by the node that builds the subcommand. Until then extra
+    # arguments after a subcommand are accepted so `make` targets reach the "not built" message.
+    ns, rest = ap.parse_known_args(argv)
+    if ns.command is None:
+        if rest:
+            ap.error(f"unrecognized arguments: {' '.join(rest)}")
+        ap.print_help()
+        return EXIT_OK
+    node = COMMANDS[ns.command][1]
+    msg = f"`{PROG} {ns.command}` is not built yet; it arrives with build node {node}"
+    if ns.json:
+        print(json.dumps({"ok": False, "error": "not_built", "node": node, "message": msg}))
+    else:
+        print(msg, file=sys.stderr)
+    return EXIT_ERROR
+
+
+if __name__ == "__main__":
+    sys.exit(main())

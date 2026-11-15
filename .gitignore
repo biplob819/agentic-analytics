@@ -1,0 +1,31 @@
+.venv/
+__pycache__/
+*.pyc
+dist/
+build/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.hypothesis/
+.harness/
+.cache/
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# keys and data never leave the machine
+*.p8
+*.pem
+keys/
+/data/
+
+# personal notes, not for the public repo
+Portfolio notes.md
+
+# Streamlit local secrets
+.streamlit/secrets.toml
+
+# Claude Code local settings
+.claude/settings.local.json
+.claude/scheduled_tasks.lock

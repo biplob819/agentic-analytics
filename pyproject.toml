@@ -1,0 +1,68 @@
+[project]
+name = "agentic-analytics"
+version = "0.0.1"
+description = "How often agentic analytics gets the answer right: a 100-question UK house-price benchmark across a ClickHouse MCP agent (Claude, GPT) and Snowflake Cortex Analyst."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Biplob Chakraborty" }]
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.7",
+    "pyyaml>=6",
+    # D-24: exact pin until evalkit-harness v0.1.0 is on PyPI
+    "evalkit-harness @ git+https://github.com/biplob819/evalkit@06591f8de9b178078c971940a83019a6530fd119",
+]
+
+[project.urls]
+Homepage = "https://github.com/biplob819/agentic-analytics"
+
+[project.scripts]
+agentic-analytics = "agentic_analytics.cli:main"
+aa = "agentic_analytics.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "hypothesis>=6",
+    "ruff>=0.6",
+    "pyright>=1.1.380",
+    "types-pyyaml>=6.0.12.20261113",
+]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentic_analytics"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "scripts", "tests"]
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]  # allow the › separator used in proof cells
+
+[tool.pyright]
+include = ["src", "scripts", "tests"]
+pythonVersion = "3.11"
+typeCheckingMode = "standard"
+extraPaths = ["scripts"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["scripts"]
+markers = [
+    "contract: schema, CLI and EvalKit-import contract tests",
+    "golden: end-to-end run against recorded responses",
+    "gold: gold coverage, gold check, frozen fixes and leak check",
+    "safety: secrets, SQL guard, allow-list and demo guard tests",
+    "live: needs real accounts; never run in CI",
+]
