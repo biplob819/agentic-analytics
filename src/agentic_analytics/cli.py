@@ -43,6 +43,20 @@ def build_parser() -> argparse.ArgumentParser:
     return ap
 
 
+def cmd_doctor(as_json: bool) -> int:
+    from agentic_analytics.env import load_dotenv
+    from agentic_analytics.warehouse.doctor import executors_from_env, run_doctor
+
+    load_dotenv()
+    ch, sf = executors_from_env()
+    report = run_doctor(clickhouse=ch, snowflake=sf)
+    print(report.to_json() if as_json else report.render(), end="" if not as_json else "\n")
+    return EXIT_OK if report.ok else EXIT_FAILED
+
+
+BUILT = {"doctor": cmd_doctor}
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = build_parser()
     # Subcommand options are defined by the node that builds the subcommand. Until then extra
@@ -53,6 +67,8 @@ def main(argv: list[str] | None = None) -> int:
             ap.error(f"unrecognized arguments: {' '.join(rest)}")
         ap.print_help()
         return EXIT_OK
+    if ns.command in BUILT:
+        return BUILT[ns.command](ns.json)
     node = COMMANDS[ns.command][1]
     msg = f"`{PROG} {ns.command}` is not built yet; it arrives with build node {node}"
     if ns.json:
