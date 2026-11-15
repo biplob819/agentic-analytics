@@ -64,6 +64,18 @@ def test_tolerance_bounds(kw):
         Tolerance(**kw)
 
 
+def test_tolerance_columns_default_to_every_column_and_tight_rel():
+    t = Tolerance()
+    assert t.columns is None and t.rel == 1e-9
+    assert Tolerance(rel=0.005, columns=("avg_price",)).columns == ("avg_price",)
+
+
+@pytest.mark.parametrize("cols", [(), ("a", "A"), (" a",), ("",)])
+def test_tolerance_columns_are_named_once(cols):
+    with pytest.raises(ValidationError):
+        Tolerance(columns=cols)
+
+
 @pytest.mark.parametrize(
     "kw",
     [

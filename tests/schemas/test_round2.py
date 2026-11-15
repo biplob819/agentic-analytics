@@ -164,3 +164,10 @@ def test_deepcopy_keeps_mappings_frozen():
     assert isinstance(c.tokens, FrozenDict)
     with pytest.raises(TypeError):
         c.tokens["in"] = 1  # type: ignore[index]
+
+
+def test_errored_answers_carry_no_clarification():
+    with pytest.raises(ValidationError):
+        answer(sql=None, answer="", clarification="Which year?", error="step_budget")
+    with pytest.raises(ValidationError):
+        answer(sql=None, answer="", suggestions=["x?"], error="transport")

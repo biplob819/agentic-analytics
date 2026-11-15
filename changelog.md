@@ -16,3 +16,7 @@ Format: `[TYPE] [NODE] — summary`. Types: FEAT, FIX, DOCS, HARNESS, MEASURE.
 - [FIX] [N1.2] — verifier rounds 1–5: SETTINGS/FORMAT on every query node, quoted stage paths, ARRAY JOIN subquery and IN-position bypasses closed; switched from position checks to a name-based rule over the documented ClickHouse table-function list (pinned in a test); system db refused everywhere; false positives on agent-style SQL removed; 100+ mutants killed (L-5)
 - [FIX] [N1.6] — an unknown GPT finish reason is a cut-off turn, as for Claude (A2.1 verifier fairness nit)
 - [FIX] [A2.1] — verifier: self-check feedback only with time left and the first valid answer kept on overrun (fairness), hook under the wall clock, blank hook output ignored, loop texts in the prompt hash; cross-node imports removed (step conventions in `agentic_analytics.steps`, D-39)
+- [FEAT] [S2.1] — scorers: re-execution through the executor protocol, result match via sql_match (extra columns allowed, per-question tolerance and order), clarification and false-clarification, answer-from-rows numeric check (70 fixtures), policy (tool calls, writes, injection), score_record always schema-valid
+- [FIX] [N1.1] — an errored answer carries no clarification or suggestions (D-40)
+- [FIX] [S2.1] — verifier: column mapping for renamed/reordered columns, per-column tolerance (exact counts), dates in words, more number forms, percent/ratio rules, numeric injection markers; isolating tests for surviving mutants
+- [FIX] [N1.1] — `Tolerance.columns` and default rel 1e-9 (D-41)

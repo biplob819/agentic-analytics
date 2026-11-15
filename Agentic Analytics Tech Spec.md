@@ -188,8 +188,9 @@ class DatasetPack(Model):            # pack.yaml
 
 
 class Tolerance(Model):
-    rel: float = 1e-6          # 0.005 for averages (FR7)
+    rel: float = 1e-9          # 0.005 for averages (FR7)
     abs: float = 1e-9
+    columns: tuple[str, ...] | None = None  # gold columns the tolerance covers; others exact (D-41)
 
 
 class Question(Model):

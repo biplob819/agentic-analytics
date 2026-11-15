@@ -10,8 +10,9 @@
   },
   "interpretations": [],
   "tolerance": {
-    "rel": 1e-6,
-    "abs": 1e-9
+    "rel": 1e-9,
+    "abs": 1e-9,
+    "columns": null
   },
   "ordered": false,
   "top_n": null,

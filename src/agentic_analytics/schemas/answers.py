@@ -96,6 +96,8 @@ class AnalyticsAnswer(Model):
             raise ValueError("an answer is either SQL or a request for clarification, not both")
         if self.error is None and self.sql is None and not self.asked_for_clarification:
             raise ValueError("an answer without an error needs SQL or a clarification")
+        if self.error is not None and (self.clarification is not None or self.suggestions):
+            raise ValueError("an answer that errored carries no clarification or suggestions")
         if self.sql is None and self.chart is not None:
             raise ValueError("a chart needs executed SQL")
         return self

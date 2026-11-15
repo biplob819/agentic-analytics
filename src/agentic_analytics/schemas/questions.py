@@ -14,6 +14,7 @@ from agentic_analytics.schemas._base import (
     Engine,
     FrozenMap,
     Model,
+    Name,
     NonBlank,
     NonNegInt,
     PosInt,
@@ -32,8 +33,23 @@ def _both_engines(sql: dict[str, str], what: str) -> None:
 
 
 class Tolerance(Model):
-    rel: Annotated[float, Field(ge=0.0, lt=1.0, allow_inf_nan=False, strict=True)] = 1e-6
+    """Numeric tolerance for result matching. `columns` names the gold columns it applies to
+    (case-insensitive); numbers in other columns must match exactly. None means every numeric
+    column (S2.1 verifier: a count of 29,000,025 must not pass for 29,000,000)."""
+
+    rel: Annotated[float, Field(ge=0.0, lt=1.0, allow_inf_nan=False, strict=True)] = 1e-9
     abs: Annotated[float, Field(ge=0.0, allow_inf_nan=False, strict=True)] = 1e-9
+    columns: tuple[Name, ...] | None = None
+
+    @field_validator("columns")
+    @classmethod
+    def _named_once(cls, v: tuple[str, ...] | None) -> tuple[str, ...] | None:
+        if v is not None:
+            if not v:
+                raise ValueError("columns is None (every numeric column) or names at least one")
+            if len({c.casefold() for c in v}) != len(v):
+                raise ValueError("tolerance columns must be unique")
+        return v
 
 
 class Question(Versioned):
