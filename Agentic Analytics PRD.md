@@ -168,7 +168,7 @@ One table, loaded identically on both engines, a semantic view on Snowflake, and
 
 **The table.** `uk.uk_price_paid` on ClickHouse and `UK.PUBLIC.UK_PRICE_PAID` on Snowflake, with the 14 columns from [ClickHouse's dataset guide](https://clickhouse.com/docs/getting-started/example-datasets/uk-price-paid): price, date, postcode1, postcode2, type, is\_new, duration, addr1, addr2, street, locality, town, district, county. About 27.5 million rows of sales in England and Wales since 1995.
 
-**Semantic view (Snowflake).** Dimensions: sale date, year, town, district, county, property type, new build, tenure. Measures: sales count, average price, median price. Synonyms such as "house prices" for price and "area" for district. Five verified queries are added only for the `examples` fix.
+**Semantic view (Snowflake).** Dimensions: sale date, year, town, district, county, property type, new build, tenure. Measures: sales count, average price, median price. Synonyms such as "sale price" for price and "borough" for district (not "house prices" or "area", OWNER D-67). Five verified queries are added only for the `examples` fix.
 
 **Schemas.**
 

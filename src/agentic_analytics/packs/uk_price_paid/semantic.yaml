@@ -1,0 +1,167 @@
+# The single semantic source for the uk_price_paid pack (D-8, SEM-01, Tech Spec §2.7).
+#
+# It generates both the Snowflake semantic view that Cortex Analyst reads (SEM-02) and the
+# "descriptions" prompt block the MCP agents get as a fix (SEM-03), so both see the same
+# information (C6). Never add ClickHouse column comments instead: they would leak into the
+# baseline. Snowflake's DDL has no sample values, so each item's sample values are appended to
+# its comment text, and the prompt block carries exactly the same text.
+#
+# Rules (checked by agentic_analytics.semantic.model): names are lowercase identifiers, unique
+# across the view; synonyms are unique across the view and never equal a name; text is one line;
+# every column exists in the pack's load SQL on both engines; facts are numeric; time
+# dimensions and year/month transforms sit on the date column.
+#
+# Status: owner reviews (QST-05 / SEM review sitting). Every sample value was found in the loaded
+# table at the N1.4 live step (2026-11-16, test_live_sample_values_exist_in_the_data).
+schema_version: "1.0"
+name: uk_price_paid
+description: >-
+  Residential property sales in England and Wales from HM Land Registry's Price Paid Data,
+  one row per sale, from 1 January 1995 onwards. Prices are in pounds sterling (GBP). Place
+  names (town, district, county, locality, street) are stored in uppercase, so compare them
+  with uppercase text such as 'LONDON'. Missing text values are empty strings, not NULL. Every
+  question comes with an as-of date, the last day of the month before the latest month in
+  the data: treat it as today and do not count sales after it. Sales appear only after they are
+  registered, weeks to months after completion, so the last few months before the as-of date
+  are under-counted and keep filling in with later releases. Repossessions and buy-to-let
+  sales (category B) are included and cannot be told apart from standard sales.
+
+table:
+  name: uk_price_paid
+  description: >-
+    One row per residential property sale (a price paid transaction) registered with HM Land
+    Registry in England and Wales.
+  synonyms: [price paid data, property sales, house sales]
+
+dimensions:
+  - name: town
+    column: town
+    description: >-
+      The post town of the property, in uppercase (for example 'LONDON'); compare with
+      uppercase text. A post town is not the same as the local authority district.
+    synonyms: [city, post town]
+    sample_values: [LONDON, MANCHESTER, BIRMINGHAM, LEEDS, BRISTOL]
+
+  - name: district
+    column: district
+    description: >-
+      The local authority district (the council area) the property is in, in uppercase;
+      compare with uppercase text.
+    synonyms: [borough, local authority, council area]  # no "area": OWNER D-67
+
+  - name: county
+    column: county
+    description: >-
+      The county the property is in, in uppercase; compare with uppercase text. Large urban
+      areas such as GREATER LONDON and GREATER MANCHESTER appear as counties.
+    sample_values: [GREATER LONDON, GREATER MANCHESTER, WEST MIDLANDS, WEST YORKSHIRE]
+
+  - name: locality
+    column: locality
+    description: >-
+      The locality (a village or neighbourhood) within the town, in uppercase; often an empty
+      string when not recorded.
+    synonyms: [village, neighbourhood]
+
+  - name: street
+    column: street
+    description: >-
+      The street name of the property's address, in uppercase; an empty string when not
+      recorded.
+    synonyms: [road, street name]
+
+  - name: postcode1
+    column: postcode1
+    description: >-
+      The outward part of the postcode, before the space (for example 'SW1A' in 'SW1A 1AA');
+      an empty string when the sale has no postcode.
+    synonyms: [outward code, outcode]
+
+  - name: postcode2
+    column: postcode2
+    description: >-
+      The inward part of the postcode, after the space (for example '1AA' in 'SW1A 1AA'); an
+      empty string when the sale has no postcode.
+    synonyms: [inward code, incode]
+
+  - name: type
+    column: type
+    description: >-
+      The property type, one of five lowercase values: terraced, semi-detached, detached,
+      flat (flats and maisonettes) or other. Do not rely on the sort order of these values.
+    synonyms: [property type, house type, kind of property]
+    sample_values: [terraced, semi-detached, detached, flat, other]
+
+  - name: duration
+    column: duration
+    description: >-
+      The tenure of the property, one of three lowercase values: freehold, leasehold or
+      unknown. Do not rely on the sort order of these values.
+    synonyms: [tenure, freehold or leasehold]
+    sample_values: [freehold, leasehold, unknown]
+
+  - name: is_new
+    column: is_new
+    description: >-
+      Whether the property was newly built when sold: 1 for a new build, 0 for an established
+      building. It is a number, not a boolean, so filter with is_new = 1 or is_new = 0.
+    synonyms: [new build, newly built, new home]
+    sample_values: ["1", "0"]
+
+  - name: date
+    column: date
+    kind: time
+    description: >-
+      The date the sale completed (the completion date on the transfer deed), not the date it
+      was registered. The data starts on 1 January 1995; do not count sales after the as-of
+      date.
+    synonyms: [sale date, completion date, transaction date]
+
+  - name: year
+    column: date
+    kind: time
+    transform: year
+    description: The calendar year of the completion date, as a number such as 2019.
+    synonyms: [sale year]
+
+  - name: month
+    column: date
+    kind: time
+    transform: month
+    description: >-
+      The calendar month of the completion date, given as the first day of that month.
+    synonyms: [sale month]
+
+facts:
+  - name: price
+    column: price
+    description: >-
+      The price paid for the property in pounds sterling (GBP), in whole pounds, as stated on
+      the transfer deed.
+    synonyms: [sale price, price paid, amount paid]
+
+metrics:
+  - name: sales_count
+    agg: count
+    fact: price
+    description: The number of sales; each row is one sale.
+    synonyms: [number of sales, transactions, sales volume]
+
+  - name: total_value
+    agg: sum
+    fact: price
+    description: The sum of the prices paid, in GBP.
+    synonyms: [total sales value, total spend]
+
+  - name: average_price
+    agg: avg
+    fact: price
+    description: The mean price paid, in GBP.
+    synonyms: [mean price, avg price]
+
+  - name: median_price
+    agg: median
+    fact: price
+    description: >-
+      The median (middle) price paid, in GBP, computed exactly rather than approximated.
+    synonyms: [middle price, median sale price]

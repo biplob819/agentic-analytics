@@ -1,0 +1,104 @@
+SEMANTIC DESCRIPTIONS
+Generated from the uk_price_paid semantic model: what each column means, its synonyms and sample values.
+
+Overview: Residential property sales in England and Wales from HM Land Registry's Price Paid Data, one row per sale, from 1 January 1995 onwards. Prices are in pounds sterling (GBP). Place names (town, district, county, locality, street) are stored in uppercase, so compare them with uppercase text such as 'LONDON'. Missing text values are empty strings, not NULL. Every question comes with an as-of date, the last day of the month before the latest month in the data: treat it as today and do not count sales after it. Sales appear only after they are registered, weeks to months after completion, so the last few months before the as-of date are under-counted and keep filling in with later releases. Repossessions and buy-to-let sales (category B) are included and cannot be told apart from standard sales.
+
+Table: uk_price_paid
+  Description: One row per residential property sale (a price paid transaction) registered with HM Land Registry in England and Wales.
+  Synonyms: "price paid data", "property sales", "house sales"
+
+Dimensions (filter or group by these):
+
+- town
+  Column: town
+  Description: The post town of the property, in uppercase (for example 'LONDON'); compare with uppercase text. A post town is not the same as the local authority district. Sample values: LONDON, MANCHESTER, BIRMINGHAM, LEEDS, BRISTOL.
+  Synonyms: "city", "post town"
+
+- district
+  Column: district
+  Description: The local authority district (the council area) the property is in, in uppercase; compare with uppercase text.
+  Synonyms: "borough", "local authority", "council area"
+
+- county
+  Column: county
+  Description: The county the property is in, in uppercase; compare with uppercase text. Large urban areas such as GREATER LONDON and GREATER MANCHESTER appear as counties. Sample values: GREATER LONDON, GREATER MANCHESTER, WEST MIDLANDS, WEST YORKSHIRE.
+  Synonyms: none
+
+- locality
+  Column: locality
+  Description: The locality (a village or neighbourhood) within the town, in uppercase; often an empty string when not recorded.
+  Synonyms: "village", "neighbourhood"
+
+- street
+  Column: street
+  Description: The street name of the property's address, in uppercase; an empty string when not recorded.
+  Synonyms: "road", "street name"
+
+- postcode1
+  Column: postcode1
+  Description: The outward part of the postcode, before the space (for example 'SW1A' in 'SW1A 1AA'); an empty string when the sale has no postcode.
+  Synonyms: "outward code", "outcode"
+
+- postcode2
+  Column: postcode2
+  Description: The inward part of the postcode, after the space (for example '1AA' in 'SW1A 1AA'); an empty string when the sale has no postcode.
+  Synonyms: "inward code", "incode"
+
+- type
+  Column: type
+  Description: The property type, one of five lowercase values: terraced, semi-detached, detached, flat (flats and maisonettes) or other. Do not rely on the sort order of these values. Sample values: terraced, semi-detached, detached, flat, other.
+  Synonyms: "property type", "house type", "kind of property"
+
+- duration
+  Column: duration
+  Description: The tenure of the property, one of three lowercase values: freehold, leasehold or unknown. Do not rely on the sort order of these values. Sample values: freehold, leasehold, unknown.
+  Synonyms: "tenure", "freehold or leasehold"
+
+- is_new
+  Column: is_new
+  Description: Whether the property was newly built when sold: 1 for a new build, 0 for an established building. It is a number, not a boolean, so filter with is_new = 1 or is_new = 0. Sample values: 1, 0.
+  Synonyms: "new build", "newly built", "new home"
+
+- date
+  Column: date
+  Description: The date the sale completed (the completion date on the transfer deed), not the date it was registered. The data starts on 1 January 1995; do not count sales after the as-of date.
+  Synonyms: "sale date", "completion date", "transaction date"
+
+- year
+  Column: date (calendar year)
+  Description: The calendar year of the completion date, as a number such as 2019.
+  Synonyms: "sale year"
+
+- month
+  Column: date (first day of the month)
+  Description: The calendar month of the completion date, given as the first day of that month.
+  Synonyms: "sale month"
+
+Facts (numbers on each row):
+
+- price
+  Column: price
+  Description: The price paid for the property in pounds sterling (GBP), in whole pounds, as stated on the transfer deed.
+  Synonyms: "sale price", "price paid", "amount paid"
+
+Metrics (aggregates over the rows):
+
+- sales_count
+  Aggregation: count of price
+  Description: The number of sales; each row is one sale.
+  Synonyms: "number of sales", "transactions", "sales volume"
+
+- total_value
+  Aggregation: sum of price
+  Description: The sum of the prices paid, in GBP.
+  Synonyms: "total sales value", "total spend"
+
+- average_price
+  Aggregation: average of price
+  Description: The mean price paid, in GBP.
+  Synonyms: "mean price", "avg price"
+
+- median_price
+  Aggregation: median of price
+  Description: The median (middle) price paid, in GBP, computed exactly rather than approximated.
+  Synonyms: "middle price", "median sale price"

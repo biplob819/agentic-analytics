@@ -489,7 +489,7 @@ Gold SQL is the yardstick for every score, so it gets EvalKit's judge-calibratio
 
 | Fix | Content | Applies to |
 | --- | --- | --- |
-| `descriptions` | The prompt block generated from `packs/uk_price_paid/semantic.yaml`: what each column means, synonyms ("area" for district), sample values (uppercase towns, the type values) and measure definitions | MCP agents (Cortex already has it through the semantic view) |
+| `descriptions` | The prompt block generated from `packs/uk_price_paid/semantic.yaml`: what each column means, synonyms ("borough" for district; not "area", OWNER D-67), sample values (uppercase towns, the type values) and measure definitions | MCP agents (Cortex already has it through the semantic view) |
 | `examples` | 5 verified question-and-SQL pairs in `fixes/examples.yaml`, put in the prompt | MCP agents |
 | `self-check` | Implausibility rules: zero rows, a NULL aggregate, an average or median price outside £10k–£10m, a count above the table's row count, dates outside the data range, a YoY change beyond ±80%. A hit triggers one feedback turn, as long as MCP calls remain | MCP agents |
 
