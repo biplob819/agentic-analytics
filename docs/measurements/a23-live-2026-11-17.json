@@ -1,0 +1,1049 @@
+{
+  "as_of": "2026-08-31",
+  "effort": "medium",
+  "env_names_scanned": [
+    "ANTHROPIC_API_KEY",
+    "CLICKHOUSE_ADMIN_PASSWORD",
+    "CLICKHOUSE_MCP_KEY_ID",
+    "CLICKHOUSE_MCP_KEY_SECRET",
+    "CLICKHOUSE_RO_PASSWORD",
+    "DEMO_OWNER_PASSCODE",
+    "DEMO_PASSCODE",
+    "EVALKIT_DEMO_DATABASE_URL",
+    "OPENAI_API_KEY",
+    "SNOWFLAKE_ADMIN_PRIVATE_KEY_PATH",
+    "SNOWFLAKE_RO_PRIVATE_KEY_PATH"
+  ],
+  "env_names_scanned_note": "secret values from .env found by Redactor.from_environ (names only); each export was searched for every value in raw, JSON-escaped and URL-encoded form, plus the secret_scan patterns",
+  "export_leaks": {},
+  "exports_scanned": 12,
+  "kind": "a23-live",
+  "post_fix_note": "Recomputed offline from the real trace exports after the two A2.3 fixes: chart_for gives no chart for one row of two values (GPT q-001 drew a one-point line), and a final_answer step's latency is no longer counted again on its tool span when turns are traced. The live calls ran on the code before the fixes.",
+  "questions": [
+    "q-001",
+    "q-042",
+    "q-062",
+    "q-101"
+  ],
+  "recorded_at": "2026-11-16T23:01:48+00:00",
+  "redaction_planted_real_secrets": {
+    "checked": [
+      "export file (default Redactor.from_environ)",
+      "every argument the Langfuse v3 client received (recording fake)"
+    ],
+    "leaks": "none",
+    "note": "each real trace rebuilt from its export with every .env secret value planted; values never printed; planted files deleted after the scan",
+    "planted_in": [
+      "question",
+      "answer text",
+      "Cortex interpretation",
+      "step arguments (JSON string, nested twice)",
+      "step errors (raw, URL-encoded, JSON-escaped)",
+      "SQL comment (URL-encoded, JSON-escaped)",
+      "execution rows"
+    ],
+    "secret_values_per_trace": 11,
+    "traces": 12
+  },
+  "rows": [
+    {
+      "answer": "The table recorded 861,782 property sales in 2023. This is the UK price paid dataset, which covers England and Wales.",
+      "backend": "claude_mcp",
+      "chart": {
+        "cell_types": [
+          "int"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "kpi",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "count()"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 1,
+        "rows_total": 1,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cost_usd": 0.015434,
+      "effort": "medium",
+      "error": null,
+      "execution": {
+        "elapsed_ms": 2479,
+        "error": null,
+        "query_id": "aa-d3051bd0-ae0d-459b-99a1-5b76faa7f467",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "gold_match_result": {
+        "matched": true,
+        "reason": null
+      },
+      "latency_ms": {
+        "ask_wall": 31488,
+        "model_or_api": 10248,
+        "warehouse": 2479
+      },
+      "model": "claude-sonnet-5-5",
+      "model_snapshot": "claude-sonnet-5-5",
+      "post_fix": {
+        "chart_kind": "kpi",
+        "trace_span_ms_after_fix": 33919,
+        "trace_span_ms_before_fix": 35882
+      },
+      "question_id": "q-001",
+      "request_id": "req_011Ch7SE9e2SuPy3uS7queUv",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": true,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": true,
+        "unsupported_numbers": []
+      },
+      "sql": "SELECT count() FROM uk.uk_price_paid WHERE date >= '2023-01-01' AND date < '2024-01-01'",
+      "suggestions": [],
+      "tokens": {
+        "cache_write": 4514,
+        "cached": 6834,
+        "in": 11356,
+        "out": 345,
+        "reasoning": 0
+      },
+      "tool_calls": 2,
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-001-claude_mcp-1.json",
+        "export_reason": null,
+        "public": false,
+        "spans": [
+          "generation",
+          "generation",
+          "generation",
+          "tool",
+          "tool",
+          "tool",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "turns": 3
+    },
+    {
+      "answer": "There were 9,785 property sales recorded in the town of Leeds in 2023.",
+      "backend": "claude_mcp",
+      "chart": {
+        "cell_types": [
+          "int"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "kpi",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "count()"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 1,
+        "rows_total": 1,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cost_usd": 0.015007,
+      "effort": "medium",
+      "error": null,
+      "execution": {
+        "elapsed_ms": 2509,
+        "error": null,
+        "query_id": "aa-da729dd6-5d0d-4bc3-90aa-b72f8c939dff",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "gold_match_result": {
+        "matched": true,
+        "reason": null
+      },
+      "latency_ms": {
+        "ask_wall": 8738,
+        "model_or_api": 6080,
+        "warehouse": 2509
+      },
+      "model": "claude-sonnet-5-5",
+      "model_snapshot": "claude-sonnet-5-5",
+      "post_fix": {
+        "chart_kind": "kpi",
+        "trace_span_ms_after_fix": 11184,
+        "trace_span_ms_before_fix": 12730
+      },
+      "question_id": "q-042",
+      "request_id": "req_011Ch7SFmv7o8Nc8PWRyiYSt",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": true,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": true,
+        "unsupported_numbers": []
+      },
+      "sql": "select count() from uk.uk_price_paid where town='LEEDS' and toYear(date)=2023",
+      "suggestions": [],
+      "tokens": {
+        "cache_write": 4503,
+        "cached": 6838,
+        "in": 11349,
+        "out": 305,
+        "reasoning": 0
+      },
+      "tool_calls": 2,
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-042-claude_mcp-1.json",
+        "export_reason": null,
+        "public": false,
+        "spans": [
+          "generation",
+          "generation",
+          "generation",
+          "tool",
+          "tool",
+          "tool",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "turns": 3
+    },
+    {
+      "answer": "The 5 towns with the most recorded property sales in 2023 were: London (59,855), Manchester (14,473), Bristol (13,357), Birmingham (12,081) and Nottingham (11,665).",
+      "backend": "claude_mcp",
+      "chart": {
+        "cell_types": [
+          "int",
+          "str"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "bar",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "town",
+          "sales"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 5,
+        "rows_total": 5,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cost_usd": 0.016582,
+      "effort": "medium",
+      "error": null,
+      "execution": {
+        "elapsed_ms": 316,
+        "error": null,
+        "query_id": "aa-9528806c-5b02-4d8a-b70a-54ec4237806f",
+        "rows_total": 5,
+        "truncated": false
+      },
+      "gold_match_result": {
+        "matched": true,
+        "reason": null
+      },
+      "latency_ms": {
+        "ask_wall": 6898,
+        "model_or_api": 4566,
+        "warehouse": 316
+      },
+      "model": "claude-sonnet-5-5",
+      "model_snapshot": "claude-sonnet-5-5",
+      "post_fix": {
+        "chart_kind": "bar",
+        "trace_span_ms_after_fix": 7210,
+        "trace_span_ms_before_fix": 9244
+      },
+      "question_id": "q-062",
+      "request_id": "req_011Ch7SGRzphTY1LJFZjdDRf",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": true,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": true,
+        "unsupported_numbers": []
+      },
+      "sql": "SELECT town, count() AS sales FROM uk.uk_price_paid WHERE date >= '2023-01-01' AND date < '2024-01-01' GROUP BY town ORDER BY sales DESC LIMIT 5",
+      "suggestions": [],
+      "tokens": {
+        "cache_write": 4613,
+        "cached": 6834,
+        "in": 11455,
+        "out": 435,
+        "reasoning": 0
+      },
+      "tool_calls": 2,
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-062-claude_mcp-1.json",
+        "export_reason": null,
+        "public": false,
+        "spans": [
+          "generation",
+          "generation",
+          "generation",
+          "tool",
+          "tool",
+          "tool",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "turns": 3
+    },
+    {
+      "answer": "In 2025, the average price paid in the Leeds district was about £321,928, based on 13,011 sales. If you only count the town of Leeds, the average was about £325,240 across 10,900 sales. I used the district figure because it covers the whole local authority area.",
+      "backend": "claude_mcp",
+      "chart": {
+        "cell_types": [
+          "float"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "kpi",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "avg(price)"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 1,
+        "rows_total": 1,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cost_usd": 0.016918,
+      "effort": "medium",
+      "error": null,
+      "execution": {
+        "elapsed_ms": 382,
+        "error": null,
+        "query_id": "aa-bc157320-58b2-46b0-bbd3-dc5db2cf9fa0",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "gold_match_result": null,
+      "latency_ms": {
+        "ask_wall": 9304,
+        "model_or_api": 6112,
+        "warehouse": 382
+      },
+      "model": "claude-sonnet-5-5",
+      "model_snapshot": "claude-sonnet-5-5",
+      "post_fix": {
+        "chart_kind": "kpi",
+        "trace_span_ms_after_fix": 9681,
+        "trace_span_ms_before_fix": 11773
+      },
+      "question_id": "q-101",
+      "request_id": "req_011Ch7SH8wSbCxhvjx8W3zqk",
+      "scores": {
+        "answer_from_rows": false,
+        "clarified": false,
+        "correct": false,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": null,
+        "unsupported_numbers": [
+          "13,011",
+          "£325,240",
+          "10,900"
+        ]
+      },
+      "sql": "select avg(price) from uk.uk_price_paid where district='LEEDS' and date between '2025-01-01' and '2025-12-31'",
+      "suggestions": [],
+      "tokens": {
+        "cache_write": 4620,
+        "cached": 6820,
+        "in": 11448,
+        "out": 467,
+        "reasoning": 0
+      },
+      "tool_calls": 2,
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-101-claude_mcp-1.json",
+        "export_reason": "failure",
+        "public": false,
+        "spans": [
+          "generation",
+          "generation",
+          "generation",
+          "tool",
+          "tool",
+          "tool",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "turns": 3
+    },
+    {
+      "answer": "There were **861,782 property sales** recorded in England and Wales in **2023** in the dataset.",
+      "backend": "gpt_mcp",
+      "chart": {
+        "cell_types": [
+          "int"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "line",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "year",
+          "property_sales"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 1,
+        "rows_total": 1,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cost_usd": 0.007392,
+      "effort": "medium",
+      "error": null,
+      "execution": {
+        "elapsed_ms": 2331,
+        "error": null,
+        "query_id": "aa-4836e464-3522-4b6b-bb80-6a61746a55f6",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "gold_match_result": {
+        "matched": true,
+        "reason": null
+      },
+      "latency_ms": {
+        "ask_wall": 38038,
+        "model_or_api": 35491,
+        "warehouse": 2331
+      },
+      "model": "gpt-6.1-sol",
+      "model_snapshot": "gpt-6.1-sol",
+      "post_fix": {
+        "chart_kind": null,
+        "trace_span_ms_after_fix": 40364,
+        "trace_span_ms_before_fix": 53934
+      },
+      "question_id": "q-001",
+      "request_id": "req_794252fee841474bba61c6fb6ff09bbf",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": true,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": true,
+        "unsupported_numbers": []
+      },
+      "sql": "SELECT toYear(date) AS year, count() AS property_sales FROM uk.uk_price_paid WHERE date >= toDate('2023-01-01') AND date < toDate('2024-01-01') GROUP BY year",
+      "suggestions": [],
+      "tokens": {
+        "cache_write": 2597,
+        "cached": 3701,
+        "in": 6307,
+        "out": 181,
+        "reasoning": 0
+      },
+      "tool_calls": 2,
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-001-gpt_mcp-1.json",
+        "export_reason": null,
+        "public": false,
+        "spans": [
+          "generation",
+          "generation",
+          "generation",
+          "tool",
+          "tool",
+          "tool",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "turns": 3
+    },
+    {
+      "answer": "There were **9,785 property sales** recorded in the town of Leeds in 2023.",
+      "backend": "gpt_mcp",
+      "chart": {
+        "cell_types": [
+          "int"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "kpi",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "property_sales"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 1,
+        "rows_total": 1,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cost_usd": 0.004924,
+      "effort": "medium",
+      "error": null,
+      "execution": {
+        "elapsed_ms": 915,
+        "error": null,
+        "query_id": "aa-7235c26b-499b-46af-aa7e-c8b65f8995a9",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "gold_match_result": {
+        "matched": true,
+        "reason": null
+      },
+      "latency_ms": {
+        "ask_wall": 34422,
+        "model_or_api": 31668,
+        "warehouse": 915
+      },
+      "model": "gpt-6.1-sol",
+      "model_snapshot": "gpt-6.1-sol",
+      "post_fix": {
+        "chart_kind": "kpi",
+        "trace_span_ms_after_fix": 35333,
+        "trace_span_ms_before_fix": 45548
+      },
+      "question_id": "q-042",
+      "request_id": "req_8c86e507b45f42208bd7d5b15eb0db43",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": true,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": true,
+        "unsupported_numbers": []
+      },
+      "sql": "SELECT count() AS property_sales FROM uk.uk_price_paid WHERE town = 'LEEDS' AND date >= '2023-01-01' AND date < '2024-01-01'",
+      "suggestions": [],
+      "tokens": {
+        "cache_write": 1388,
+        "cached": 4899,
+        "in": 6296,
+        "out": 164,
+        "reasoning": 0
+      },
+      "tool_calls": 2,
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-042-gpt_mcp-1.json",
+        "export_reason": null,
+        "public": false,
+        "spans": [
+          "generation",
+          "generation",
+          "generation",
+          "tool",
+          "tool",
+          "tool",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "turns": 3
+    },
+    {
+      "answer": "The towns with the most recorded property sales in 2023, using the dataset’s `town` field, were:\n\n| Town | Property sales |\n|---|---:|\n| London | 59,855 |\n| Manchester | 14,473 |\n| Bristol | 13,357 |\n| Birmingham | 12,081 |\n| Nottingham | 11,665 |",
+      "backend": "gpt_mcp",
+      "chart": {
+        "cell_types": [
+          "int",
+          "str"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "bar",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "town",
+          "sales"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 5,
+        "rows_total": 5,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cost_usd": 0.0059,
+      "effort": "medium",
+      "error": null,
+      "execution": {
+        "elapsed_ms": 900,
+        "error": null,
+        "query_id": "aa-17bc7853-3696-44e5-b30f-926455d8fefa",
+        "rows_total": 5,
+        "truncated": false
+      },
+      "gold_match_result": {
+        "matched": true,
+        "reason": null
+      },
+      "latency_ms": {
+        "ask_wall": 36024,
+        "model_or_api": 30454,
+        "warehouse": 900
+      },
+      "model": "gpt-6.1-sol",
+      "model_snapshot": "gpt-6.1-sol",
+      "post_fix": {
+        "chart_kind": "bar",
+        "trace_span_ms_after_fix": 36922,
+        "trace_span_ms_before_fix": 47665
+      },
+      "question_id": "q-062",
+      "request_id": "req_323e766f17444ea1a36681c7ae5badb1",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": true,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": true,
+        "unsupported_numbers": []
+      },
+      "sql": "SELECT town, count() AS sales FROM uk.uk_price_paid WHERE date >= '2023-01-01' AND date < '2024-01-01' AND town != '' GROUP BY town ORDER BY sales DESC, town ASC LIMIT 5",
+      "suggestions": [],
+      "tokens": {
+        "cache_write": 1441,
+        "cached": 4895,
+        "in": 6345,
+        "out": 251,
+        "reasoning": 0
+      },
+      "tool_calls": 2,
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-062-gpt_mcp-1.json",
+        "export_reason": null,
+        "public": false,
+        "spans": [
+          "generation",
+          "generation",
+          "generation",
+          "tool",
+          "tool",
+          "tool",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "turns": 3
+    },
+    {
+      "answer": "The average property sale price in Leeds in 2025 was **£325,239.68**, based on **10,900 recorded sales** across all property types. This uses properties recorded with the town as Leeds.",
+      "backend": "gpt_mcp",
+      "chart": {
+        "cell_types": [
+          "float",
+          "int"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": null,
+        "columns": [
+          "year",
+          "sales",
+          "average_price_gbp"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 1,
+        "rows_total": 1,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cost_usd": 0.005759,
+      "effort": "medium",
+      "error": null,
+      "execution": {
+        "elapsed_ms": 904,
+        "error": null,
+        "query_id": "aa-4ff99817-bd24-46cc-9023-164d89f31cb2",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "gold_match_result": null,
+      "latency_ms": {
+        "ask_wall": 11055,
+        "model_or_api": 8524,
+        "warehouse": 904
+      },
+      "model": "gpt-6.1-sol",
+      "model_snapshot": "gpt-6.1-sol",
+      "post_fix": {
+        "chart_kind": null,
+        "trace_span_ms_after_fix": 11955,
+        "trace_span_ms_before_fix": 16167
+      },
+      "question_id": "q-101",
+      "request_id": "req_3eadaaec61fd47b490e4c8f9c3580c99",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": false,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": null,
+        "unsupported_numbers": []
+      },
+      "sql": "SELECT toYear(date) AS year, count() AS sales, round(avg(price), 2) AS average_price_gbp FROM uk.uk_price_paid WHERE town = 'LEEDS' AND date >= toDate('2025-01-01') AND date < toDate('2026-01-01') GROUP BY year",
+      "suggestions": [],
+      "tokens": {
+        "cache_write": 1426,
+        "cached": 4887,
+        "in": 6322,
+        "out": 240,
+        "reasoning": 0
+      },
+      "tool_calls": 2,
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-101-gpt_mcp-1.json",
+        "export_reason": "failure",
+        "public": false,
+        "spans": [
+          "generation",
+          "generation",
+          "generation",
+          "tool",
+          "tool",
+          "tool",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "turns": 3
+    },
+    {
+      "analyst_latency_ms": 2698.0,
+      "answer": "The result is 861782.",
+      "as_of_line_prepended": true,
+      "backend": "cortex_analyst",
+      "chart": {
+        "cell_types": [
+          "int"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "kpi",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "SALES_COUNT"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 1,
+        "rows_total": 1,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cortex_messages": 1,
+      "cost_usd": 0.0,
+      "credits_estimate": 0.067,
+      "effort": null,
+      "error": null,
+      "execution": {
+        "elapsed_ms": 1668,
+        "error": null,
+        "query_id": "01c87585-000e-3285-0003-2ba60002b022",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "gold_match_result": {
+        "matched": true,
+        "reason": null
+      },
+      "interpretation": "This is our interpretation of your question:\n\nHow many property sales (sales count) were recorded in England and Wales in the calendar year 2023?",
+      "latency_ms": {
+        "ask_wall": 5299,
+        "model_or_api": 3629,
+        "warehouse": 1668
+      },
+      "model": "cortex_analyst",
+      "model_snapshot": "claude-sonnet-4-6",
+      "post_fix": {
+        "chart_kind": "kpi",
+        "trace_span_ms_after_fix": 5297,
+        "trace_span_ms_before_fix": 5297
+      },
+      "question_id": "q-001",
+      "request_id": "55a62d31-c147-4918-98a8-30179e2412fb",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": true,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": true,
+        "unsupported_numbers": []
+      },
+      "sql": "WITH __uk_price_paid AS (\n  SELECT\n    date,\n    YEAR(date) AS year,\n    price\n  FROM ANALYTICS.UK.UK_PRICE_PAID\n)\nSELECT\n  COUNT(price) AS sales_count\nFROM __uk_price_paid\nWHERE\n  year = 2023\n -- Generated by Cortex Analyst (request_id: 55a62d31-c147-4918-98a8-30179e2412fb)\n;",
+      "suggestions": [],
+      "tokens": {},
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-001-cortex_analyst-1.json",
+        "export_reason": null,
+        "public": false,
+        "spans": [
+          "generation",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "warnings": []
+    },
+    {
+      "analyst_latency_ms": 2473.0,
+      "answer": "The result is 9785.",
+      "as_of_line_prepended": true,
+      "backend": "cortex_analyst",
+      "chart": {
+        "cell_types": [
+          "int"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "kpi",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "SALES_COUNT"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 1,
+        "rows_total": 1,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cortex_messages": 1,
+      "cost_usd": 0.0,
+      "credits_estimate": 0.067,
+      "effort": null,
+      "error": null,
+      "execution": {
+        "elapsed_ms": 317,
+        "error": null,
+        "query_id": "01c87585-000e-326a-0000-00032ba6d175",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "gold_match_result": {
+        "matched": true,
+        "reason": null
+      },
+      "interpretation": "This is our interpretation of your question:\n\nHow many property sales were recorded in the town of Leeds (LEEDS) in the calendar year 2023?",
+      "latency_ms": {
+        "ask_wall": 3427,
+        "model_or_api": 3108,
+        "warehouse": 317
+      },
+      "model": "cortex_analyst",
+      "model_snapshot": "claude-sonnet-4-6",
+      "post_fix": {
+        "chart_kind": "kpi",
+        "trace_span_ms_after_fix": 3425,
+        "trace_span_ms_before_fix": 3425
+      },
+      "question_id": "q-042",
+      "request_id": "884310c5-b93e-40ef-9fb8-2a83b1b3a4f9",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": true,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": true,
+        "unsupported_numbers": []
+      },
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS sales_count\n    WHERE uk_price_paid.town = 'LEEDS'\n    AND uk_price_paid.year = 2023\n)\n -- Generated by Cortex Analyst (request_id: 884310c5-b93e-40ef-9fb8-2a83b1b3a4f9)\n;",
+      "suggestions": [],
+      "tokens": {},
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-042-cortex_analyst-1.json",
+        "export_reason": null,
+        "public": false,
+        "spans": [
+          "generation",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "warnings": []
+    },
+    {
+      "analyst_latency_ms": 2599.0,
+      "answer": "5 rows returned; first: SALES_COUNT: 59855, TOWN: LONDON",
+      "as_of_line_prepended": true,
+      "backend": "cortex_analyst",
+      "chart": {
+        "cell_types": [
+          "int",
+          "str"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "bar",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "SALES_COUNT",
+          "TOWN"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 5,
+        "rows_total": 5,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cortex_messages": 1,
+      "cost_usd": 0.0,
+      "credits_estimate": 0.067,
+      "effort": null,
+      "error": null,
+      "execution": {
+        "elapsed_ms": 233,
+        "error": null,
+        "query_id": "01c87585-000e-3285-0003-2ba60002b026",
+        "rows_total": 5,
+        "truncated": false
+      },
+      "gold_match_result": {
+        "matched": true,
+        "reason": null
+      },
+      "interpretation": "This is our interpretation of your question:\n\nWhich 5 towns recorded the most property sales (by count of sales) in the calendar year 2023?",
+      "latency_ms": {
+        "ask_wall": 3689,
+        "model_or_api": 3450,
+        "warehouse": 233
+      },
+      "model": "cortex_analyst",
+      "model_snapshot": "claude-sonnet-4-6",
+      "post_fix": {
+        "chart_kind": "bar",
+        "trace_span_ms_after_fix": 3683,
+        "trace_span_ms_before_fix": 3683
+      },
+      "question_id": "q-062",
+      "request_id": "1b210947-b008-4a04-92b9-e3e812dbdffc",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": true,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": true,
+        "unsupported_numbers": []
+      },
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS sales_count\n    DIMENSIONS uk_price_paid.town\n    WHERE uk_price_paid.year = 2023\n)\nORDER BY sales_count DESC NULLS LAST\nLIMIT 5\n -- Generated by Cortex Analyst (request_id: 1b210947-b008-4a04-92b9-e3e812dbdffc)\n;",
+      "suggestions": [],
+      "tokens": {},
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-062-cortex_analyst-1.json",
+        "export_reason": null,
+        "public": false,
+        "spans": [
+          "generation",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "warnings": []
+    },
+    {
+      "analyst_latency_ms": 2831.0,
+      "answer": "The result is 325239.684679.",
+      "as_of_line_prepended": true,
+      "backend": "cortex_analyst",
+      "chart": {
+        "cell_types": [
+          "float"
+        ],
+        "chart_equals_builder_on_executed_rows": true,
+        "chart_kind": "kpi",
+        "chart_values_all_from_executed_rows": true,
+        "columns": [
+          "AVERAGE_PRICE"
+        ],
+        "model_wrote_no_chart": true,
+        "rows_held": 1,
+        "rows_total": 1,
+        "shape_keys_present": true
+      },
+      "clarification": null,
+      "cortex_messages": 1,
+      "cost_usd": 0.0,
+      "credits_estimate": 0.067,
+      "effort": null,
+      "error": null,
+      "execution": {
+        "elapsed_ms": 244,
+        "error": null,
+        "query_id": "01c87585-000e-326c-0000-00032ba6f09d",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "gold_match_result": null,
+      "interpretation": "This is our interpretation of your question:\n\nWhat was the average price paid for properties in Leeds (town = 'LEEDS') in the calendar year 2025?",
+      "latency_ms": {
+        "ask_wall": 3758,
+        "model_or_api": 3508,
+        "warehouse": 244
+      },
+      "model": "cortex_analyst",
+      "model_snapshot": "claude-sonnet-4-6",
+      "post_fix": {
+        "chart_kind": "kpi",
+        "trace_span_ms_after_fix": 3752,
+        "trace_span_ms_before_fix": 3752
+      },
+      "question_id": "q-101",
+      "request_id": "c3aa70e2-77fa-439a-8e7f-b9cc83b7e2cf",
+      "scores": {
+        "answer_from_rows": true,
+        "clarified": false,
+        "correct": false,
+        "false_clarification": false,
+        "mismatch_reason": null,
+        "result_match": null,
+        "unsupported_numbers": []
+      },
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS average_price\n    WHERE uk_price_paid.town = 'LEEDS'\n    AND YEAR(uk_price_paid.date) = 2025\n)\n -- Generated by Cortex Analyst (request_id: c3aa70e2-77fa-439a-8e7f-b9cc83b7e2cf)\n;",
+      "suggestions": [],
+      "tokens": {},
+      "trace": {
+        "export_path": "results/a23-live-2026-11-17/traces/q-101-cortex_analyst-1.json",
+        "export_reason": "failure",
+        "public": false,
+        "spans": [
+          "generation",
+          "execution"
+        ],
+        "tracer_url": null
+      },
+      "warnings": []
+    }
+  ],
+  "run_id": "a23-live-2026-11-17",
+  "schema_version": "1.0",
+  "spend_extra": {
+    "cost_usd": 0.002471,
+    "note": "one extra GPT-6.1 Sol q-042 call (not in rows) to check a script traceback"
+  },
+  "summary": {
+    "chart_from_builder_on_executed_rows_all_12": true,
+    "correct_by_backend": {
+      "claude_mcp": 3,
+      "cortex_analyst": 3,
+      "gpt_mcp": 3
+    },
+    "cortex_as_of_line_prepended_all_4": true,
+    "model_wrote_no_chart_all_12": true,
+    "note": "q-001, q-042, q-062 correct on all three backends against S2.1 match_result; the ambiguous q-101 (expected: clarify) was answered with a chosen reading by all three, so it scores incorrect and its trace was selected as a failure export",
+    "shape_ok_all_12": true
+  },
+  "totals": {
+    "cortex_credits_estimate": 0.268,
+    "cortex_messages": 4,
+    "model_cost_usd": 0.087915
+  },
+  "tracer": {
+    "note": "TracingUnavailable: the langfuse package is not installed; add it with `uv add 'langfuse>=3,<4'` or trace with NoopTracer",
+    "used": "NoopTracer"
+  }
+}

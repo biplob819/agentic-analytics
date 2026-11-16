@@ -63,6 +63,7 @@ from agentic_analytics.schemas import (
     Execution,
     Record,
 )
+from agentic_analytics.steps import FINAL_ANSWER_TOOL
 
 if TYPE_CHECKING:
     from agentic_analytics.models.base import ModelTurn
@@ -120,23 +121,31 @@ _SECRET_ENV_NAME = re.compile(r"(?i)(KEY|SECRET|PASSWORD|PASSWD|PASSCODE|TOKEN|D
 # mapping keys whose values are replaced whole; `token(?!s)` spares token counts (`tokens_in`)
 _SECRET_FIELD = re.compile(
     r"(?i)(token(?!s)|secret|passw(?:or)?d|passcode|credential|private[-_]?key"
-    r"|^authorization$|^proxy[-_]authorization$|^x[-_]api[-_]key$|^api[-_]?key$|^key$"
+    r"|api[-_]?key|access[-_]?key"
+    r"|^authorization$|^proxy[-_]authorization$|^key$"
     r"|^cookie$|^set[-_]cookie$)"
 )
 _PEM_BLOCK = re.compile(
     r"-----BEGIN [A-Z ]*PRIVATE KEY(?: BLOCK)?-----.*?-----END [A-Z ]*PRIVATE KEY(?: BLOCK)?-----",
     re.DOTALL,
 )
-# a header name, its separator and an optional opening quote (plain or JSON-escaped)
+# a header name, its separator and an optional opening quote (plain or JSON-escaped); `_` counts
+# as a boundary (`X_API_KEY=`), and a password word may end a longer name (`PGPASSWORD=`,
+# `db_password=`)
 _HEADER = re.compile(
-    r"(?i)\b(proxy-authorization|authorization|x-api-key|api[-_]?key|set-cookie|cookie)"
+    r"(?i)((?<![A-Za-z0-9])(?:proxy-authorization|authorization|x-api-key|api[-_]?key"
+    r"|set-cookie|cookie)|passw(?:or)?d|pwd)"
     r"(?:\\*[\"'])?\s*[:=]\s*(?P<q>\\*[\"'])?"
 )
 _UNQUOTED_VALUE = re.compile(r"(?i)(?:(?:bearer|basic|token|digest)\s+)?[^\s\"'\\,;&}\]]*")
+# a query or fragment parameter (`?`, `&`, `&amp;`, `#`, `;`) whose name is a secret word or ends
+# in one after `-`, `_` or a camelCase hump (`client_secret`, `X-Amz-Signature`, `accessToken`)
 _QUERY_SECRET = re.compile(
-    r"(?i)([?&](?:token|access_token|refresh_token|id_token|key|api_key|apikey|sig|signature"
-    r"|password|secret|auth)=)[^&\s#\"'\\]+"
+    r"(?i)((?:[?&#;]|&amp;)(?:[A-Za-z0-9._-]*[-_]|(?-i:[A-Za-z0-9]*[a-z0-9](?=[A-Z])))?"
+    r"(?:token|key|apikey|sig|signature|password|passwd|pwd|secret|credential|auth)=)"
+    r"[^&\s#\"'\\]+"
 )
+_PERCENT_HEX_ANY_CASE = re.compile(r"(%[0-9A-Fa-f]{2})")
 _BARE_CREDENTIAL = re.compile(r"(?i)\b(bearer|basic)\s+([A-Za-z0-9._~+/=\-]{8,})")
 
 
@@ -171,10 +180,25 @@ def _scrub_headers(s: str) -> str:
 
 
 def _variants(value: str) -> set[str]:
-    """The secret as it can appear in text: raw, JSON-escaped once or twice, URL-encoded."""
+    """The secret as it can appear in text: raw, JSON-escaped once or twice, URL-encoded once or
+    twice (`%20` or `+` for a space, `/` encoded or kept as `quote`'s default keeps it), with
+    percent hex in any case (`_matcher`)."""
     once = {json.dumps(value)[1:-1], json.dumps(value, ensure_ascii=False)[1:-1]}
     twice = {json.dumps(v)[1:-1] for v in once}
-    return {value, *once, *twice, quote(value, safe=""), quote_plus(value, safe="")}
+    url = {quote(value, safe=s) for s in ("", "/")} | {quote_plus(value, safe=s) for s in ("", "/")}
+    url |= {quote(u, safe="") for u in url}
+    return {value, *once, *twice, *url}
+
+
+def _matcher(variant: str) -> re.Pattern[str] | None:
+    """For a URL-encoded variant, a pattern whose percent hex digits match in any case (an encoder
+    may mix `%2f` and `%2F`); None for a variant with no percent escape (plain replace)."""
+    parts = _PERCENT_HEX_ANY_CASE.split(variant)
+    if len(parts) == 1:
+        return None
+    return re.compile(
+        "".join(f"%(?i:{p[1:]})" if i % 2 else re.escape(p) for i, p in enumerate(parts))
+    )
 
 
 class Redactor:
@@ -184,18 +208,27 @@ class Redactor:
     corrupts a result cell; it is scrubbed only where it appears inside a string):
 
     1. each secret value, in every form from `_variants` (raw, JSON-escaped once or twice,
-       URL-encoded): one of at least `SHORT_SECRET_CHARS` characters anywhere, a shorter one
-       (`DEMO_PASSCODE=482`) only as a whole token, so `4821` and `x482y` are left alone;
+       URL-encoded once or twice, any case of percent hex): one of at least
+       `SHORT_SECRET_CHARS` characters anywhere, a shorter one (`DEMO_PASSCODE=482`) only as a
+       whole token, so `4821` and `x482y` are left alone;
     2. PEM private-key blocks;
     3. Authorization, Proxy-Authorization, X-Api-Key, api_key, Cookie and Set-Cookie values,
-       case-insensitively, quoted, JSON-escaped or bare;
-    4. URL query parameters token, access_token, key, sig, signature, password and similar;
+       and password / passwd / pwd values (a DSN in a driver error), case-insensitively,
+       quoted, JSON-escaped or bare;
+    4. URL query parameters named token, key, sig, signature, password, secret, credential or
+       auth, alone or ending a longer name (`access_token`, `client_secret`, `X-Amz-Signature`);
     5. bare `Bearer`/`Basic` credentials;
     6. every `scripts/secret_scan.py` pattern (a URL password keeps its URL).
 
+    Not covered: a secret base64- or hex-encoded (as in a `Basic` header the MCP client builds,
+    which rules 3 and 5 catch only beside their header name or scheme word), split across
+    fields or strings, or encoded in some other way; a secret-named word in plain prose outside
+    a header, password or URL-query position (`client_secret: x` in an error message).
+
     In structures, values under keys named like *token* (not *tokens*), *secret*, *password*,
-    *passcode*, *credential*, private_key, api_key, key, authorization or cookie are replaced
-    whole, and a string holding a JSON object or array is decoded, scrubbed and re-encoded.
+    *passcode*, *credential*, *private_key*, *api_key*, *access_key*, key, authorization or
+    cookie are replaced whole, and a string holding a JSON object or array is decoded, scrubbed
+    and re-encoded.
     """
 
     def __init__(self, secrets: Mapping[str, str] | None = None) -> None:
@@ -207,7 +240,10 @@ class Redactor:
                 continue
             bucket = long if len(value) >= SHORT_SECRET_CHARS else short
             bucket += [(v, name) for v in _variants(value)]
-        self._long = sorted(set(long), key=lambda vn: (-len(vn[0]), vn))
+        # longest first, so a secret inside a longer one never leaves the longer one's tail
+        self._long = [
+            (v, n, _matcher(v)) for v, n in sorted(set(long), key=lambda vn: (-len(vn[0]), vn))
+        ]
         self._short = [
             (re.compile(r"(?<![A-Za-z0-9_])" + re.escape(v) + r"(?![A-Za-z0-9_])"), n)
             for v, n in sorted(set(short), key=lambda vn: (-len(vn[0]), vn))
@@ -236,8 +272,12 @@ class Redactor:
         return f"Redactor({len(self._secrets)} secret values)"
 
     def text(self, s: str) -> str:
-        for value, name in self._long:
-            s = s.replace(value, f"[REDACTED:{name}]")
+        for value, name, matcher in self._long:
+            label = f"[REDACTED:{name}]"
+            if matcher is None:
+                s = s.replace(value, label)
+            else:
+                s = matcher.sub(lambda _, label=label: label, s)
         for pattern, name in self._short:
             s = pattern.sub(f"[REDACTED:{name}]", s)
         s = _PEM_BLOCK.sub("[REDACTED:private key]", s)
@@ -450,19 +490,28 @@ def _step_generation_spans(answer: AnalyticsAnswer) -> list[Span]:
     return spans
 
 
-def _tool_spans(answer: AnalyticsAnswer) -> list[Span]:
-    return [
-        Span(
-            name=f"tool {s.tool}",
-            kind="tool",
-            latency_ms=s.latency_ms,
-            input=dict(s.arguments),
-            output={"rows_returned": s.rows_returned, "truncated": s.truncated},
-            error=s.error,
-            metadata={"step_index": s.index},
+def _tool_spans(answer: AnalyticsAnswer, *, timed_turns: bool) -> list[Span]:
+    """One span per step. A `final_answer` step's latency is its model turn's (A2.1), so when the
+    turns are traced as generation spans the step takes no time of its own: counting it twice
+    made traces last longer than the run (A2.3 live: 16.2 s of spans for an 11.1 s question)."""
+    spans = []
+    for s in answer.steps:
+        on_turn = timed_turns and s.tool == FINAL_ANSWER_TOOL
+        meta: dict[str, Any] = {"step_index": s.index}
+        if on_turn:
+            meta["turn_latency_ms"] = s.latency_ms  # already on the turn's generation span
+        spans.append(
+            Span(
+                name=f"tool {s.tool}",
+                kind="tool",
+                latency_ms=0 if on_turn else s.latency_ms,
+                input=dict(s.arguments),
+                output={"rows_returned": s.rows_returned, "truncated": s.truncated},
+                error=s.error,
+                metadata=meta,
+            )
         )
-        for s in answer.steps
-    ]
+    return spans
 
 
 def _execution_span(ex: Execution) -> Span:
@@ -511,7 +560,7 @@ def build_trace(
     spans: list[Span] = []
     if key.backend in MCP_BACKENDS:
         spans += _turn_spans(turns) if turns else _step_generation_spans(answer)
-        spans += _tool_spans(answer)
+        spans += _tool_spans(answer, timed_turns=bool(turns))
     else:
         spans.append(
             Span(
