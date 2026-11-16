@@ -118,7 +118,7 @@ Limits: 6 MCP calls, 10 model turns and 120 seconds of wall clock. Going past an
 ### 2.5 Cortex Analyst path
 
 ```
-POST /api/v2/cortex/analyst/message {messages:[user text], semantic_view: ANALYTICS.UK.PRICE_PAID_SV}
+POST /api/v2/cortex/analyst/message {messages:[user text], semantic_view: ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC}
   ├─ sql block         ─▶ Execute(Snowflake, SELECT-only role) ─▶ templated answer + chart
   ├─ suggestions block ─▶ asked_for_clarification = True, suggestions kept   (accept "suggestion" too)
   └─ text block        ─▶ stored as interpretation

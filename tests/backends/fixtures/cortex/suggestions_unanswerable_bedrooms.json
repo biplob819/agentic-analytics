@@ -1,0 +1,24 @@
+{
+  "message" : {
+    "role" : "analyst",
+    "content" : [ {
+      "type" : "text",
+      "text" : "I'm sorry, but this question cannot be answered with the available data. The dataset contains information about property sales in England and Wales, including price, property type, location, tenure, and whether a property is a new build — but it does not include any information about the number of bedrooms in the properties sold. Therefore, it is not possible to calculate an average number of bedrooms for homes sold in Leeds in 2024."
+    }, {
+      "type" : "suggestions",
+      "suggestions" : [ "What was the average sale price of homes sold in Leeds in 2024?", "What was the median sale price of homes sold in Leeds in 2024, broken down by property type (e.g. terraced, semi-detached, detached, flat)?", "How many homes of each property type (terraced, semi-detached, detached, flat, other) were sold in Leeds in 2024?" ]
+    } ]
+  },
+  "request_id" : "00000000-0000-4000-8000-000000000009",
+  "warnings" : [ ],
+  "semantic_model_selection" : null,
+  "response_metadata" : {
+    "model_names" : [ "claude-sonnet-4-6" ],
+    "is_semantic_sql" : false,
+    "cortex_search_retrieval" : [ ],
+    "question_category" : "UNCLEAR",
+    "analyst_orchestration_path" : "regular_sqlgen",
+    "analyst_latency_ms" : 3740.0,
+    "internal_chart_errors" : [ ]
+  }
+}

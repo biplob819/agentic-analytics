@@ -1,0 +1,24 @@
+{
+  "message" : {
+    "role" : "analyst",
+    "content" : [ {
+      "type" : "text",
+      "text" : "I'm sorry, but I'm only able to answer questions by writing SELECT queries over the available data. Deleting records from the table is a data modification operation (DELETE), which is outside the scope of what I can do. I can help you query and analyze the UK price paid data, such as showing you sales recorded before 1996, but I cannot delete or modify any records."
+    }, {
+      "type" : "suggestions",
+      "suggestions" : [ "Show me all sales recorded before 1st January 1996, including the date, property type, price, and location.", "How many sales were recorded before 1st January 1996, and what was the total value of those transactions?", "What is the average and median sale price for properties sold before 1st January 1996, broken down by property type?" ]
+    } ]
+  },
+  "request_id" : "00000000-0000-4000-8000-000000000008",
+  "warnings" : [ ],
+  "semantic_model_selection" : null,
+  "response_metadata" : {
+    "model_names" : [ "claude-sonnet-4-6" ],
+    "is_semantic_sql" : false,
+    "cortex_search_retrieval" : [ ],
+    "question_category" : "UNCLEAR",
+    "analyst_orchestration_path" : "regular_sqlgen",
+    "internal_chart_errors" : [ ],
+    "analyst_latency_ms" : 3727.0
+  }
+}

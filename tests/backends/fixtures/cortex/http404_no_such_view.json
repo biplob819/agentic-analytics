@@ -1,0 +1,6 @@
+{
+  "message" : "SQL compilation error:\nSemantic View 'ANALYTICS.UK.NO_SUCH_VIEW' does not exist or not authorized. Your primary role PUBLIC or one of your secondary roles must have at least one privilege granted on SEMANTIC VIEW ANALYTICS.UK.NO_SUCH_VIEW.",
+  "code" : null,
+  "error_code" : "390404",
+  "request_id" : "00000000-0000-4000-8000-000000000011"
+}

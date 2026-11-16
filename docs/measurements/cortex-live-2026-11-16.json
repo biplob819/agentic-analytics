@@ -1,0 +1,304 @@
+{
+  "run_id": "a2.2-cortex-live-2026-11-16",
+  "recorded_at_utc": "2026-11-16T22:12:17Z/2026-11-16T22:20:07Z",
+  "account_region": "AWS ap-southeast-7 (Thailand); Cortex inference cross-region to AWS_US (OWNER D-62): every api_latency_ms below includes the Thailand-to-US distance",
+  "semantic_view": "ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC",
+  "as_of": "2026-08-31",
+  "latency_note": "api_latency_ms is ask_cortex's API time measured on the client (D-35), excluding execution; analyst_latency_ms is Cortex's own response_metadata figure; the difference is transit plus Snowflake front-end overhead. The client ran outside Snowflake; the account sits in ap-southeast-7.",
+  "scoring": "correct_vs_gold from agentic_analytics.scoring.result.match_result (S2.1) against packs/uk_price_paid/gold/snowflake; None for clarify-expected questions and probes",
+  "calls": [
+    {
+      "id": "q-001",
+      "question": "How many property sales were recorded in England and Wales in 2023?",
+      "category": "aggregation",
+      "fixture": "tests/backends/fixtures/cortex/sql_aggregation_q001.json",
+      "api_latency_ms": 3643,
+      "analyst_latency_ms": 2651.0,
+      "question_category": "CLEAR_SQL",
+      "model": "claude-sonnet-4-6",
+      "cortex_messages": 1,
+      "reply": "sql",
+      "suggestions": null,
+      "first_execution": "guard refused SEMANTIC_VIEW (defect, fixed)",
+      "reexecuted_after_guard_fix": {
+        "error": null,
+        "warehouse_elapsed_ms": 1071,
+        "answer": "The result is 861782.",
+        "correct_vs_gold": true,
+        "reason": null
+      }
+    },
+    {
+      "id": "q-021",
+      "question": "How many property sales were recorded in each month of 2024?",
+      "category": "time",
+      "fixture": "tests/backends/fixtures/cortex/sql_time_q021.json",
+      "api_latency_ms": 3522,
+      "analyst_latency_ms": 2606.0,
+      "question_category": "CLEAR_SQL",
+      "model": "claude-sonnet-4-6",
+      "cortex_messages": 1,
+      "reply": "sql",
+      "suggestions": null,
+      "first_execution": "guard refused SEMANTIC_VIEW (defect, fixed)",
+      "reexecuted_after_guard_fix": {
+        "error": null,
+        "warehouse_elapsed_ms": 178,
+        "answer": "12 rows returned; first: SALES_COUNT: 84266, MONTH: 2024-12-01",
+        "correct_vs_gold": false,
+        "reason": "no_matching_columns (gold=2, predicted=2)"
+      }
+    },
+    {
+      "id": "q-042",
+      "question": "How many property sales were recorded in the town of Leeds in 2023?",
+      "category": "geography",
+      "fixture": "tests/backends/fixtures/cortex/sql_geography_q042.json",
+      "api_latency_ms": 3527,
+      "analyst_latency_ms": 2553.0,
+      "question_category": "CLEAR_SQL",
+      "model": "claude-sonnet-4-6",
+      "cortex_messages": 1,
+      "reply": "sql",
+      "suggestions": null,
+      "first_execution": "guard refused SEMANTIC_VIEW (defect, fixed)",
+      "reexecuted_after_guard_fix": {
+        "error": null,
+        "warehouse_elapsed_ms": 212,
+        "answer": "The result is 9785.",
+        "correct_vs_gold": true,
+        "reason": null
+      }
+    },
+    {
+      "id": "q-062",
+      "question": "Which 5 towns recorded the most property sales in 2023?",
+      "category": "top_n",
+      "fixture": "tests/backends/fixtures/cortex/sql_top_n_q062.json",
+      "api_latency_ms": 3424,
+      "analyst_latency_ms": 2622.0,
+      "question_category": "CLEAR_SQL",
+      "model": "claude-sonnet-4-6",
+      "cortex_messages": 1,
+      "reply": "sql",
+      "suggestions": null,
+      "first_execution": "guard refused SEMANTIC_VIEW (defect, fixed)",
+      "reexecuted_after_guard_fix": {
+        "error": null,
+        "warehouse_elapsed_ms": 171,
+        "answer": "5 rows returned; first: SALES_COUNT: 59855, TOWN: LONDON",
+        "correct_vs_gold": true,
+        "reason": null
+      }
+    },
+    {
+      "id": "q-082",
+      "question": "Show the number of property sales in 2022 and in 2023, and the percentage change from 2022 to 2023.",
+      "category": "yoy",
+      "fixture": "tests/backends/fixtures/cortex/sql_yoy_cte_q082.json",
+      "api_latency_ms": 4231,
+      "analyst_latency_ms": 3658.0,
+      "question_category": "CLEAR_SQL",
+      "model": "claude-sonnet-4-6",
+      "cortex_messages": 1,
+      "reply": "sql",
+      "suggestions": null,
+      "first_execution": "guard refused SEMANTIC_VIEW (defect, fixed)",
+      "reexecuted_after_guard_fix": {
+        "error": null,
+        "warehouse_elapsed_ms": 281,
+        "answer": "YEAR_2022: 2022, YEAR_2023: 2023, SALES_COUNT_2022: 1077406, SALES_COUNT_2023: 861782, ABSOLUTE_CHANGE: -215624, PCT_CHANGE: -0.200133",
+        "correct_vs_gold": false,
+        "reason": "no_matching_columns (gold=3, predicted=6)"
+      }
+    },
+    {
+      "id": "q-101",
+      "question": "What was the average price in Leeds last year?",
+      "category": "ambiguous",
+      "fixture": "tests/backends/fixtures/cortex/sql_ambiguous_q101.json",
+      "api_latency_ms": 5521,
+      "analyst_latency_ms": 4956.0,
+      "question_category": "CLEAR_SQL",
+      "model": "claude-sonnet-4-6",
+      "cortex_messages": 1,
+      "reply": "sql",
+      "suggestions": null,
+      "first_execution": "guard refused SEMANTIC_VIEW (defect, fixed)",
+      "reexecuted_after_guard_fix": {
+        "error": null,
+        "warehouse_elapsed_ms": 167,
+        "answer": "The result is 325239.684679.",
+        "correct_vs_gold": null,
+        "reason": null
+      }
+    },
+    {
+      "id": "q-103",
+      "question": "What are the most expensive areas?",
+      "category": "ambiguous",
+      "fixture": "tests/backends/fixtures/cortex/sql_ambiguous_q103.json",
+      "api_latency_ms": 3936,
+      "analyst_latency_ms": 3048.0,
+      "question_category": "CLEAR_SQL",
+      "model": "claude-sonnet-4-6",
+      "cortex_messages": 1,
+      "reply": "sql",
+      "suggestions": null,
+      "first_execution": "guard refused SEMANTIC_VIEW (defect, fixed)",
+      "reexecuted_after_guard_fix": {
+        "error": null,
+        "warehouse_elapsed_ms": 220,
+        "answer": "20 rows returned; first: AVERAGE_PRICE: 2228812.348111, MEDIAN_PRICE: 425000, SALES_COUNT: 10218, DISTRICT: CITY OF LONDON",
+        "correct_vs_gold": null,
+        "reason": null
+      }
+    },
+    {
+      "id": "p-w01",
+      "question": "Delete every sale recorded before 1996 from the uk_price_paid table.",
+      "category": "probe-write",
+      "fixture": "tests/backends/fixtures/cortex/suggestions_write_probe_pw01.json",
+      "api_latency_ms": 4365,
+      "analyst_latency_ms": 3727.0,
+      "question_category": "UNCLEAR",
+      "model": "claude-sonnet-4-6",
+      "cortex_messages": 1,
+      "reply": "suggestions",
+      "suggestions": [
+        "Show me all sales recorded before 1st January 1996, including the date, property type, price, and location.",
+        "How many sales were recorded before 1st January 1996, and what was the total value of those transactions?",
+        "What is the average and median sale price for properties sold before 1st January 1996, broken down by property type?"
+      ],
+      "first_execution": null,
+      "reexecuted_after_guard_fix": null
+    },
+    {
+      "id": null,
+      "question": "What was the average number of bedrooms in homes sold in Leeds in 2024?",
+      "category": "unanswerable",
+      "fixture": "tests/backends/fixtures/cortex/suggestions_unanswerable_bedrooms.json",
+      "api_latency_ms": 4524,
+      "analyst_latency_ms": 3740.0,
+      "question_category": "UNCLEAR",
+      "model": "claude-sonnet-4-6",
+      "cortex_messages": 1,
+      "reply": "suggestions",
+      "suggestions": [
+        "What was the average sale price of homes sold in Leeds in 2024?",
+        "What was the median sale price of homes sold in Leeds in 2024, broken down by property type (e.g. terraced, semi-detached, detached, flat)?",
+        "How many homes of each property type (terraced, semi-detached, detached, flat, other) were sold in Leeds in 2024?"
+      ],
+      "first_execution": null,
+      "reexecuted_after_guard_fix": null
+    }
+  ],
+  "live_test_run": {
+    "file": "tests/backends/test_cortex_live.py",
+    "passed": 4,
+    "billed_messages": 4,
+    "note": "q-001 (correct vs gold) + q-101 together 9.42 s wall incl. execution; p-w01 4.65 s wall (declined with suggestions); read timeout at timeout_s=1.0 1.28 s wall (error=timeout, counted 1 message); errors test 400/404/401/missing key path, 0 messages"
+  },
+  "unbilled_error_calls": [
+    {
+      "case": "malformed body (messages: [])",
+      "status": 400,
+      "error_code": "390400",
+      "classify": "config",
+      "fixture": "tests/backends/fixtures/cortex/http400_malformed_body.json"
+    },
+    {
+      "case": "unknown semantic view",
+      "status": 404,
+      "error_code": "390404",
+      "classify": "config",
+      "fixture": "tests/backends/fixtures/cortex/http404_no_such_view.json",
+      "note": "message says 'Your primary role PUBLIC': AA_RO_USER has DEFAULT_ROLE null live"
+    },
+    {
+      "case": "unregistered RSA key",
+      "status": 401,
+      "code": "390144",
+      "classify": "config",
+      "fixture": "tests/backends/fixtures/cortex/http401_unregistered_key.json"
+    },
+    {
+      "case": "wrong key file path",
+      "status": null,
+      "exception": "CortexConfigError",
+      "classify": "config",
+      "note": "never sent; message names the variable, not the path"
+    }
+  ],
+  "cortex_messages_total": 13,
+  "credits_estimate": {
+    "cortex": 0.871,
+    "warehouse_upper_bound": 0.17,
+    "note": "13 x 0.067 published rate; trial credits, not cash"
+  },
+  "api_latency_ms_summary": {
+    "n": 9,
+    "min": 3424,
+    "max": 5521,
+    "median": 3936
+  },
+  "verifier_as_of_check": {
+    "run_id": "a2.2-verifier-asof-2026-11-16",
+    "why": "D-10: R3.1's run/runner.py cortex_question prepends the agents' as-of line to every Cortex question; the builder's live calls sent the raw question and saw Cortex resolve 'last year' from CURRENT_DATE. Re-asked q-118 ('last month') and q-101 ('last year') exactly as the runner will, as-of 2026-08-31.",
+    "finding": "Cortex honours the as-of line. q-118: 'previous calendar month before 2026-08-31, which is July 2026', SQL filters date >= DATE_TRUNC('month', DATEADD(month, -1, '2026-08-31'::DATE)) AND date < DATE_TRUNC('month', '2026-08-31'::DATE), 296 sales (the bank's second interpretation of q-118). q-101: 'full calendar year 2025', SQL YEAR(date) = 2025, avg 325239.684679. Neither SQL uses CURRENT_DATE. Both ambiguous items got a chosen reading (CLEAR_SQL), not a clarification. No fairness gap from the as-of date, provided the runner keeps prepending the line.",
+    "calls": [
+      {
+        "id": "q-118",
+        "at_utc": "2026-11-16T22:34:49+00:00",
+        "question_sent": "Data current to 2026-08-31. Treat that date as today: 'last year' means the last full calendar year before that date (2025), 'this year' means 2026 up to 2026-08-31, and 'the last 12 months' means the 12 months ending 2026-08-31.\n\nHow many sales were there in York last month?",
+        "cortex_messages": 1,
+        "api_latency_ms": 4421,
+        "analyst_latency_ms": 3598.0,
+        "question_category": "CLEAR_SQL",
+        "interpretation": "This is our interpretation of your question:\n\nHow many sales were there in York (town = 'YORK') in the previous calendar month before 2026-08-31, which is July 2026 (2026-07-01 to 2026-07-31)?",
+        "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS sales_count\n    WHERE uk_price_paid.town = 'YORK'\n    AND uk_price_paid.date >= DATE_TRUNC('month', DATEADD(month, -1, '2026-08-31'::DATE))\n    AND uk_price_paid.date < DATE_TRUNC('month', '2026-08-31'::DATE)\n)\n -- Generated by Cortex Analyst (request_id: <redacted>)\n;",
+        "result": {
+          "columns": [
+            "SALES_COUNT"
+          ],
+          "rows": [
+            [
+              296
+            ]
+          ]
+        },
+        "answer": "The result is 296.",
+        "uses_current_date": false
+      },
+      {
+        "id": "q-101",
+        "at_utc": "2026-11-16T22:34:54+00:00",
+        "question_sent": "Data current to 2026-08-31. Treat that date as today: 'last year' means the last full calendar year before that date (2025), 'this year' means 2026 up to 2026-08-31, and 'the last 12 months' means the 12 months ending 2026-08-31.\n\nWhat was the average price in Leeds last year?",
+        "cortex_messages": 1,
+        "api_latency_ms": 4010,
+        "analyst_latency_ms": 3221.0,
+        "question_category": "CLEAR_SQL",
+        "interpretation": "This is our interpretation of your question:\n\nWhat was the average price paid for properties in Leeds (town = 'LEEDS') in the full calendar year 2025?",
+        "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS average_price\n    WHERE uk_price_paid.town = 'LEEDS'\n    AND YEAR(uk_price_paid.date) = 2025\n)\n -- Generated by Cortex Analyst (request_id: <redacted>)\n;",
+        "result": {
+          "columns": [
+            "AVERAGE_PRICE"
+          ],
+          "rows": [
+            [
+              325239.684679
+            ]
+          ]
+        },
+        "answer": "The result is 325239.684679.",
+        "uses_current_date": false
+      }
+    ],
+    "cortex_messages": 2,
+    "credits_estimate": {
+      "cortex": 0.134,
+      "warehouse_upper_bound": 0.034,
+      "note": "2 x 0.067 published rate; warehouse ANALYTICS_XS at most ~2 min incl. 60 s auto-suspend; trial credits, not cash"
+    }
+  }
+}

@@ -16,6 +16,12 @@ Policy decisions (also in specs/N1.2-executors/spec.md):
   `generateSeries`; Snowflake `FLATTEN`, `SPLIT_TO_TABLE`, `GENERATOR`). Functions that reach
   files, the network, other servers, dictionaries, stages or the control plane are refused in
   any position (`url`, `s3`, `file`, `remote`, `SYSTEM$...`, ...).
+- Snowflake `SEMANTIC_VIEW(<db.schema.view> METRICS ... DIMENSIONS ... FACTS ... WHERE ...)` is
+  allowed as a FROM/JOIN source when the view is a plain `DATABASE.SCHEMA.VIEW` name (A2.2 live:
+  Cortex Analyst writes its SQL this way, `is_semantic_sql`). It only reads a semantic view under
+  the session's role; its metric, dimension and WHERE expressions are checked like any other
+  node. Refused on ClickHouse, when quoted (`"SEMANTIC_VIEW"(...)`) or schema-qualified (a UDF),
+  and when any part of the view name is a literal, stage, parameter or `IDENTIFIER(...)`.
 - Schema-qualified function calls (`db.fn(x)`) are refused: they are user-defined or external
   functions, which a benchmark query never needs.
 - Snowflake stage references (`@stage`, `@~`, `@%table`, quoted `'@s/f.csv'`) and any table
@@ -63,6 +69,12 @@ SAFE_TABLE_FUNCTIONS: Final[dict[str, frozenset[str]]] = {
     "snowflake": frozenset(
         {"flatten", "split_to_table", "strtok_split_to_table", "generator", "explode"}
     ),
+}
+
+# Snowflake `SEMANTIC_VIEW(...)` clause sources (A2.2): read-only, allowed only on Snowflake.
+SEMANTIC_VIEW_SOURCES: Final[dict[str, frozenset[str]]] = {
+    "clickhouse": frozenset(),
+    "snowflake": frozenset({"semantic_view"}),
 }
 
 # Functions refused anywhere in the tree, on either engine.
@@ -452,6 +464,33 @@ def _system_qualified(node: exp.Expr) -> bool:
     )
 
 
+def _plain_view_name(view: exp.Expr | None) -> bool:
+    """`DATABASE.SCHEMA.VIEW`: three non-empty identifiers and nothing else (no IDENTIFIER(...),
+    literal, stage, parameter or AT/BEFORE clause in any part)."""
+    if not isinstance(view, exp.Table):
+        return False
+    parts = ("this", "db", "catalog")
+    if any(v for k, v in view.args.items() if k not in parts):
+        return False
+    return all(
+        isinstance(view.args.get(k), exp.Identifier) and bool(view.args[k].name) for k in parts
+    )
+
+
+def _semantic_view_problem(node: exp.SemanticView, engine: Engine) -> str | None:
+    """`SEMANTIC_VIEW(...)` must be a Snowflake FROM/JOIN source over a plain view name."""
+    if "semantic_view" not in SEMANTIC_VIEW_SOURCES[engine]:
+        return "SEMANTIC_VIEW is not allowed on this engine"
+    parent = node.parent
+    if not (isinstance(parent, exp.Table) and parent.this is node):
+        return "SEMANTIC_VIEW is allowed only as a FROM/JOIN source"
+    if parent.args.get("db") or parent.args.get("catalog"):  # db.schema.SEMANTIC_VIEW(...): a UDF
+        return "schema-qualified (user-defined or external) functions are not allowed"
+    if not _plain_view_name(node.this):
+        return "SEMANTIC_VIEW must name a semantic view (DATABASE.SCHEMA.VIEW)"
+    return None
+
+
 def _check_tree(root: exp.Expr, engine: Engine) -> str | None:
     dialect = engine
     safe = SAFE_TABLE_FUNCTIONS[engine]
@@ -483,6 +522,10 @@ def _check_tree(root: exp.Expr, engine: Engine) -> str | None:
                 return problem
         if isinstance(node, exp.Table) and isinstance(node.this, exp.Literal):
             return "a string literal is not a table (stage paths such as '@s/f.csv')"
+        if isinstance(node, exp.SemanticView):
+            problem = _semantic_view_problem(node, engine)
+            if problem:
+                return problem
         if (
             engine == "clickhouse"
             and isinstance(node, exp.Table | exp.Column)
@@ -562,8 +605,17 @@ def _token_problem(tokens: list, engine: Engine, sql: str) -> str | None:
             and t2.token_type == TokenType.L_PAREN
             and t1.token_type not in (_FUNC_TABLE_OK | {TokenType.L_PAREN})
             and _norm(t1.text) not in safe
+            and _norm(t1.text) not in SEMANTIC_VIEW_SOURCES[engine]
         ):
             return f"table function {_norm(t1.text)} is not allowed"
+        if (
+            engine == "snowflake"
+            and tok.token_type == TokenType.IDENTIFIER  # quoted: "SEMANTIC_VIEW"(...) is a UDF
+            and _norm(tok.text) == "semantic_view"
+            and t1 is not None
+            and t1.token_type == TokenType.L_PAREN
+        ):
+            return "SEMANTIC_VIEW must be the unquoted keyword"
         if engine != "clickhouse":
             continue
         if _norm(tok.text) == "system" and t1 is not None and t1.token_type == TokenType.DOT:
@@ -628,4 +680,10 @@ def check_sql(sql: str, engine: Engine) -> GuardVerdict:
     return GuardVerdict(True)
 
 
-__all__ = ["DENIED_FUNCTIONS", "SAFE_TABLE_FUNCTIONS", "GuardVerdict", "check_sql"]
+__all__ = [
+    "DENIED_FUNCTIONS",
+    "SAFE_TABLE_FUNCTIONS",
+    "SEMANTIC_VIEW_SOURCES",
+    "GuardVerdict",
+    "check_sql",
+]
