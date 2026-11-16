@@ -1,0 +1,8 @@
+{
+  "downloaded_at": "2026-11-16T19:56:33.527694+00:00",
+  "file": "pp-complete.csv",
+  "lines": 31702685,
+  "sha256": "96f93c64e676dcc1afffb86893616ee0d994cb774915b0b1a754ee7e6d1bc56a",
+  "size_bytes": 5541566049,
+  "url": "http://prod1.publicdata.landregistry.gov.uk.s3-website-eu-west-1.amazonaws.com/pp-complete.csv"
+}

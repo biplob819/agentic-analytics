@@ -8,7 +8,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
+from collections.abc import Callable
+from typing import Any
 
 from agentic_analytics import __version__
 
@@ -40,7 +43,33 @@ def build_parser() -> argparse.ArgumentParser:
         p = sub.add_parser(name, help=help_text)
         # SUPPRESS keeps a top-level --json from being reset by the subparser default
         p.add_argument("--json", action="store_true", default=argparse.SUPPRESS)
+        if name == "load":
+            from agentic_analytics.load.cli import add_load_args
+
+            add_load_args(p)
     return ap
+
+
+def _redact(value: Any) -> Any:
+    """Every CLI message passes the trace redactor: no secret from an exception text leaks."""
+    from agentic_analytics.tracing import Redactor
+
+    r = Redactor.from_environ()
+    return (
+        r.text(value) if isinstance(value, str) else r(json.loads(json.dumps(value, default=str)))
+    )
+
+
+def _emit(as_json: bool, payload: dict[str, Any], text: str, *, err: bool = False) -> None:
+    if as_json:
+        print(json.dumps(_redact(payload), sort_keys=True, default=str))
+    else:
+        print(_redact(text), file=sys.stderr if err else sys.stdout)
+
+
+def _error(as_json: bool, message: str, code: int = EXIT_ERROR) -> int:
+    _emit(as_json, {"ok": False, "error": message}, message, err=True)
+    return code
 
 
 def cmd_doctor(as_json: bool) -> int:
@@ -54,7 +83,26 @@ def cmd_doctor(as_json: bool) -> int:
     return EXIT_OK if report.ok else EXIT_FAILED
 
 
-BUILT = {"doctor": cmd_doctor}
+def cmd_load(ns: argparse.Namespace) -> int:
+    """N1.3: load the engines, plant the probes, run parity, set the as-of date. Progress lines
+    and the outcome both pass the redactor."""
+    from agentic_analytics.env import load_dotenv
+    from agentic_analytics.load.cli import cli_load
+
+    load_dotenv()
+
+    def say(text: str) -> None:
+        print(_redact(text), flush=True)
+
+    code, payload, text = cli_load(ns, os.environ, say=say)
+    _emit(ns.json, payload, text, err=code != EXIT_OK)
+    return code
+
+
+BUILT: dict[str, Callable[[argparse.Namespace], int]] = {
+    "doctor": lambda ns: cmd_doctor(ns.json),
+    "load": cmd_load,
+}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -68,7 +116,13 @@ def main(argv: list[str] | None = None) -> int:
         ap.print_help()
         return EXIT_OK
     if ns.command in BUILT:
-        return BUILT[ns.command](ns.json)
+        if rest:
+            ap.error(f"unrecognized arguments: {' '.join(rest)}")
+        try:
+            return BUILT[ns.command](ns)
+        except Exception as exc:  # never a traceback: one redacted line, exit 2 (§4)
+            text = " ".join(f"{type(exc).__name__}: {exc}".split())[:300]
+            return _error(ns.json, f"{PROG} {ns.command}: runtime error: {text}")
     node = COMMANDS[ns.command][1]
     msg = f"`{PROG} {ns.command}` is not built yet; it arrives with build node {node}"
     if ns.json:

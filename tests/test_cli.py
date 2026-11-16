@@ -35,25 +35,31 @@ def test_pre_commit_runs_ruff_and_secret_scan():
         assert hook in text
 
 
-def test_unbuilt_subcommand_exits_2_and_names_its_node(capsys):
+def test_unbuilt_subcommand_exits_2_and_names_its_node(capsys, monkeypatch):
+    # every subcommand is built now; unbuild one to keep the not-built path covered
+    monkeypatch.delitem(cli.BUILT, "load")
     assert cli.main(["load", "--engine", "all"]) == 2
     assert "N1.3" in capsys.readouterr().err
 
 
 @pytest.mark.contract
 def test_unbuilt_subcommand_json_shape(capsys):
-    assert cli.main(["gold", "--json"]) == 2
+    unbuilt = [name for name in cli.COMMANDS if name not in cli.BUILT]
+    if not unbuilt:
+        pytest.skip("every subcommand is built")
+    assert cli.main([unbuilt[0], "--json"]) == 2
     out = json.loads(capsys.readouterr().out)
     assert out == {
         "ok": False,
         "error": "not_built",
-        "node": "Q2.2",
+        "node": cli.COMMANDS[unbuilt[0]][1],
         "message": out["message"],
     }
 
 
 @pytest.mark.contract
-def test_json_flag_before_the_subcommand(capsys):
+def test_json_flag_before_the_subcommand(capsys, monkeypatch):
+    monkeypatch.delitem(cli.BUILT, "load")
     assert cli.main(["--json", "load"]) == 2
     assert json.loads(capsys.readouterr().out)["node"] == "N1.3"
 

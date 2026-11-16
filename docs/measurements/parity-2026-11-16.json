@@ -1,0 +1,923 @@
+{
+  "engines": [
+    "clickhouse",
+    "snowflake"
+  ],
+  "fingerprints": [
+    {
+      "errors": {},
+      "match": true,
+      "name": "row_count",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "n"
+          ],
+          "rows": [
+            [
+              31702685
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "N"
+          ],
+          "rows": [
+            [
+              31702685
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "sum_price",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "total_price"
+          ],
+          "rows": [
+            [
+              7547550240728
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "TOTAL_PRICE"
+          ],
+          "rows": [
+            [
+              7547550240728
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "by_type",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "property_type",
+            "n"
+          ],
+          "rows": [
+            [
+              "detached",
+              7308445
+            ],
+            [
+              "flat",
+              5701022
+            ],
+            [
+              "other",
+              660917
+            ],
+            [
+              "semi-detached",
+              8651328
+            ],
+            [
+              "terraced",
+              9380973
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "PROPERTY_TYPE",
+            "N"
+          ],
+          "rows": [
+            [
+              "detached",
+              7308445
+            ],
+            [
+              "flat",
+              5701022
+            ],
+            [
+              "other",
+              660917
+            ],
+            [
+              "semi-detached",
+              8651328
+            ],
+            [
+              "terraced",
+              9380973
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "by_duration",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "tenure",
+            "n"
+          ],
+          "rows": [
+            [
+              "freehold",
+              24245217
+            ],
+            [
+              "leasehold",
+              7456943
+            ],
+            [
+              "unknown",
+              525
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "TENURE",
+            "N"
+          ],
+          "rows": [
+            [
+              "freehold",
+              24245217
+            ],
+            [
+              "leasehold",
+              7456943
+            ],
+            [
+              "unknown",
+              525
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "by_is_new",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "new_build",
+            "n"
+          ],
+          "rows": [
+            [
+              0,
+              28399501
+            ],
+            [
+              1,
+              3303184
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "NEW_BUILD",
+            "N"
+          ],
+          "rows": [
+            [
+              0,
+              28399501
+            ],
+            [
+              1,
+              3303184
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "date_range",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "min_date",
+            "max_date"
+          ],
+          "rows": [
+            [
+              "1995-01-01",
+              "2026-09-30"
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "MIN_DATE",
+            "MAX_DATE"
+          ],
+          "rows": [
+            [
+              "1995-01-01",
+              "2026-09-30"
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "distinct_towns",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "towns"
+          ],
+          "rows": [
+            [
+              1173
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "TOWNS"
+          ],
+          "rows": [
+            [
+              1173
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "per_year",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "sale_year",
+            "n"
+          ],
+          "rows": [
+            [
+              1995,
+              797161
+            ],
+            [
+              1996,
+              965435
+            ],
+            [
+              1997,
+              1094685
+            ],
+            [
+              1998,
+              1050711
+            ],
+            [
+              1999,
+              1195101
+            ],
+            [
+              2000,
+              1129602
+            ],
+            [
+              2001,
+              1246072
+            ],
+            [
+              2002,
+              1351994
+            ],
+            [
+              2003,
+              1235666
+            ],
+            [
+              2004,
+              1232201
+            ],
+            [
+              2005,
+              1061844
+            ],
+            [
+              2006,
+              1326356
+            ],
+            [
+              2007,
+              1272512
+            ],
+            [
+              2008,
+              649724
+            ],
+            [
+              2009,
+              625379
+            ],
+            [
+              2010,
+              663361
+            ],
+            [
+              2011,
+              661268
+            ],
+            [
+              2012,
+              668986
+            ],
+            [
+              2013,
+              811197
+            ],
+            [
+              2014,
+              985217
+            ],
+            [
+              2015,
+              1011804
+            ],
+            [
+              2016,
+              1046796
+            ],
+            [
+              2017,
+              1067674
+            ],
+            [
+              2018,
+              1037647
+            ],
+            [
+              2019,
+              1012284
+            ],
+            [
+              2020,
+              898194
+            ],
+            [
+              2021,
+              1282171
+            ],
+            [
+              2022,
+              1077406
+            ],
+            [
+              2023,
+              861782
+            ],
+            [
+              2024,
+              932214
+            ],
+            [
+              2025,
+              992278
+            ],
+            [
+              2026,
+              457963
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "SALE_YEAR",
+            "N"
+          ],
+          "rows": [
+            [
+              1995,
+              797161
+            ],
+            [
+              1996,
+              965435
+            ],
+            [
+              1997,
+              1094685
+            ],
+            [
+              1998,
+              1050711
+            ],
+            [
+              1999,
+              1195101
+            ],
+            [
+              2000,
+              1129602
+            ],
+            [
+              2001,
+              1246072
+            ],
+            [
+              2002,
+              1351994
+            ],
+            [
+              2003,
+              1235666
+            ],
+            [
+              2004,
+              1232201
+            ],
+            [
+              2005,
+              1061844
+            ],
+            [
+              2006,
+              1326356
+            ],
+            [
+              2007,
+              1272512
+            ],
+            [
+              2008,
+              649724
+            ],
+            [
+              2009,
+              625379
+            ],
+            [
+              2010,
+              663361
+            ],
+            [
+              2011,
+              661268
+            ],
+            [
+              2012,
+              668986
+            ],
+            [
+              2013,
+              811197
+            ],
+            [
+              2014,
+              985217
+            ],
+            [
+              2015,
+              1011804
+            ],
+            [
+              2016,
+              1046796
+            ],
+            [
+              2017,
+              1067674
+            ],
+            [
+              2018,
+              1037647
+            ],
+            [
+              2019,
+              1012284
+            ],
+            [
+              2020,
+              898194
+            ],
+            [
+              2021,
+              1282171
+            ],
+            [
+              2022,
+              1077406
+            ],
+            [
+              2023,
+              861782
+            ],
+            [
+              2024,
+              932214
+            ],
+            [
+              2025,
+              992278
+            ],
+            [
+              2026,
+              457963
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "text_postcode1",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "distinct_values",
+            "total_chars",
+            "empty_values",
+            "null_values"
+          ],
+          "rows": [
+            [
+              2394,
+              108750067,
+              50928,
+              0
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "DISTINCT_VALUES",
+            "TOTAL_CHARS",
+            "EMPTY_VALUES",
+            "NULL_VALUES"
+          ],
+          "rows": [
+            [
+              2394,
+              108750067,
+              50928,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "text_postcode2",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "distinct_values",
+            "total_chars",
+            "empty_values",
+            "null_values"
+          ],
+          "rows": [
+            [
+              4005,
+              94955268,
+              50929,
+              0
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "DISTINCT_VALUES",
+            "TOTAL_CHARS",
+            "EMPTY_VALUES",
+            "NULL_VALUES"
+          ],
+          "rows": [
+            [
+              4005,
+              94955268,
+              50929,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "text_addr1",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "distinct_values",
+            "total_chars",
+            "empty_values",
+            "null_values"
+          ],
+          "rows": [
+            [
+              595589,
+              117437841,
+              4178,
+              0
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "DISTINCT_VALUES",
+            "TOTAL_CHARS",
+            "EMPTY_VALUES",
+            "NULL_VALUES"
+          ],
+          "rows": [
+            [
+              595589,
+              117437841,
+              4178,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "text_addr2",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "distinct_values",
+            "total_chars",
+            "empty_values",
+            "null_values"
+          ],
+          "rows": [
+            [
+              71220,
+              24727419,
+              27909381,
+              0
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "DISTINCT_VALUES",
+            "TOTAL_CHARS",
+            "EMPTY_VALUES",
+            "NULL_VALUES"
+          ],
+          "rows": [
+            [
+              71220,
+              24727419,
+              27909381,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "text_street",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "distinct_values",
+            "total_chars",
+            "empty_values",
+            "null_values"
+          ],
+          "rows": [
+            [
+              338170,
+              409405091,
+              505180,
+              0
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "DISTINCT_VALUES",
+            "TOTAL_CHARS",
+            "EMPTY_VALUES",
+            "NULL_VALUES"
+          ],
+          "rows": [
+            [
+              338170,
+              409405091,
+              505180,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "text_locality",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "distinct_values",
+            "total_chars",
+            "empty_values",
+            "null_values"
+          ],
+          "rows": [
+            [
+              24066,
+              178485562,
+              12200915,
+              0
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "DISTINCT_VALUES",
+            "TOTAL_CHARS",
+            "EMPTY_VALUES",
+            "NULL_VALUES"
+          ],
+          "rows": [
+            [
+              24066,
+              178485562,
+              12200915,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "text_town",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "distinct_values",
+            "total_chars",
+            "empty_values",
+            "null_values"
+          ],
+          "rows": [
+            [
+              1173,
+              276019588,
+              0,
+              0
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "DISTINCT_VALUES",
+            "TOTAL_CHARS",
+            "EMPTY_VALUES",
+            "NULL_VALUES"
+          ],
+          "rows": [
+            [
+              1173,
+              276019588,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "text_district",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "distinct_values",
+            "total_chars",
+            "empty_values",
+            "null_values"
+          ],
+          "rows": [
+            [
+              467,
+              344807590,
+              0,
+              0
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "DISTINCT_VALUES",
+            "TOTAL_CHARS",
+            "EMPTY_VALUES",
+            "NULL_VALUES"
+          ],
+          "rows": [
+            [
+              467,
+              344807590,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "errors": {},
+      "match": true,
+      "name": "text_county",
+      "reason": null,
+      "results": {
+        "clickhouse": {
+          "columns": [
+            "distinct_values",
+            "total_chars",
+            "empty_values",
+            "null_values"
+          ],
+          "rows": [
+            [
+              132,
+              381577472,
+              0,
+              0
+            ]
+          ]
+        },
+        "snowflake": {
+          "columns": [
+            "DISTINCT_VALUES",
+            "TOTAL_CHARS",
+            "EMPTY_VALUES",
+            "NULL_VALUES"
+          ],
+          "rows": [
+            [
+              132,
+              381577472,
+              0,
+              0
+            ]
+          ]
+        }
+      }
+    }
+  ],
+  "generated_at": "2026-11-16T21:01:33.994566+00:00",
+  "kind": "parity",
+  "pack": "uk_price_paid@1.0",
+  "passed": true,
+  "schema_version": "1.0",
+  "snapshot_sha256": "96f93c64e676dcc1afffb86893616ee0d994cb774915b0b1a754ee7e6d1bc56a",
+  "status": "pass"
+}

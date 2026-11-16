@@ -1,0 +1,136 @@
+# LOD-03 parity fingerprints. Each one runs on both engines and must return identically shaped
+# rows: the same column names (compared case-insensitively) and values compared exactly with
+# EvalKit's sql_match (rel_tol = 0, abs_tol = 0). {database} is the pack's database for the
+# engine. Every query must pass the read-only SQL guard. Enums are cast to text on ClickHouse and
+# dates are returned as YYYY-MM-DD text on both engines, so no driver type decides a match.
+# Every text column also gets a text_<column> fingerprint (distinct values, total characters,
+# empty strings, NULLs), so a swapped, truncated or NULL-for-empty column cannot pass. NULLs are
+# counted explicitly because COUNT(DISTINCT) skips them on both engines.
+version: 1
+fingerprints:
+  - name: row_count
+    clickhouse: SELECT count() AS n FROM {database}.uk_price_paid
+    snowflake: SELECT COUNT(*) AS n FROM {database}.uk_price_paid
+  - name: sum_price
+    clickhouse: SELECT sum(price) AS total_price FROM {database}.uk_price_paid
+    snowflake: SELECT SUM(price) AS total_price FROM {database}.uk_price_paid
+  - name: by_type
+    clickhouse: >-
+      SELECT CAST(type AS String) AS property_type, count() AS n
+      FROM {database}.uk_price_paid GROUP BY property_type ORDER BY property_type
+    snowflake: >-
+      SELECT type AS property_type, COUNT(*) AS n
+      FROM {database}.uk_price_paid GROUP BY property_type ORDER BY property_type
+  - name: by_duration
+    clickhouse: >-
+      SELECT CAST(duration AS String) AS tenure, count() AS n
+      FROM {database}.uk_price_paid GROUP BY tenure ORDER BY tenure
+    snowflake: >-
+      SELECT duration AS tenure, COUNT(*) AS n
+      FROM {database}.uk_price_paid GROUP BY tenure ORDER BY tenure
+  - name: by_is_new
+    clickhouse: >-
+      SELECT is_new AS new_build, count() AS n
+      FROM {database}.uk_price_paid GROUP BY new_build ORDER BY new_build
+    snowflake: >-
+      SELECT is_new AS new_build, COUNT(*) AS n
+      FROM {database}.uk_price_paid GROUP BY new_build ORDER BY new_build
+  - name: date_range
+    clickhouse: >-
+      SELECT toString(min(date)) AS min_date, toString(max(date)) AS max_date
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT TO_VARCHAR(MIN(date), 'YYYY-MM-DD') AS min_date,
+      TO_VARCHAR(MAX(date), 'YYYY-MM-DD') AS max_date
+      FROM {database}.uk_price_paid
+  - name: distinct_towns
+    clickhouse: SELECT uniqExact(town) AS towns FROM {database}.uk_price_paid
+    snowflake: SELECT COUNT(DISTINCT town) AS towns FROM {database}.uk_price_paid
+  - name: per_year
+    clickhouse: >-
+      SELECT toYear(date) AS sale_year, count() AS n
+      FROM {database}.uk_price_paid GROUP BY sale_year ORDER BY sale_year
+    snowflake: >-
+      SELECT YEAR(date) AS sale_year, COUNT(*) AS n
+      FROM {database}.uk_price_paid GROUP BY sale_year ORDER BY sale_year
+  - name: text_postcode1
+    clickhouse: >-
+      SELECT uniqExact(postcode1) AS distinct_values, sum(lengthUTF8(postcode1)) AS total_chars,
+      countIf(postcode1 = '') AS empty_values, countIf(isNull(postcode1)) AS null_values
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT COUNT(DISTINCT postcode1) AS distinct_values, COALESCE(SUM(LENGTH(postcode1)), 0) AS total_chars,
+      COUNT_IF(postcode1 = '') AS empty_values, COUNT_IF(postcode1 IS NULL) AS null_values
+      FROM {database}.uk_price_paid
+  - name: text_postcode2
+    clickhouse: >-
+      SELECT uniqExact(postcode2) AS distinct_values, sum(lengthUTF8(postcode2)) AS total_chars,
+      countIf(postcode2 = '') AS empty_values, countIf(isNull(postcode2)) AS null_values
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT COUNT(DISTINCT postcode2) AS distinct_values, COALESCE(SUM(LENGTH(postcode2)), 0) AS total_chars,
+      COUNT_IF(postcode2 = '') AS empty_values, COUNT_IF(postcode2 IS NULL) AS null_values
+      FROM {database}.uk_price_paid
+  - name: text_addr1
+    clickhouse: >-
+      SELECT uniqExact(addr1) AS distinct_values, sum(lengthUTF8(addr1)) AS total_chars,
+      countIf(addr1 = '') AS empty_values, countIf(isNull(addr1)) AS null_values
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT COUNT(DISTINCT addr1) AS distinct_values, COALESCE(SUM(LENGTH(addr1)), 0) AS total_chars,
+      COUNT_IF(addr1 = '') AS empty_values, COUNT_IF(addr1 IS NULL) AS null_values
+      FROM {database}.uk_price_paid
+  - name: text_addr2
+    clickhouse: >-
+      SELECT uniqExact(addr2) AS distinct_values, sum(lengthUTF8(addr2)) AS total_chars,
+      countIf(addr2 = '') AS empty_values, countIf(isNull(addr2)) AS null_values
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT COUNT(DISTINCT addr2) AS distinct_values, COALESCE(SUM(LENGTH(addr2)), 0) AS total_chars,
+      COUNT_IF(addr2 = '') AS empty_values, COUNT_IF(addr2 IS NULL) AS null_values
+      FROM {database}.uk_price_paid
+  - name: text_street
+    clickhouse: >-
+      SELECT uniqExact(street) AS distinct_values, sum(lengthUTF8(street)) AS total_chars,
+      countIf(street = '') AS empty_values, countIf(isNull(street)) AS null_values
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT COUNT(DISTINCT street) AS distinct_values, COALESCE(SUM(LENGTH(street)), 0) AS total_chars,
+      COUNT_IF(street = '') AS empty_values, COUNT_IF(street IS NULL) AS null_values
+      FROM {database}.uk_price_paid
+  - name: text_locality
+    clickhouse: >-
+      SELECT uniqExact(locality) AS distinct_values, sum(lengthUTF8(locality)) AS total_chars,
+      countIf(locality = '') AS empty_values, countIf(isNull(locality)) AS null_values
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT COUNT(DISTINCT locality) AS distinct_values, COALESCE(SUM(LENGTH(locality)), 0) AS total_chars,
+      COUNT_IF(locality = '') AS empty_values, COUNT_IF(locality IS NULL) AS null_values
+      FROM {database}.uk_price_paid
+  - name: text_town
+    clickhouse: >-
+      SELECT uniqExact(town) AS distinct_values, sum(lengthUTF8(town)) AS total_chars,
+      countIf(town = '') AS empty_values, countIf(isNull(town)) AS null_values
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT COUNT(DISTINCT town) AS distinct_values, COALESCE(SUM(LENGTH(town)), 0) AS total_chars,
+      COUNT_IF(town = '') AS empty_values, COUNT_IF(town IS NULL) AS null_values
+      FROM {database}.uk_price_paid
+  - name: text_district
+    clickhouse: >-
+      SELECT uniqExact(district) AS distinct_values, sum(lengthUTF8(district)) AS total_chars,
+      countIf(district = '') AS empty_values, countIf(isNull(district)) AS null_values
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT COUNT(DISTINCT district) AS distinct_values, COALESCE(SUM(LENGTH(district)), 0) AS total_chars,
+      COUNT_IF(district = '') AS empty_values, COUNT_IF(district IS NULL) AS null_values
+      FROM {database}.uk_price_paid
+  - name: text_county
+    clickhouse: >-
+      SELECT uniqExact(county) AS distinct_values, sum(lengthUTF8(county)) AS total_chars,
+      countIf(county = '') AS empty_values, countIf(isNull(county)) AS null_values
+      FROM {database}.uk_price_paid
+    snowflake: >-
+      SELECT COUNT(DISTINCT county) AS distinct_values, COALESCE(SUM(LENGTH(county)), 0) AS total_chars,
+      COUNT_IF(county = '') AS empty_values, COUNT_IF(county IS NULL) AS null_values
+      FROM {database}.uk_price_paid
