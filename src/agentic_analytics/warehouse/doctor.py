@@ -11,11 +11,17 @@ stored. With executors injected, it checks each engine end to end:
 - the ClickHouse profile reads back `readonly = 1` and `max_execution_time <= 30`; the Snowflake
   session runs as the read-only role, and the warehouse reads back `AUTO_SUSPEND` <= 60 s with
   `AUTO_RESUME`. The ClickHouse Cloud idle timeout is a console setting with no SQL read-back, so
-  that check is reported as skipped.
+  that check is reported as skipped;
+- with MCP configured (N1.7, SET-07, OWNER D-55), one `run_select_query` through the remote MCP
+  server reads `currentRoles()` and `getSetting('readonly')`: it passes only when every role is
+  `analytics_ro` and readonly is 1 or 2 (D-64: the remote MCP server asks for 2), which proves
+  the console binding of the generic Query API endpoint to the MCP key and `analytics_ro`, the
+  one setup step with no API to check it.
 """
 
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import json
 import os
@@ -26,7 +32,7 @@ from typing import Any, Literal
 
 from agentic_analytics.schemas import DatasetPack
 from agentic_analytics.warehouse.clickhouse import ClickHouseExecutor
-from agentic_analytics.warehouse.roles import SF_ROLE
+from agentic_analytics.warehouse.roles import CH_ROLE, SF_ROLE
 from agentic_analytics.warehouse.snowflake import SnowflakeExecutor
 
 ENV_VARS: tuple[str, ...] = (
@@ -40,6 +46,8 @@ ENV_VARS: tuple[str, ...] = (
     "CLICKHOUSE_RO_PASSWORD",
     "CLICKHOUSE_ADMIN_USER",
     "CLICKHOUSE_ADMIN_PASSWORD",
+    "CLICKHOUSE_CLOUD_API_KEY",
+    "CLICKHOUSE_CLOUD_API_SECRET",
     "SNOWFLAKE_ACCOUNT",
     "SNOWFLAKE_RO_USER",
     "SNOWFLAKE_RO_PRIVATE_KEY_PATH",
@@ -318,6 +326,100 @@ def snowflake_checks(
     return checks
 
 
+# ---- MCP role check (N1.7, SET-07) -------------------------------------------------------------
+
+MCP_ROLE_SQL = "SELECT currentRoles() AS roles, getSetting('readonly') AS readonly"
+MCP_CHECK = "clickhouse.mcp_role"
+DEFAULT_MCP_DATABASES: tuple[str, ...] = ("uk", "uk_probes")
+McpQuery = Callable[[str], tuple[bool, str]]  # SQL -> (is_error, tool result text)
+
+
+def _role_list(cell: Any) -> list[str]:
+    """`currentRoles()` as the MCP server returns it: a JSON array, or ClickHouse array text."""
+    if isinstance(cell, list):
+        return [str(x) for x in cell]
+    text = str(cell).strip()
+    with contextlib.suppress(ValueError):
+        value = json.loads(text)
+        if isinstance(value, list):
+            return [str(x) for x in value]
+    quoted = re.findall(r"'([^']*)'", text)
+    if quoted:
+        return quoted
+    return [s.strip() for s in text.strip("[]").split(",") if s.strip()]
+
+
+def _first_row(content: str) -> dict[str, Any] | None:
+    try:
+        body = json.loads(content)
+    except ValueError:
+        return None
+    if not isinstance(body, dict):
+        return None
+    cols, rows = body.get("columns"), body.get("rows")
+    if not isinstance(cols, list) or not isinstance(rows, list) or not rows:
+        return None
+    first = rows[0]
+    if not isinstance(first, list):
+        return None
+    return {str(c).lower(): v for c, v in zip(cols, first, strict=False)}
+
+
+def mcp_checks(query: McpQuery, *, scrub: _Scrubber) -> list[Check]:
+    """One `run_select_query` through MCP must run as `analytics_ro` with readonly 1 or 2
+    (D-64: the remote MCP server asks for 2; both refuse writes)."""
+    is_error, content = query(MCP_ROLE_SQL)
+    if is_error:
+        return [Check(MCP_CHECK, "fail", scrub(f"MCP query failed: {content}"))]
+    row = _first_row(content)
+    if row is None or "roles" not in row:
+        return [Check(MCP_CHECK, "fail", scrub(f"could not read the MCP result: {content}"))]
+    roles = _role_list(row["roles"])
+    readonly = row.get("readonly")
+    good = bool(roles) and all(r == CH_ROLE for r in roles) and str(readonly) in ("1", "2")
+    detail = f"MCP queries run with roles {roles} and readonly={readonly}; required [{CH_ROLE!r}]"
+    if not good:
+        detail += (
+            " and readonly 1 or 2: bind the generic Query API endpoint to the MCP key and "
+            f"{CH_ROLE} in the ClickHouse Cloud console"
+        )
+    return [Check(MCP_CHECK, "pass" if good else "fail", scrub(detail))]
+
+
+def mcp_query(
+    *,
+    service_id: str,
+    databases: tuple[str, ...] = DEFAULT_MCP_DATABASES,
+    settings: Any = None,
+    server: Any = None,
+) -> McpQuery:
+    """A blocking SQL -> (is_error, text) call through the N1.5 MCP client and toolbox."""
+
+    async def ask(sql: str) -> tuple[bool, str]:
+        from agentic_analytics.mcp.client import McpConnection, Toolbox
+
+        async with McpConnection(settings, server=server) as conn:
+            box = Toolbox(conn, service_id, databases, max_calls=1, row_cap=5)
+            out = await box.call("run_select_query", {"query": sql})
+        return out.is_error, out.content
+
+    return lambda sql: asyncio.run(ask(sql))
+
+
+def mcp_query_from_env(
+    environ: Mapping[str, str] | None = None,
+    databases: tuple[str, ...] = DEFAULT_MCP_DATABASES,
+) -> McpQuery | None:
+    """The MCP query for doctor, or None when the MCP variables are not all set."""
+    from agentic_analytics.mcp.client import McpConfigError, McpSettings
+
+    try:
+        settings = McpSettings.from_env(os.environ if environ is None else environ)
+    except McpConfigError:
+        return None
+    return mcp_query(service_id=settings.service_id, databases=databases, settings=settings)
+
+
 def _safe(name: str, fn: Callable[[], list[Check]], scrub: _Scrubber) -> list[Check]:
     try:
         return fn()
@@ -336,8 +438,11 @@ def run_doctor(
     pack: DatasetPack | None = None,
     clickhouse_target: tuple[str, str] = ("uk", "uk_price_paid"),
     snowflake_target: tuple[str, str] = ("ANALYTICS.UK", "UK_PRICE_PAID"),
+    mcp: McpQuery | None = None,
+    check_mcp: bool = False,
 ) -> DoctorReport:
-    """Build the doctor report. Engines without an executor are reported as skipped."""
+    """Build the doctor report. Engines without an executor are reported as skipped; the MCP
+    role check runs when `mcp` is given and is reported as skipped when only `check_mcp` is."""
     env = os.environ if environ is None else environ
     scrub = _Scrubber(env)
     if pack is not None:
@@ -357,6 +462,12 @@ def run_doctor(
             "clickhouse.error",
             lambda: clickhouse_checks(clickhouse, database=db, table=tbl, scrub=scrub),
             scrub,
+        )
+    if mcp is not None:
+        checks += _safe(MCP_CHECK, lambda: mcp_checks(mcp, scrub=scrub), scrub)
+    elif check_mcp:
+        checks.append(
+            Check(MCP_CHECK, "skip", "no MCP client (CLICKHOUSE_MCP_* or SERVICE_ID missing)")
         )
     if snowflake is None:
         checks.append(Check("snowflake", "skip", "no executor (Snowflake env vars missing)"))
@@ -410,6 +521,9 @@ __all__ = [
     "clickhouse_checks",
     "env_presence",
     "executors_from_env",
+    "mcp_checks",
+    "mcp_query",
+    "mcp_query_from_env",
     "run_doctor",
     "snowflake_checks",
 ]

@@ -21,6 +21,7 @@ Generated from Agentic Analytics Tech Spec §12.2 on 2026-11-15; edit here from 
 | **N1.4** | Semantic layer | N1.3 | node_converge + verifier | `packs/uk_price_paid/semantic.yaml`, generated semantic view and descriptions block, parity test | US2 |
 | **N1.5** | MCP client | N1.1, N1.6 | node_converge + verifier | Streamable-HTTP client, allow-list, `serviceId` injection, row cap, call counter, fake server | US1 |
 | **N1.6** | Model adapters and cost | N1.1 | node_converge + verifier | Claude and GPT tool-calling adapters, `prices.yaml`, estimate, `--dry-run`, `--max-cost`, spend ledger | US5 |
+| **N1.7** | Account setup command | N1.2 | node_converge + verifier | `agentic-analytics setup clickhouse` and `setup snowflake` (OWNER D-55): service, MCP key, read-only user and role, Snowflake key pairs and bootstrap SQL, `.env`, the two console steps, the `doctor` MCP role check | US9 |
 
 ## Wave 2 — questions and gold
 

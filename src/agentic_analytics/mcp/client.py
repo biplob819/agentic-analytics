@@ -283,6 +283,8 @@ def model_schema(server_schema: dict[str, Any], databases: tuple[str, ...]) -> d
 #   {"columns": [names or {"name": ...}], "rows": [[...] or {...}, ...]}
 #   ClickHouse JSON: {"meta": [{"name", "type"}], "data": [...], "rows": n, "statistics": {...}}
 #   a list of objects (JSONEachRow), possibly wrapped in {"data" | "result" | "rows": ...}.
+# LIVE (D-64): the ClickHouse Cloud remote MCP server returns ClickHouse JSON wrapped in an object,
+#   {"result": {"meta": [...], "data": [{...}], "rows": n, "statistics": {...}}}.
 # Anything else is an unknown shape and the raw text goes to the model, clipped. Only an
 # explicit server-side cut counts: an integer `rows` above the number of rows sent, or
 # `"truncated": true`. ClickHouse's `rows_before_limit_at_least` is ignored on purpose: it counts
@@ -360,7 +362,7 @@ def _shape(payload: Any, depth: int = 0) -> _Shaped | None:
             shaped = _Shaped(cols, rows)
         else:
             key = next((k for k in ("data", "result", "rows") if k in payload), None)
-            if key is None or not isinstance(payload[key], list | str):
+            if key is None or not isinstance(payload[key], list | str | dict):
                 return None
             shaped = _shape(payload[key], depth + 1)
             if shaped is None:

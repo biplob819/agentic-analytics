@@ -370,7 +370,7 @@ def test_shape_rows_deeply_nested_python_value_never_raises():
         deep = {"data": [deep]}
     cols, _ = shape_rows(deep)  # one row whose single cell is the nested value
     assert cols == ["data"]
-    assert shape_rows({"result": deep}) == (None, None)
+    assert shape_rows({"result": deep})[0] == ["data"]  # D-64: a dict under "result" unwraps
     res = types.SimpleNamespace(content=[], structured_content=deep, is_error=False)
     out = query(ScriptedConn(res))  # json cannot write the cell: raw (empty) text, no exception
     assert (out.is_error, out.content, out.rows_returned) == (False, "", None)
@@ -937,3 +937,49 @@ def test_settings_reject_non_https_urls(url):
 )
 def test_settings_accept_https_and_local_http(url):
     assert McpSettings.from_env({**ENV, "CLICKHOUSE_MCP_URL": url}).url == url
+
+
+def test_live_clickhouse_remote_mcp_shape_is_read() -> None:
+    """D-64: the payload the ClickHouse Cloud remote MCP server returned live."""
+    live = {
+        "result": {
+            "meta": [
+                {"name": "roles", "type": "Array(String)"},
+                {"name": "readonly", "type": "UInt8"},
+            ],
+            "data": [{"roles": ["analytics_ro"], "readonly": 2}],
+            "rows": 1,
+            "statistics": {"elapsed": 0.0013, "rows_read": 1, "bytes_read": 1},
+        }
+    }
+    cols, rows = shape_rows(live)
+    assert cols == ["roles", "readonly"]
+    assert rows == [[["analytics_ro"], 2]]
+
+
+def test_live_shape_carries_the_inner_server_cut() -> None:
+    """D-64 verifier: a cut stated inside the unwrapped object survives the outer level."""
+    inner = {"meta": [{"name": "a"}], "data": [{"a": 1}, {"a": 2}], "rows": 5000}
+
+    def ask(payload: dict[str, Any]) -> Any:
+        res = types.SimpleNamespace(content=[], structured_content=payload, is_error=False)
+        return query(ScriptedConn(res))
+
+    out = ask({"result": inner})
+    assert (out.rows_returned, out.rows_total, out.truncated) == (2, 5000, True)
+    out = ask({"result": {**inner, "rows": 2, "truncated": True}})
+    assert (out.rows_returned, out.rows_total, out.truncated) == (2, 2, True)
+    out = ask({"result": {**inner, "rows": 2}})
+    assert (out.rows_returned, out.rows_total, out.truncated) == (2, 2, False)
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"result": {"status": "error", "message": "Code: 164. readonly"}},
+        {"result": {"error": "Code: 497", "rows": 0}},
+        {"result": {"result": {"result": {"result": {"result": {"data": [{"a": 1}]}}}}}},
+    ],
+)
+def test_unwrapped_error_or_too_deep_object_is_not_rows(payload: Any) -> None:
+    assert shape_rows(payload) == (None, None)

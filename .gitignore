@@ -1,4 +1,5 @@
 .venv/
+.venv-*/
 __pycache__/
 *.pyc
 dist/
@@ -29,3 +30,6 @@ Portfolio notes.md
 # Claude Code local settings
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
+
+# clickhousectl saves its API key here (OWNER D-55); never commit it
+.clickhouse/

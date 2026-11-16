@@ -26,7 +26,7 @@ def test_graph_matches_tech_spec_node_table():
     section = SPEC[SPEC.index("### 12.2") : SPEC.index("### 12.3")]
     expected = dict(re.findall(r"^\| \*\*(\w\d\.\d)\*\* \| [^|]+ \| ([^|]+) \|", section, re.M))
     nodes = load_graph()
-    assert len(expected) == 23
+    assert len(expected) == 24  # N1.7 added by OWNER D-55
     assert set(nodes) == set(expected)
     for nid, deps in expected.items():
         want = [] if deps.strip() == "\u2014" else [d.strip() for d in deps.split(",")]
@@ -45,7 +45,7 @@ def test_catalog_matches_tech_spec_capabilities():
         if m:
             expected.append((m.group(1), node, f"{m.group(2)} [{m.group(3)}]"))
     caps = load_catalog()
-    assert len(expected) == 133
+    assert len(expected) == 140  # SET-01..07 (OWNER D-55)
     assert [(c.cap_id, c.node, c.note) for c in caps] == expected
 
 

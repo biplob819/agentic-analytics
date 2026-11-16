@@ -29,6 +29,7 @@ COMMANDS: dict[str, tuple[str, str]] = {
     "report": ("build the dashboard", "R3.1"),
     "reconcile": ("pull metered warehouse credits into a run", "R3.1"),
     "demo-cache": ("save answered questions for demo replay", "D4.1"),
+    "setup": ("set up an engine account: `setup clickhouse` or `setup snowflake`", "N1.7"),
 }
 
 EXIT_OK, EXIT_FAILED, EXIT_ERROR, EXIT_COST_CAP = 0, 1, 2, 3
@@ -47,6 +48,10 @@ def build_parser() -> argparse.ArgumentParser:
             from agentic_analytics.load.cli import add_load_args
 
             add_load_args(p)
+        elif name == "setup":
+            from agentic_analytics.setup.cli import add_setup_args
+
+            add_setup_args(p)
     return ap
 
 
@@ -74,11 +79,15 @@ def _error(as_json: bool, message: str, code: int = EXIT_ERROR) -> int:
 
 def cmd_doctor(as_json: bool) -> int:
     from agentic_analytics.env import load_dotenv
-    from agentic_analytics.warehouse.doctor import executors_from_env, run_doctor
+    from agentic_analytics.warehouse.doctor import (
+        executors_from_env,
+        mcp_query_from_env,
+        run_doctor,
+    )
 
     load_dotenv()
     ch, sf = executors_from_env()
-    report = run_doctor(clickhouse=ch, snowflake=sf)
+    report = run_doctor(clickhouse=ch, snowflake=sf, mcp=mcp_query_from_env(), check_mcp=True)
     print(report.to_json() if as_json else report.render(), end="" if not as_json else "\n")
     return EXIT_OK if report.ok else EXIT_FAILED
 
@@ -99,9 +108,26 @@ def cmd_load(ns: argparse.Namespace) -> int:
     return code
 
 
+def cmd_setup(ns: argparse.Namespace) -> int:
+    """N1.7 (OWNER D-55). Output goes through the setup command's own secret box, which knows
+    every secret it has seen; the printed Snowflake SQL holds public keys only."""
+    from agentic_analytics.env import load_dotenv
+    from agentic_analytics.setup.cli import cli_setup
+
+    env_file = getattr(ns, "env_file", ".env")
+    load_dotenv(env_file)
+    code, payload, text = cli_setup(ns, os.environ)
+    if ns.json:
+        print(json.dumps(payload, sort_keys=True, default=str))
+    else:
+        print(text, file=sys.stderr if code != EXIT_OK else sys.stdout)
+    return code
+
+
 BUILT: dict[str, Callable[[argparse.Namespace], int]] = {
     "doctor": lambda ns: cmd_doctor(ns.json),
     "load": cmd_load,
+    "setup": cmd_setup,
 }
 
 

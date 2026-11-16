@@ -409,6 +409,7 @@ def ask(question: str, backends: list[BackendName], mode: Literal["replay", "liv
 | `agentic-analytics init` | Writes `run.yaml` and `.env.example` into the current folder | No |
 | `agentic-analytics pack check [--pack PATH]` | Validates a dataset pack with no accounts (§2.7) | No |
 | `agentic-analytics doctor` | Shows which env vars are set (never their values), reaches both engines, and asserts the roles are read-only | No |
+| `agentic-analytics setup clickhouse` / `setup snowflake` | Account setup from the terminal (N1.7, OWNER D-55): creates or adopts the ClickHouse Cloud service, MCP key and read-only user through `clickhousectl`, and prints the two console steps with no API; makes the Snowflake key pairs and prints (or `--run`s) the ACCOUNTADMIN SQL. Writes `.env`, never prints a secret | ClickHouse service only when it creates one |
 | `make load` → `agentic-analytics load --engine all` | Loads both engines idempotently, then runs the parity check | Warehouse |
 | `make gold` → `agentic-analytics gold` | Runs the gold check. `--only q-121` checks one new question | Warehouse |
 | `agentic-analytics run --backend all --fix none --trials 3` | Runs the benchmark. `--fix` takes `descriptions`, `examples` or `self-check`. Also takes `--dry-run`, `--max-cost`, `--rescore` | Yes |
@@ -427,6 +428,7 @@ def ask(question: str, backends: list[BackendName], mode: Literal["replay", "liv
 | `CLICKHOUSE_MCP_KEY_ID`, `CLICKHOUSE_MCP_KEY_SECRET`, `CLICKHOUSE_SERVICE_ID` | MCP client |
 | `CLICKHOUSE_HOST`, `CLICKHOUSE_RO_USER`, `CLICKHOUSE_RO_PASSWORD` | Read-only executor |
 | `CLICKHOUSE_ADMIN_USER`, `CLICKHOUSE_ADMIN_PASSWORD` | Loader and role setup only |
+| `CLICKHOUSE_CLOUD_API_KEY`, `CLICKHOUSE_CLOUD_API_SECRET` | `setup clickhouse` only, through `clickhousectl`: an optional, owner-only, short-lived admin Cloud API key, deleted after setup (OWNER D-55) |
 | `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_RO_USER`, `SNOWFLAKE_RO_PRIVATE_KEY_PATH`, `SNOWFLAKE_WAREHOUSE` | Executor, Cortex client |
 | `SNOWFLAKE_ADMIN_USER`, `SNOWFLAKE_ADMIN_PRIVATE_KEY_PATH` | Loader, semantic view, role setup only |
 | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` | Tracing |
@@ -608,9 +610,9 @@ agentic-analytics/
 
 Status vocabulary: `not-started | spec | building | green`. Changelog lines read `[TYPE] [NODE] — summary`.
 
-### 12.2 Build graph: 23 nodes in five waves
+### 12.2 Build graph: 24 nodes in five waves
 
-**Must scope: 21 nodes,** W0.1 to B3.3. **Should scope (US7): 2 nodes,** D4.1 and D4.2. The whole graph is built in one pass (OWNER D-20). B3.3 publishes v0.1.0 to PyPI (OWNER D-27).
+**Must scope: 22 nodes,** W0.1 to B3.3, with N1.7 (OWNER D-55). **Should scope (US7): 2 nodes,** D4.1 and D4.2. The whole graph is built in one pass (OWNER D-20). B3.3 publishes v0.1.0 to PyPI (OWNER D-27).
 
 | Node | Title | Depends on | Deliverable (what exists when it is green) | Stories |
 | --- | --- | --- | --- | --- |
@@ -621,6 +623,7 @@ Status vocabulary: `not-started | spec | building | green`. Changelog lines read
 | **N1.4** | Semantic layer | N1.3 | `packs/uk_price_paid/semantic.yaml`, generated semantic view and descriptions block, parity test | US2 |
 | **N1.5** | MCP client | N1.1, N1.6 | Streamable-HTTP client, allow-list, `serviceId` injection, row cap, call counter, fake server | US1 |
 | **N1.6** | Model adapters and cost | N1.1 | Claude and GPT tool-calling adapters, `prices.yaml`, estimate, `--dry-run`, `--max-cost`, spend ledger | US5 |
+| **N1.7** | Account setup command | N1.2 | `agentic-analytics setup clickhouse` and `setup snowflake` (OWNER D-55): service, MCP key, read-only user and role, Snowflake key pairs and bootstrap SQL, `.env`, the two console steps, the `doctor` MCP role check | US9 |
 | **Q2.1** | Question bank and probes | N1.1, N1.3 | 120 drafted questions, lints, dual authorship, owner review, 20 probes | US1, US3, US8 |
 | **Q2.2** | Gold check | Q2.1, N1.2 | `agentic-analytics gold`, cross-engine match, tie check, the selected 100, `gold_check_id` | US9 |
 | **A2.1** | MCP agent loop | N1.5, N1.6 | One loop for Claude and GPT, system prompt, `final_answer`, budgets, live smoke | US1 |
@@ -650,6 +653,7 @@ graph LR
   N16 --> N15
   N11 --> N16[N1.6 Models + cost]
   N12 --> N13[N1.3 Loaders + parity]
+  N12 --> N17[N1.7 Account setup]
   N13 --> N14[N1.4 Semantic layer]
   N11 --> Q21[Q2.1 Questions + probes]
   N13 --> Q21
@@ -692,7 +696,7 @@ graph LR
 | 0 | W0.1 |
 | 1 | N1.1 |
 | 2 | N1.2, N1.6 |
-| 3 | N1.3, N1.5, S2.1 |
+| 3 | N1.3, N1.5, N1.7, S2.1 |
 | 4 | N1.4, Q2.1, M2.1, A2.1 |
 | 5 | A2.2, Q2.2 |
 | 6 | A2.3, F3.1 |
@@ -733,6 +737,7 @@ graph LR
 | 21 | B3.3 | v0.1.0 on PyPI; Must scope complete |
 | 22 | D4.1 |  |
 | 23 | D4.2 |  |
+| 24 | N1.7 | added by OWNER D-55; can run any time after N1.2 |
 
 ### 12.4 Capability catalog
 
@@ -815,6 +820,18 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 | MOD-04 | Per-call cost (cached and reasoning tokens), pre-run estimate, `--dry-run`, `--max-cost` (exit 3) | NFR1 |
 | MOD-05 | Retry policy and error taxonomy (§2.6) | E2 |
 | MOD-06 | Spend-ledger append after every real run | NFR1 |
+
+**N1.7 Account setup command**
+
+| Cap | Capability | Trace |
+| --- | --- | --- |
+| SET-01 | `agentic-analytics setup clickhouse`: creates or adopts (by exact name) the ClickHouse Cloud service on AWS through `clickhousectl --json` and a tolerant parser, saves the one-time admin password to `.env` the moment it is issued, and waits until the service runs | OWNER D-55, US9 |
+| SET-02 | MCP API key with the system org role Basic Service API Reader (found by name; `--mcp-role-id` overrides) and an explicit IP allow list, its secret written straight to `.env`; kept on a rerun unless `--rotate-mcp-key` | OWNER D-55, FR4 |
+| SET-03 | Read-only user and the `analytics_ro` role from `roles.py`, applied with the admin password only after `role_sql_problems` passes | OWNER D-55, NFR3 |
+| SET-04 | `.env` written atomically with mode 600 and every other line kept; no password, key secret or private key is ever printed or logged | OWNER D-55, NFR4 |
+| SET-05 | The two console steps with no public API printed word for word: the MCP toggle, and the generic Query API endpoint bound to the MCP key and `analytics_ro` | OWNER D-55, D-19 |
+| SET-06 | `agentic-analytics setup snowflake`: RSA-2048 key pairs (mode 600, never overwritten) and the ACCOUNTADMIN bootstrap SQL, printed for Snowsight or run with `--run` behind a hidden password and MFA prompt, then `.env` filled in and both key-pair logins checked | OWNER D-55, NFR4 |
+| SET-07 | `doctor` proves that an MCP `run_select_query` runs as `analytics_ro` with `readonly` 1 or 2 (D-64) | OWNER D-55, D-19, NFR3 |
 
 **Q2.1 Question bank and probes**
 
@@ -1088,6 +1105,7 @@ Severity: **C** = would make the headline result wrong or unfair; **H** = would 
 | E6 | Secrets inventory, and admin keys kept apart from runtime keys | §4 environment table |
 | E7 | Cortex docs spell the content type both `suggestion` and `suggestions` | CTX-02 |
 | E8 | The self-check fix can collide with the six-call cap | §7, FIX-04 |
+| E9 | Account setup was console and Snowsight clicks with secrets copied by hand, and the MCP Query API endpoint's role binding had no check | OWNER D-55, SET-01 to SET-07 |
 
 **PRD amendments proposed** (not yet applied):
 
@@ -1100,8 +1118,8 @@ Severity: **C** = would make the headline result wrong or unfair; **H** = would 
 
 ## Appendix B: What the owner needs to provide
 
-1. A ClickHouse Cloud trial service, with MCP enabled. Also an API key with org role Member and service role Query Endpoints, a Query API endpoint attached and bound to `analytics_ro` (the builder supplies the SQL), and admin credentials for the loader.
-2. A Snowflake trial in AWS us-west-2 or eu-west-1, with key-pair users for admin and `ANALYTICS_RO` (the builder generates the keys and the SQL; the owner pastes the public keys).
+1. A ClickHouse Cloud trial service, with MCP enabled. Also an API key with the org role Basic Service API Reader, a Query API endpoint attached and bound to `analytics_ro` (the builder supplies the SQL), and admin credentials for the loader. `agentic-analytics setup clickhouse` (N1.7) does all of it from an admin Cloud API key except signup, the MCP toggle and the endpoint binding, which it prints as console steps.
+2. A Snowflake trial in AWS us-west-2 or eu-west-1, with key-pair users for admin and `ANALYTICS_RO` (the builder generates the keys and the SQL; the owner pastes the public keys). `agentic-analytics setup snowflake` (N1.7) makes the keys and the SQL, and `--run` runs it with a hidden password and MFA prompt.
 3. Langfuse Cloud Hobby project keys.
 4. The `agentic-analytics` repo on GitHub (public), and the Cloudflare Pages project.
 5. One review sitting of about 45 minutes for the question bank and the semantic-layer wording.
