@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 100,
+  "engine": "snowflake",
+  "executed_at": "2026-11-15T12:00:00Z",
+  "question_id": "q-061",
+  "result": {
+    "columns": [
+      "label",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "L00",
+        419730
+      ],
+      [
+        "L01",
+        412730
+      ],
+      [
+        "L02",
+        405730
+      ],
+      [
+        "L03",
+        398730
+      ],
+      [
+        "L04",
+        391730
+      ],
+      [
+        "L05",
+        384730
+      ],
+      [
+        "L06",
+        377730
+      ],
+      [
+        "L07",
+        370730
+      ],
+      [
+        "L08",
+        363730
+      ],
+      [
+        "L09",
+        356730
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "69a38a900c6ada97d52211cf1fad893df6fda7685bfe5d63bac4b0ef73ce589b"
+}

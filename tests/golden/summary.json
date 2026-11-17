@@ -1,0 +1,504 @@
+{
+  "schema_version": "1.0",
+  "run_id": "golden",
+  "config_hash": "67b124c104f52eed7f53828f9e01a299f13db13fde487cb06fc754fb690f4bcf",
+  "snapshot_sha256": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+  "as_of": "2026-09-30",
+  "gold_check_id": "e7a31b7b4b675a87bf6c6fa768da3590fc7e60dd797a8487418f0f6513298997",
+  "pack": "uk_price_paid@1.0",
+  "gold_mode": "cross_engine",
+  "backends": [
+    {
+      "backend": "claude_mcp",
+      "fixes": [],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.611111111111111,
+        "lo": 0.3611111111111111,
+        "hi": 0.8611111111111112
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 2,
+          "accuracy": {
+            "point": 0.3333333333333333,
+            "lo": 0.0,
+            "hi": 0.8333333333333333
+          }
+        },
+        {
+          "category": "time",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 2,
+          "accuracy": {
+            "point": 0.3333333333333333,
+            "lo": 0.0,
+            "hi": 0.6666666666666666
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+      },
+      "false_clarification_rate": {
+        "point": 0.1,
+        "lo": 0.0,
+        "hi": 0.3
+      },
+      "pass_all_trials": {
+        "point": 0.5,
+        "lo": 0.25,
+        "hi": 0.75
+      },
+      "trial_agreement": 0.75,
+      "answer_from_rows_violations": 3,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.01187181818181818,
+      "latency_p50_ms": 1348,
+      "latency_p95_ms": 2677
+    },
+    {
+      "backend": "claude_mcp",
+      "fixes": [
+        "examples"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.6666666666666666,
+        "lo": 0.4166666666666667,
+        "hi": 0.9166666666666666
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 2,
+          "accuracy": {
+            "point": 0.6666666666666666,
+            "lo": 0.16666666666666666,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 2,
+          "accuracy": {
+            "point": 0.3333333333333333,
+            "lo": 0.0,
+            "hi": 0.8333333333333333
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+      },
+      "false_clarification_rate": {
+        "point": 0.1,
+        "lo": 0.0,
+        "hi": 0.3
+      },
+      "pass_all_trials": {
+        "point": 0.5833333333333334,
+        "lo": 0.3333333333333333,
+        "hi": 0.8333333333333334
+      },
+      "trial_agreement": 0.8333333333333334,
+      "answer_from_rows_violations": 3,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.011796000000000001,
+      "latency_p50_ms": 1347,
+      "latency_p95_ms": 2677
+    },
+    {
+      "backend": "gpt_mcp",
+      "fixes": [],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.5833333333333334,
+        "lo": 0.3055555555555555,
+        "hi": 0.8333333333333334
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 2,
+          "accuracy": {
+            "point": 0.16666666666666666,
+            "lo": 0.0,
+            "hi": 0.6666666666666666
+          }
+        },
+        {
+          "category": "time",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 2,
+          "accuracy": {
+            "point": 0.8333333333333333,
+            "lo": 0.3333333333333333,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.5,
+        "lo": 0.0,
+        "hi": 1.0
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.5,
+        "lo": 0.25,
+        "hi": 0.75
+      },
+      "trial_agreement": 0.75,
+      "answer_from_rows_violations": 3,
+      "policy_violations": 0,
+      "errors": {
+        "answer.refusal": 3
+      },
+      "cost_per_correct_usd": 0.013738714285714286,
+      "latency_p50_ms": 1701,
+      "latency_p95_ms": 2779
+    },
+    {
+      "backend": "gpt_mcp",
+      "fixes": [
+        "examples"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.7222222222222222,
+        "lo": 0.47222222222222227,
+        "hi": 0.9166666666666666
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 2,
+          "accuracy": {
+            "point": 0.8333333333333333,
+            "lo": 0.3333333333333333,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.5,
+        "lo": 0.0,
+        "hi": 1.0
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.6666666666666666,
+        "lo": 0.4166666666666667,
+        "hi": 0.9166666666666666
+      },
+      "trial_agreement": 0.8333333333333334,
+      "answer_from_rows_violations": 3,
+      "policy_violations": 0,
+      "errors": {
+        "answer.refusal": 3
+      },
+      "cost_per_correct_usd": 0.010891384615384615,
+      "latency_p50_ms": 1701,
+      "latency_p95_ms": 2779
+    },
+    {
+      "backend": "cortex_analyst",
+      "fixes": [],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.75,
+        "lo": 0.5,
+        "hi": 1.0
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 2,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 2,
+          "accuracy": {
+            "point": 0.0,
+            "lo": 0.0,
+            "hi": 0.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 2,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 1.0,
+        "lo": 1.0,
+        "hi": 1.0
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.75,
+        "lo": 0.5,
+        "hi": 1.0
+      },
+      "trial_agreement": 1.0,
+      "answer_from_rows_violations": 0,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.268,
+      "latency_p50_ms": 2400,
+      "latency_p95_ms": 2400
+    }
+  ],
+  "uplifts": [
+    {
+      "backend": "claude_mcp",
+      "fix": "examples",
+      "delta_points": {
+        "point": 5.555555555555556,
+        "lo": -16.666666666666668,
+        "hi": 27.777777777777782
+      },
+      "p_value": 0.7056471764117941,
+      "separated": false
+    },
+    {
+      "backend": "gpt_mcp",
+      "fix": "examples",
+      "delta_points": {
+        "point": 13.888888888888891,
+        "lo": 0.0,
+        "hi": 36.111111111111114
+      },
+      "p_value": 0.21989005497251374,
+      "separated": false
+    }
+  ],
+  "probes": {
+    "p-iq01": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w01": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    }
+  },
+  "cost_status": "estimated",
+  "total_cost_usd": 9.683799,
+  "total_credits": {
+    "clickhouse": 0.0,
+    "snowflake": 2.814
+  },
+  "started_at": "2026-11-15T12:00:00Z",
+  "finished_at": "2026-11-15T12:00:00Z"
+}

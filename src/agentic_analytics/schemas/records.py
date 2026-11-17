@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Annotated
+from typing import Annotated, Any
 
-from pydantic import Field, model_validator
+from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from agentic_analytics.schemas._base import (
     ENGINE_OF,
@@ -54,6 +54,9 @@ class Scores(Model):
         return self
 
 
+UNSET_OMITTED = ("ask_wall_ms", "analyst_latency_ms")
+
+
 class Record(Versioned):
     run_id: NonBlank
     question_id: Annotated[str, Field(pattern=r"^(q-[0-9]{3}|p-(w|iq|id)[0-9]{2})$")]
@@ -69,6 +72,11 @@ class Record(Versioned):
     cortex_messages: NonNegInt
     warehouse_elapsed_ms: NonNegInt
     warehouse_credits_alloc: NonNegFloat | None = None
+    # R3.1: the runner's wall time for the ask, question in to answer out (for Cortex the API
+    # round trip plus the execution of its SQL); None on records made before it was measured
+    ask_wall_ms: NonNegInt | None = None
+    # Cortex's own time from `response_metadata.analyst_latency_ms` (A2.2), Cortex only
+    analyst_latency_ms: NonNegFloat | None = None
     timestamp: Timestamp
     seed: StrictInt
     git_sha: GitSha
@@ -106,4 +114,16 @@ class Record(Versioned):
             raise ValueError("tokens keys are in, out, cached, reasoning")
         if self.backend == "cortex_analyst" and self.cost_usd and not self.cortex_messages:
             raise ValueError("Cortex spend without a message count")
+        if self.analyst_latency_ms is not None and self.backend != "cortex_analyst":
+            raise ValueError("analyst_latency_ms is Cortex's own time; only Cortex records have it")
         return self
+
+    @model_serializer(mode="wrap")
+    def _omit_unmeasured(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """The R3.1 timings are left out while unset, so a record without them keeps the exact
+        format it had before they existed (stored records, fixtures and the bundled example)."""
+        data = handler(self)
+        for name in UNSET_OMITTED:
+            if data.get(name, 0) is None:
+                del data[name]
+        return data

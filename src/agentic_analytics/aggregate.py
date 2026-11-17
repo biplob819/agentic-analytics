@@ -411,9 +411,12 @@ def probes_failed(probes: Mapping[str, Mapping[str, bool]]) -> list[str]:
 
 
 def latency_ms(record: Record) -> int:
-    """End-to-end latency of one answer: the agent's step latencies (model and tool calls)
-    plus the scorer's execution of the final SQL. Cortex answers have no steps, so their
-    latency is the execution alone (the Cortex API round trip is not on the record)."""
+    """End-to-end latency of one answer, question in to answer out: the agent's step latencies
+    (model and tool calls) plus the scorer's execution of the final SQL. Cortex answers have no
+    steps, so theirs is the runner's wall time for the ask (`ask_wall_ms`: the Cortex API round
+    trip plus the execution, R3.1); a Cortex record without it falls back to the execution."""
+    if record.backend == "cortex_analyst" and record.ask_wall_ms is not None:
+        return record.ask_wall_ms
     steps = sum(s.latency_ms for s in record.answer.steps)
     return steps + (record.execution.elapsed_ms if record.execution is not None else 0)
 

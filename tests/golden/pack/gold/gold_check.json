@@ -1,0 +1,33 @@
+{
+  "as_of": "2026-09-30",
+  "checked_at": "2026-11-15T12:00:00Z",
+  "engines": [
+    "clickhouse",
+    "snowflake"
+  ],
+  "failures": [],
+  "gold_check_id": "e7a31b7b4b675a87bf6c6fa768da3590fc7e60dd797a8487418f0f6513298997",
+  "kind": "gold_check",
+  "mode": "cross_engine",
+  "pack": "uk_price_paid@1.0",
+  "probes": [
+    "p-iq01"
+  ],
+  "questions": [
+    "q-001",
+    "q-002",
+    "q-021",
+    "q-022",
+    "q-041",
+    "q-042",
+    "q-061",
+    "q-071",
+    "q-081",
+    "q-082",
+    "q-101",
+    "q-102"
+  ],
+  "schema_version": "1.0",
+  "snapshot_sha256": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+  "status": "pass"
+}

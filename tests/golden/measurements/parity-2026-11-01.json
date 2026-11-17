@@ -1,0 +1,1 @@
+{"schema_version": "1.0", "kind": "parity", "pack": "uk_price_paid@1.0", "engines": ["clickhouse", "snowflake"], "status": "pass", "passed": true, "snapshot_sha256": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e", "generated_at": "2026-11-01T10:00:00+00:00", "fingerprints": []}

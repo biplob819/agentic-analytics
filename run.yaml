@@ -1,0 +1,23 @@
+# agentic-analytics run configuration (a RunConfig, Tech Spec §3).
+# `agentic-analytics load` sets as_of to the snapshot's last complete month (D-10).
+backends: [claude_mcp, gpt_mcp, cortex_analyst]
+models:
+  claude_mcp: claude-sonnet-5-5
+  gpt_mcp: gpt-6.1-sol
+fixes: []
+trials: 3
+max_tool_calls: 6
+max_turns: 10
+row_cap_model: 50
+row_cap_exec: 10000
+as_of: 2026-08-31
+effort: medium
+seed: 0
+max_cost_usd: 25.0
+concurrency:
+  claude_mcp: 4
+  gpt_mcp: 4
+  cortex_analyst: 2
+# The Snowflake account's region, as SELECT CURRENT_REGION() gives it, for the Cortex latency
+# caveat (OWNER D-62). Left out, the run reads it through the read-only executor at start.
+snowflake_region: AWS_AP_SOUTHEAST_7

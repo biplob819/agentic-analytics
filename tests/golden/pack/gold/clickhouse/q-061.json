@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 100,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-15T12:00:00Z",
+  "question_id": "q-061",
+  "result": {
+    "columns": [
+      "label",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "L00",
+        419730
+      ],
+      [
+        "L01",
+        412730
+      ],
+      [
+        "L02",
+        405730
+      ],
+      [
+        "L03",
+        398730
+      ],
+      [
+        "L04",
+        391730
+      ],
+      [
+        "L05",
+        384730
+      ],
+      [
+        "L06",
+        377730
+      ],
+      [
+        "L07",
+        370730
+      ],
+      [
+        "L08",
+        363730
+      ],
+      [
+        "L09",
+        356730
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "8a0bda2fe957d4c95dda2f08646b3ecc80bde47de83abcc2c4c7e2dacc9a5b4a"
+}

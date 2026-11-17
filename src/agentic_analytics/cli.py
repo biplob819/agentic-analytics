@@ -2,6 +2,10 @@
 
 Each subcommand is listed with the build node that makes it real. Until that node is green the
 subcommand exits 2 and names the node, so `make` targets fail loudly instead of doing nothing.
+
+Exit codes (Tech Spec §4): 0 ok; 1 parity, gold or probe failure; 2 configuration or runtime
+error; 3 stopped at the cost cap, with work cached and a resume hint. Every command takes
+`--json`.
 """
 
 from __future__ import annotations
@@ -20,7 +24,7 @@ PROG = "agentic-analytics"
 
 # subcommand -> (help, node that builds it)
 COMMANDS: dict[str, tuple[str, str]] = {
-    "init": ("write run.yaml and .env.example into the current folder", "B3.3"),
+    "init": ("write run.yaml and .env.example into the current folder", "R3.1"),
     "pack": ("validate a dataset pack: `pack check [--pack PATH]`", "Q2.1"),
     "doctor": ("check env vars, engine reach and read-only roles", "N1.2"),
     "load": ("load the engines and run the parity check", "N1.3"),
@@ -34,6 +38,44 @@ COMMANDS: dict[str, tuple[str, str]] = {
 }
 
 EXIT_OK, EXIT_FAILED, EXIT_ERROR, EXIT_COST_CAP = 0, 1, 2, 3
+SMOKE_MAX_COST_USD = 2.0  # §4: the smoke run spends under $2
+
+
+def _paths(p: argparse.ArgumentParser) -> None:
+    p.add_argument("--results", default="results", help="results folder (default: results)")
+    p.add_argument("--cache", default=".cache", help="answer cache folder (default: .cache)")
+    p.add_argument(
+        "--measurements",
+        default="docs/measurements",
+        help="snapshot, parity and ledger records (default: docs/measurements)",
+    )
+
+
+def _run_args(p: argparse.ArgumentParser, *, smoke: bool) -> None:
+    p.add_argument("--config", default="run.yaml", help="run configuration (default: run.yaml)")
+    p.add_argument("--pack", default="uk_price_paid", help="bundled pack name or pack directory")
+    p.add_argument("--backend", default=None, help="all, or a comma list (default: run.yaml)")
+    p.add_argument(
+        "--max-cost",
+        type=float,
+        default=None,
+        help="stop before this invocation's model spend passes $N (per invocation: a resumed "
+        "run gets the cap afresh; the outcome prints the spend behind all the run's answers)",
+    )
+    p.add_argument("--dry-run", action="store_true", help="print the estimate; make no calls")
+    p.add_argument("--resamples", type=int, default=10_000, help="bootstrap resamples")
+    if not smoke:
+        p.add_argument("--fix", default=None, help="none, all, or a comma list of fixes")
+        p.add_argument("--trials", type=int, default=None, help="trials per configuration")
+        p.add_argument("--rescore", action="store_true", help="rescore from the cache, no calls")
+        p.add_argument(
+            "--force-fix-hash",
+            default=None,
+            metavar="REASON",
+            help="run fixes against baseline answers made under another fix_hash (D-52); the "
+            "reason is logged in run.log and run.json",
+        )
+    _paths(p)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -45,7 +87,10 @@ def build_parser() -> argparse.ArgumentParser:
         p = sub.add_parser(name, help=help_text)
         # SUPPRESS keeps a top-level --json from being reset by the subparser default
         p.add_argument("--json", action="store_true", default=argparse.SUPPRESS)
-        if name == "pack":
+        if name == "init":
+            p.add_argument("--force", action="store_true", help="overwrite existing files")
+            p.add_argument("--dir", default=".", help="folder to write into (default: .)")
+        elif name == "pack":
             p.add_argument("action", nargs="?", choices=["check"], default=None)
             p.add_argument("--pack", default="uk_price_paid", help="pack name or directory")
         elif name == "gold":
@@ -64,6 +109,19 @@ def build_parser() -> argparse.ArgumentParser:
                 default="docs/measurements",
                 help="snapshot records (default: docs/measurements)",
             )
+        elif name in ("run", "smoke"):
+            _run_args(p, smoke=name == "smoke")
+        elif name == "report":
+            p.add_argument("--run", default="latest", help="latest or a run id")
+            p.add_argument("--example", action="store_true", help="the bundled synthetic run")
+            p.add_argument("--out", default=None, help="output folder (default: the run folder)")
+            p.add_argument("--results", default="results", help="results folder")
+        elif name == "reconcile":
+            p.add_argument("--run", default="latest", help="latest or a run id")
+            p.add_argument(
+                "--credits", required=True, help='JSON file of metered credits: {"snowflake": 0.4}'
+            )
+            p.add_argument("--results", default="results", help="results folder")
         elif name == "load":
             from agentic_analytics.load.cli import add_load_args
 
@@ -126,6 +184,18 @@ def cmd_load(ns: argparse.Namespace) -> int:
     code, payload, text = cli_load(ns, os.environ, say=say)
     _emit(ns.json, payload, text, err=code != EXIT_OK)
     return code
+
+
+def cmd_init(ns: argparse.Namespace) -> int:
+    from agentic_analytics.run.config import RunConfigError, write_init
+
+    try:
+        written = write_init(Path(ns.dir), force=ns.force)
+    except RunConfigError as exc:
+        return _error(ns.json, str(exc))
+    names = [str(p) for p in written]
+    _emit(ns.json, {"ok": True, "written": names}, "wrote " + ", ".join(names))
+    return EXIT_OK
 
 
 def cmd_pack(ns: argparse.Namespace) -> int:
@@ -235,7 +305,7 @@ def cmd_gold(ns: argparse.Namespace) -> int:
     except (gold.GoldConfigError, WarehouseConfigError) as exc:
         return _error(ns.json, str(exc))
     except Exception as exc:  # a runtime failure: exit 2 without a traceback
-        return _error(ns.json, f"runtime error: {type(exc).__name__}: {str(exc)[:300]}")
+        return _error(ns.json, f"runtime error: {_redact(f'{type(exc).__name__}: {exc}')[:300]}")
     failures = list(outcome.failures)
     payload: dict[str, Any] = {"ok": not failures, "failures": failures, "only": ns.only}
     if outcome.check is not None:
@@ -259,6 +329,158 @@ def cmd_gold(ns: argparse.Namespace) -> int:
     return outcome.exit_code
 
 
+def _run_or_smoke(ns: argparse.Namespace, *, smoke: bool) -> int:
+    from agentic_analytics.env import load_dotenv
+    from agentic_analytics.packs import PackError, load_pack
+    from agentic_analytics.questions import BankError, load_questions
+    from agentic_analytics.run import runner
+    from agentic_analytics.run.config import (
+        RunConfigError,
+        parse_backends,
+        parse_fixes,
+        with_overrides,
+    )
+    from agentic_analytics.run.gold import PreconditionError, load_gold_check
+    from agentic_analytics.schemas import ConfigError, load_run_config
+
+    load_dotenv()
+    rescore = bool(getattr(ns, "rescore", False))
+    try:
+        if not Path(ns.config).is_file():
+            raise RunConfigError(f"no {ns.config}: run `{PROG} init` first")
+        cfg = load_run_config(ns.config)
+        pack = load_pack(ns.pack)
+        configured = None if rescore else runner.configured_engines(os.environ)
+        if configured is not None and not configured:
+            if not ns.dry_run:
+                raise RunConfigError("no engine is configured: set the variables in .env.example")
+            configured = None  # OSS-03: a dry run estimates from the config and pack alone
+        default = "all" if smoke else ",".join(cfg.backends)
+        backends = parse_backends(ns.backend or default, configured)
+        if smoke:
+            max_cost = ns.max_cost if ns.max_cost is not None else SMOKE_MAX_COST_USD
+            cfg = with_overrides(cfg, backends=backends, fixes=(), trials=1, max_cost_usd=max_cost)
+        else:
+            cfg = with_overrides(
+                cfg,
+                backends=backends,
+                fixes=None if ns.fix is None else parse_fixes(ns.fix),
+                trials=ns.trials,
+                max_cost_usd=ns.max_cost,
+            )
+    except (RunConfigError, ConfigError, PackError) as exc:
+        return _error(ns.json, str(exc))
+
+    question_ids = None
+    if smoke:
+        try:
+            check = load_gold_check(pack)
+            bank = [q for q in load_questions(pack) if check is None or q.id in check.questions]
+        except (BankError, PackError) as exc:
+            return _error(ns.json, str(exc))
+        except PreconditionError as exc:
+            return _error(ns.json, f"refusing to start: {exc}", EXIT_FAILED)
+        question_ids = [q.id for q in runner.smoke_questions(bank)]
+
+    def say(text: str) -> None:
+        if not ns.json:
+            print(text)
+
+    measurements = Path(ns.measurements)
+    options = runner.RunOptions(
+        results_dir=Path(ns.results),
+        cache_dir=Path(ns.cache),
+        measurements_dir=measurements,
+        ledger_path=measurements / "spend-ledger.jsonl",
+        engines=None if configured is None else tuple(configured),
+        kind="smoke" if smoke else ("rescore" if rescore else "run"),
+        dry_run=ns.dry_run,
+        rescore=rescore,
+        question_ids=question_ids,
+        include_probes=not smoke,
+        n_resamples=ns.resamples,
+        fix_hash_reason=getattr(ns, "force_fix_hash", None),
+        say=say,
+    )
+
+    def services() -> runner.Services:
+        return runner.services_from_env(cfg, pack, os.environ)
+
+    outcome = runner.run_benchmark(cfg, pack, services=services, options=options)
+    _emit(ns.json, outcome.to_dict(), outcome.message, err=outcome.exit_code != EXIT_OK)
+    return outcome.exit_code
+
+
+def cmd_run(ns: argparse.Namespace) -> int:
+    return _run_or_smoke(ns, smoke=False)
+
+
+def cmd_smoke(ns: argparse.Namespace) -> int:
+    return _run_or_smoke(ns, smoke=True)
+
+
+def cmd_report(ns: argparse.Namespace) -> int:
+    from agentic_analytics.packs import PackError, load_pack
+    from agentic_analytics.report import EXAMPLE_RUN_ID, render_example, render_report
+    from agentic_analytics.run.config import RunConfigError
+    from agentic_analytics.run.runner import load_run, resolve_run, stamped_region
+    from agentic_analytics.schemas import RunSummary
+
+    results = Path(ns.results)
+    if ns.example:
+        out = Path(ns.out) if ns.out else results / EXAMPLE_RUN_ID
+        path = render_example(out)
+        _emit(ns.json, {"ok": True, "path": str(path)}, f"wrote {path} (synthetic example)")
+        return EXIT_OK
+    try:
+        run_dir = resolve_run(results, ns.run)
+        manifest, records, questions = load_run(run_dir)
+        summary = RunSummary.model_validate_json(
+            (run_dir / "summary.json").read_text(encoding="utf-8")
+        )
+    except (RunConfigError, OSError, ValueError) as exc:
+        return _error(ns.json, f"cannot report: {exc}")
+    try:
+        pack_manifest = load_pack(manifest.get("pack_source") or "").manifest
+    except (PackError, OSError):
+        pack_manifest = None
+    out = Path(ns.out) if ns.out else run_dir
+    path = render_report(
+        summary,
+        records,
+        out,
+        questions=questions,
+        pack=pack_manifest,
+        snowflake_region=stamped_region(manifest),
+    )
+    _emit(ns.json, {"ok": True, "path": str(path), "run_id": summary.run_id}, f"wrote {path}")
+    return EXIT_OK
+
+
+def cmd_reconcile(ns: argparse.Namespace) -> int:
+    from agentic_analytics.run.config import RunConfigError
+    from agentic_analytics.run.runner import reconcile_run, resolve_run
+
+    try:
+        run_dir = resolve_run(Path(ns.results), ns.run)
+        data = json.loads(Path(ns.credits).read_text(encoding="utf-8"))
+        summary = reconcile_run(run_dir, data)
+    except (RunConfigError, OSError, ValueError) as exc:
+        return _error(ns.json, f"cannot reconcile: {exc}")
+    msg = (
+        f"{summary.run_id}: cost_status {summary.cost_status}, total ${summary.total_cost_usd:.4f}"
+    )
+    payload = {
+        "ok": True,
+        "run_id": summary.run_id,
+        "cost_status": summary.cost_status,
+        "total_cost_usd": summary.total_cost_usd,
+        "total_credits": dict(summary.total_credits),
+    }
+    _emit(ns.json, payload, msg)
+    return EXIT_OK
+
+
 def cmd_setup(ns: argparse.Namespace) -> int:
     """N1.7 (OWNER D-55). Output goes through the setup command's own secret box, which knows
     every secret it has seen; the printed Snowflake SQL holds public keys only."""
@@ -277,9 +499,14 @@ def cmd_setup(ns: argparse.Namespace) -> int:
 
 BUILT: dict[str, Callable[[argparse.Namespace], int]] = {
     "doctor": lambda ns: cmd_doctor(ns.json),
+    "init": cmd_init,
     "load": cmd_load,
     "pack": cmd_pack,
     "gold": cmd_gold,
+    "run": cmd_run,
+    "smoke": cmd_smoke,
+    "report": cmd_report,
+    "reconcile": cmd_reconcile,
     "setup": cmd_setup,
 }
 
@@ -300,7 +527,8 @@ def main(argv: list[str] | None = None) -> int:
         try:
             return BUILT[ns.command](ns)
         except Exception as exc:  # never a traceback: one redacted line, exit 2 (§4)
-            text = " ".join(f"{type(exc).__name__}: {exc}".split())[:300]
+            # redact the whole text first: a cut key no longer matches its environment value
+            text = " ".join(_redact(f"{type(exc).__name__}: {exc}").split())[:300]
             return _error(ns.json, f"{PROG} {ns.command}: runtime error: {text}")
     node = COMMANDS[ns.command][1]
     msg = f"`{PROG} {ns.command}` is not built yet; it arrives with build node {node}"

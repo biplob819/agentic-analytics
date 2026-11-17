@@ -170,6 +170,22 @@ def test_latency_is_agent_steps_plus_execution():
     assert latency_ms(rec(qid(1), backend="cortex_analyst", elapsed_ms=900)) == 900
 
 
+def test_cortex_latency_is_the_runners_wall_time_when_recorded():
+    """R3.1: a Cortex record timed question in to answer out (API round trip plus execution)
+    is read on the agents' basis; without the wall time it falls back to the execution."""
+    cortex = rec(qid(1), backend="cortex_analyst", elapsed_ms=900)
+    timed = cortex.model_copy(update={"ask_wall_ms": 3_100, "analyst_latency_ms": 1_200.0})
+    assert latency_ms(timed) == 3_100
+    assert latency_ms(cortex) == 900
+    # the agents keep steps plus execution; their wall time is recorded beside it (L-9)
+    agent = rec(qid(1), step_latencies=(100, 250), elapsed_ms=50)
+    assert latency_ms(agent.model_copy(update={"ask_wall_ms": 9_999})) == 400
+    qs = questions(2)
+    records = [timed, timed.model_copy(update={"question_id": qid(2), "ask_wall_ms": 5_000})]
+    (b,) = _build(records, qs).backends
+    assert (b.latency_p50_ms, b.latency_p95_ms) == (3_100, 5_000)  # nearest rank
+
+
 def test_latency_percentiles_per_backend():
     qs = questions(10)
     records = [rec(qid(i), step_latencies=(i * 100,), elapsed_ms=0) for i in range(1, 11)]

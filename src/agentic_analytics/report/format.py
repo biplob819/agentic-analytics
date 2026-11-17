@@ -21,13 +21,60 @@ BACKEND_LABEL = {
     "cortex_analyst": "Cortex Analyst",
 }
 FIX_LABEL = {"descriptions": "descriptions", "examples": "examples", "self_check": "self-check"}
-# OWNER D-62: stated next to every Cortex latency figure on the page. M2.1 times a Cortex answer
-# by its SQL execution alone (the Cortex API round trip is not on the record), so the note says so.
-CORTEX_LATENCY_CAVEAT = (
-    "Snowflake account in Thailand (AWS ap-southeast-7); Cortex inference crosses to the US "
-    "(OWNER D-62), so any Cortex API time includes that distance. This figure is the SQL's "
-    "execution on the Snowflake warehouse only: the Cortex API round trip is not on the record."
-)
+# Place names for the AWS regions a Snowflake account is most likely in; any other region is
+# printed by its code alone.
+AWS_REGION_PLACES = {
+    "us-east-1": "N. Virginia",
+    "us-east-2": "Ohio",
+    "us-west-2": "Oregon",
+    "ca-central-1": "Canada",
+    "eu-west-1": "Ireland",
+    "eu-west-2": "London",
+    "eu-central-1": "Frankfurt",
+    "ap-south-1": "Mumbai",
+    "ap-southeast-1": "Singapore",
+    "ap-southeast-2": "Sydney",
+    "ap-northeast-1": "Tokyo",
+    "ap-southeast-7": "Thailand",
+}
+_CLOUDS = ("AWS", "AZURE", "GCP")
+
+
+def snowflake_region_label(region: str) -> str:
+    """`CURRENT_REGION()`'s form, with or without a region group, as text:
+    'AWS_AP_SOUTHEAST_7' -> 'AWS ap-southeast-7 (Thailand)', 'PUBLIC.AZURE_EASTUS2' ->
+    'AZURE eastus2'."""
+    name = region.strip().rsplit(".", 1)[-1].upper()
+    cloud, _, rest = name.partition("_")
+    if cloud not in _CLOUDS or not rest:
+        return name
+    code = rest.lower().replace("_", "-")
+    place = AWS_REGION_PLACES.get(code) if cloud == "AWS" else None
+    return f"{cloud} {code}" + (f" ({place})" if place else "")
+
+
+def cortex_latency_caveat(region: str | None) -> str:
+    """OWNER D-62: the note stated next to every Cortex latency figure, from the run stamp's
+    Snowflake region (`run.yaml`, else `CURRENT_REGION()` at run start). Cross-region inference
+    sends Cortex to AWS US regions, so an account outside them has that distance in its time."""
+    if not region:
+        return (
+            "Snowflake account region not recorded for this run; with cross-region inference "
+            "on (OWNER D-62), Cortex latency may include a hop to the US."
+        )
+    label = snowflake_region_label(region)
+    name = region.strip().rsplit(".", 1)[-1].upper()
+    if name.startswith("AWS_US_"):
+        return (
+            f"Snowflake account in {label}; Cortex inference stays in AWS US regions "
+            "(OWNER D-62), so Cortex latency has no cross-region distance in it."
+        )
+    return (
+        f"Snowflake account in {label}; Cortex inference crosses to the US (cross-region "
+        "inference to AWS US regions, OWNER D-62), so Cortex latency includes that distance."
+    )
+
+
 ALL_FIXES = ("descriptions", "examples", "self_check")
 _TRACE_NAME = re.compile(r"\A[A-Za-z0-9][A-Za-z0-9._+-]{0,200}\.json\Z")
 

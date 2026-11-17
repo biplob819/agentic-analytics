@@ -33,7 +33,7 @@ from typing import Any, Literal
 from agentic_analytics.schemas import DatasetPack
 from agentic_analytics.warehouse.clickhouse import ClickHouseExecutor
 from agentic_analytics.warehouse.roles import CH_ROLE, SF_ROLE
-from agentic_analytics.warehouse.snowflake import SnowflakeExecutor
+from agentic_analytics.warehouse.snowflake import SnowflakeExecutor, ro_key_from_env
 
 ENV_VARS: tuple[str, ...] = (
     "ANTHROPIC_API_KEY",
@@ -51,6 +51,7 @@ ENV_VARS: tuple[str, ...] = (
     "SNOWFLAKE_ACCOUNT",
     "SNOWFLAKE_RO_USER",
     "SNOWFLAKE_RO_PRIVATE_KEY_PATH",
+    "SNOWFLAKE_RO_PRIVATE_KEY",
     "SNOWFLAKE_WAREHOUSE",
     "SNOWFLAKE_ADMIN_USER",
     "SNOWFLAKE_ADMIN_PRIVATE_KEY_PATH",
@@ -61,6 +62,8 @@ ENV_VARS: tuple[str, ...] = (
     "EVALKIT_DEMO_DATABASE_URL",
     "DEMO_OWNER_PASSCODE",
     "DEMO_OWNER_CAP_USD",
+    "DEMO_LIVE_BACKENDS",
+    "DEMO_CONTACT_URL",
 )
 
 CH_REFUSAL_CODES = frozenset({164, 291, 497})  # READONLY, DATABASE_ACCESS_DENIED, ACCESS_DENIED
@@ -497,19 +500,16 @@ def executors_from_env(
             get("CLICKHOUSE_HOST"), get("CLICKHOUSE_RO_USER"), get("CLICKHOUSE_RO_PASSWORD")
         )
     sf = None
-    sf_vars = (
-        "SNOWFLAKE_ACCOUNT",
-        "SNOWFLAKE_RO_USER",
-        "SNOWFLAKE_RO_PRIVATE_KEY_PATH",
-        "SNOWFLAKE_WAREHOUSE",
-    )
-    if all(get(n) for n in sf_vars):
+    key = ro_key_from_env(env)  # the key file, else its PEM text (D-57)
+    sf_vars = ("SNOWFLAKE_ACCOUNT", "SNOWFLAKE_RO_USER", "SNOWFLAKE_WAREHOUSE")
+    if key is not None and all(get(n) for n in sf_vars):
         sf = SnowflakeExecutor(
             get("SNOWFLAKE_ACCOUNT"),
             get("SNOWFLAKE_RO_USER"),
-            get("SNOWFLAKE_RO_PRIVATE_KEY_PATH"),
+            key.path,
             get("SNOWFLAKE_WAREHOUSE"),
             SF_ROLE,
+            private_key_text=key.text,
         )
     return ch, sf
 

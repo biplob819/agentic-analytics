@@ -1,0 +1,18 @@
+{
+  "blocks": {
+    "descriptions": "ae980c26c972ba8c1f1fad066dac375cb1a6cd501575bb6c672a8eeaa7f581b8",
+    "examples": "8069ae56dbc8ca467c45db562c9a3c638abda63de0e5b1a502df0454fb7cfa7e",
+    "self_check": "ba6100a06d9adb176efc82a311820bac5534f4b81024fce83b8a3c84f6a6523f"
+  },
+  "files": {
+    "fixes/examples.yaml": "c29ae3fc7651f8146b8c97a37b8944a827ae07ad9c0fa4a27f0aa520a73a6f0a",
+    "fixes/self_check.yaml": "ba6100a06d9adb176efc82a311820bac5534f4b81024fce83b8a3c84f6a6523f"
+  },
+  "fix_hash": "25293a57f04540d98d8b6d97ad795de3e084ff49f982e84bf79f1bcde19d21c4",
+  "frozen_at": "2026-11-15T12:00:00Z",
+  "kind": "fix_freeze",
+  "pack": "uk_price_paid@1.0",
+  "reason": "golden run fixture freeze",
+  "rules_sha256": "8322fc0a0a36e134d7c4496c30724697a30dcd35af69d2096959c5444545bbd6",
+  "schema_version": "1.0"
+}

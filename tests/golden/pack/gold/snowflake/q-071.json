@@ -1,0 +1,30 @@
+{
+  "elapsed_ms": 100,
+  "engine": "snowflake",
+  "executed_at": "2026-11-15T12:00:00Z",
+  "question_id": "q-071",
+  "result": {
+    "columns": [
+      "label",
+      "value"
+    ],
+    "kind": "result_set",
+    "ordered": true,
+    "rows": [
+      [
+        "L00",
+        377547
+      ],
+      [
+        "L01",
+        370547
+      ],
+      [
+        "L02",
+        363547
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "e7dd8b1c66ee497335e71491ad555c1768ac018bef3b4ebbb14a5c38275f53f3"
+}

@@ -7,7 +7,13 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 
 import yaml
-from pydantic import Field, ValidationError, model_validator
+from pydantic import (
+    Field,
+    SerializerFunctionWrapHandler,
+    ValidationError,
+    model_serializer,
+    model_validator,
+)
 
 from agentic_analytics.schemas._base import (
     MCP_BACKENDS,
@@ -19,6 +25,10 @@ from agentic_analytics.schemas._base import (
     PosInt,
     StrictInt,
 )
+
+# A Snowflake region as `SELECT CURRENT_REGION()` returns it (`AWS_AP_SOUTHEAST_7`), optionally
+# with its region group (`PUBLIC.AWS_US_WEST_2`).
+SNOWFLAKE_REGION_PATTERN = r"^(?:[A-Za-z][A-Za-z0-9_]{0,31}\.)?[A-Za-z][A-Za-z0-9_]{1,63}$"
 
 
 class RunConfig(Model):
@@ -35,6 +45,9 @@ class RunConfig(Model):
     seed: StrictInt = 0
     max_cost_usd: Annotated[float, Field(gt=0.0, allow_inf_nan=False, strict=True)] | None = None
     concurrency: FrozenMap[PosInt] = Field(default_factory=dict)
+    # OWNER D-62: the Snowflake account's region, for the Cortex latency caveat. Left out, the
+    # runner reads `SELECT CURRENT_REGION()` through the read-only executor at run start.
+    snowflake_region: Annotated[str, Field(pattern=SNOWFLAKE_REGION_PATTERN)] | None = None
 
     @model_validator(mode="after")
     def _consistent(self) -> RunConfig:
@@ -52,6 +65,15 @@ class RunConfig(Model):
         if len(set(self.fixes)) != len(self.fixes):
             raise ValueError("fixes must be unique")
         return self
+
+    @model_serializer(mode="wrap")
+    def _omit_unset_region(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """`snowflake_region` is left out while unset, so a config without it dumps (and hashes,
+        `config_hash`) exactly as it did before the field existed."""
+        data = handler(self)
+        if data.get("snowflake_region", "") is None:
+            del data["snowflake_region"]
+        return data
 
 
 class ConfigError(ValueError):

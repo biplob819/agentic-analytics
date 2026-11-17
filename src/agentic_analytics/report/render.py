@@ -5,7 +5,8 @@ page loads nothing from the network, escapes every value it shows, links only ht
 URLs and safe relative trace paths, and is a pure function of its inputs: the same inputs give
 the same bytes. Sections: stamps, overview, accuracy by category, fix uplift, cost and
 clarification, safety probes, failure explorer, licence credit. Every Cortex latency figure
-carries the OWNER D-62 caveat, and key-shaped strings are scrubbed before escaping.
+carries the OWNER D-62 caveat, worded from the run's Snowflake region, and key-shaped strings
+are scrubbed before escaping.
 """
 
 from __future__ import annotations
@@ -23,8 +24,8 @@ from typing import Any
 from agentic_analytics.report import charts, templates
 from agentic_analytics.report.format import (
     BACKEND_LABEL,
-    CORTEX_LATENCY_CAVEAT,
     config_label,
+    cortex_latency_caveat,
     fixes_key,
     fixes_label,
     money,
@@ -481,11 +482,11 @@ def _uplift(summary: RunSummary, example: bool = False) -> str:
 # DSH-04
 
 
-def _latency_note(backend: str) -> str:
-    """OWNER D-62: the caveat that sits next to every Cortex latency figure."""
+def _latency_note(backend: str, caveat: str) -> str:
+    """OWNER D-62: the caveat (from the run's Snowflake region) next to every Cortex latency."""
     if backend != "cortex_analyst":
         return ""
-    return f'<span class="caveat">† {_e(CORTEX_LATENCY_CAVEAT)}</span>'
+    return f'<span class="caveat">† {_e(caveat)}</span>'
 
 
 def _cost_text(b: BackendSummary, estimated: bool) -> str:
@@ -494,7 +495,7 @@ def _cost_text(b: BackendSummary, estimated: bool) -> str:
     return money(b.cost_per_correct_usd) + (" estimated" if estimated else "")
 
 
-def _cost(summary: RunSummary, example: bool = False) -> str:
+def _cost(summary: RunSummary, example: bool, caveat: str) -> str:
     est = summary.cost_status == "estimated"
     rows = []
     for b in summary.backends:
@@ -503,7 +504,8 @@ def _cost(summary: RunSummary, example: bool = False) -> str:
             f"<td>{_e(_cost_text(b, est))}</td>"
             f"<td>{_iv_cell(b.clarification_rate)}</td>"
             f"<td>{_iv_cell(b.false_clarification_rate)}</td>"
-            f"<td>{b.latency_p50_ms:,} ms / {b.latency_p95_ms:,} ms{_latency_note(b.backend)}</td>"
+            f"<td>{b.latency_p50_ms:,} ms / {b.latency_p95_ms:,} ms"
+            f"{_latency_note(b.backend, caveat)}</td>"
             "</tr>"
         )
     credits = ", ".join(f"{_e(k)} {v:.3f}" for k, v in sorted(summary.total_credits.items()))
@@ -663,7 +665,9 @@ def _pre(sql: str) -> str:
     return f"<pre><code>{_e(sql)}</code></pre>"
 
 
-def _explorer_item(r: Record, questions: Mapping[str, Question], gold_sql: GoldMap | None) -> str:
+def _explorer_item(
+    r: Record, questions: Mapping[str, Question], gold_sql: GoldMap | None, caveat: str
+) -> str:
     q = questions.get(r.question_id)
     reason = failure_reason(r, q)
     cfg = config_label(r.backend, r.fixes)
@@ -728,7 +732,7 @@ def _explorer_item(r: Record, questions: Mapping[str, Question], gold_sql: GoldM
         parts.append(
             f'<p class="muted">Executed on {_e(ex.engine)} · rows {rows} · '
             f"{ex.elapsed_ms:,} ms · error {_e(ex.error or 'none')}"
-            f"{_latency_note(r.backend)}</p>"
+            f"{_latency_note(r.backend, caveat)}</p>"
         )
     if r.answer.steps:
         steps = "".join(
@@ -739,7 +743,7 @@ def _explorer_item(r: Record, questions: Mapping[str, Question], gold_sql: GoldM
             for s in r.answer.steps
         )
         parts.append(
-            f"<table><caption>Agent steps{_latency_note(r.backend)}</caption><thead><tr>"
+            f"<table><caption>Agent steps{_latency_note(r.backend, caveat)}</caption><thead><tr>"
             '<th scope="col">#</th>'
             '<th scope="col">Tool</th><th scope="col">Arguments</th><th scope="col">Rows</th>'
             '<th scope="col">Error</th><th scope="col">Latency</th></tr></thead>'
@@ -808,6 +812,7 @@ def _failures(
     records: Sequence[Record] | None,
     questions: Mapping[str, Question],
     gold_sql: GoldMap | None,
+    caveat: str,
 ) -> str:
     if records is None:
         return (
@@ -840,7 +845,7 @@ def _failures(
         f'<label for="f-config">Configuration </label><select id="f-config">'
         f'<option value="">all</option>{opt_c}</select>'
         '<div id="failure-list">'
-        + "".join(_explorer_item(r, questions, gold_sql) for r in items)
+        + "".join(_explorer_item(r, questions, gold_sql, caveat) for r in items)
         + "</div></div>"
     )
 
@@ -857,21 +862,26 @@ def render_html(
     pack: DatasetPack | None = None,
     attribution: str | None = None,
     example: bool = False,
+    snowflake_region: str | None = None,
 ) -> str:
     """The dashboard page as a string; a pure function of its arguments.
 
-    A copy of the bundled example is stamped SYNTHETIC whatever `example` says."""
+    A copy of the bundled example is stamped SYNTHETIC whatever `example` says.
+    `snowflake_region` (the run stamp's, R3.1) words the OWNER D-62 Cortex latency caveat."""
     example = example or looks_synthetic(summary, records, placeholder_hashes=False)
     credit, src_pack = resolve_credit(summary, pack, attribution)
     qs = dict(questions or {})
+    caveat = cortex_latency_caveat(snowflake_region)
     sections = "".join(
         (
             templates.section("overview", "Overview", _overview(summary)),
             templates.section("categories", "Accuracy by category", _categories(summary, example)),
             templates.section("uplift", "Fix uplift", _uplift(summary, example)),
-            templates.section("cost", "Cost and clarification", _cost(summary, example)),
+            templates.section("cost", "Cost and clarification", _cost(summary, example, caveat)),
             templates.section("probes", "Safety probes", _probes(summary)),
-            templates.section("failures", "Failure explorer", _failures(records, qs, gold_sql)),
+            templates.section(
+                "failures", "Failure explorer", _failures(records, qs, gold_sql, caveat)
+            ),
         )
     )
     title = f"Agentic Analytics · run {summary.run_id}"
@@ -1065,12 +1075,14 @@ def render_report(
     pack: DatasetPack | None = None,
     attribution: str | None = None,
     example: bool = False,
+    snowflake_region: str | None = None,
 ) -> Path:
     """DSH-01: write `index.html` and `summary.vl.json` into `out_dir`; return the HTML path.
 
     `questions` supplies question text and gold SQL for the failure explorer; `gold_sql`
     (question id -> engine -> SQL) overrides or adds gold SQL. `pack` or `attribution` give the
     licence credit; by default it comes from the bundled pack named in `summary.pack`.
+    `snowflake_region` is the run stamp's region (run.json), which words the D-62 caveat.
     """
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -1084,6 +1096,7 @@ def render_report(
         pack=pack,
         attribution=attribution,
         example=example,
+        snowflake_region=snowflake_region,
     )
     specs = json.dumps(
         vega_lite_specs(summary, example=example),

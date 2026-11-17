@@ -1,0 +1,14 @@
+# The golden run (Tech Spec §11): 12 questions, 3 backends, 3 trials, the examples fix on both
+# agents, recorded responses. One worker per backend, so per-trial recordings replay in order.
+backends: [claude_mcp, gpt_mcp, cortex_analyst]
+models:
+  claude_mcp: claude-sonnet-5-5
+  gpt_mcp: gpt-6.1-sol
+fixes: [examples]
+trials: 3
+as_of: 2026-09-30
+seed: 7
+concurrency:
+  claude_mcp: 1
+  gpt_mcp: 1
+  cortex_analyst: 1

@@ -13,7 +13,7 @@ import re
 from pathlib import Path
 
 from agentic_analytics.answer.assemble import assemble
-from agentic_analytics.report.format import CORTEX_LATENCY_CAVEAT
+from agentic_analytics.report.format import cortex_latency_caveat
 from agentic_analytics.report.templates import CSS
 from agentic_analytics.schemas import Record, ResultSet
 from tests.aggregate.helpers import rec
@@ -189,11 +189,16 @@ def _ms_contexts(fragment: str) -> list[str]:
     return [body for _, body in cells if re.search(r"\d ms\b", body)]
 
 
+THAILAND = "AWS_AP_SOUTHEAST_7"  # the account's CURRENT_REGION() (OWNER D-62)
+
+
 def test_every_cortex_latency_figure_carries_the_thailand_caveat():
-    """OWNER D-62: next to every Cortex latency figure, and only there."""
-    assert "Thailand" in CORTEX_LATENCY_CAVEAT and "crosses to the US" in CORTEX_LATENCY_CAVEAT
-    page = html(summary(run_id=RUN), live_records())
-    caveat = CORTEX_LATENCY_CAVEAT.replace("'", "&#x27;")
+    """OWNER D-62: next to every Cortex latency figure, and only there; the text comes from the
+    run's recorded Snowflake region."""
+    text_ = cortex_latency_caveat(THAILAND)
+    assert "Thailand" in text_ and "crosses to the US" in text_
+    page = html(summary(run_id=RUN), live_records(), snowflake_region=THAILAND)
+    caveat = text_.replace("'", "&#x27;")
     rows = re.findall(r"<tr>(.*?)</tr>", section(page, "cost"), re.S)
     cortex = [r for r in rows if '<th scope="row">Cortex Analyst' in r]
     others = [r for r in rows if '<th scope="row">' in r and r not in cortex]
@@ -217,13 +222,13 @@ def test_every_cortex_latency_figure_carries_the_thailand_caveat():
 def test_a_cortex_answer_with_steps_puts_the_caveat_on_its_step_latencies():
     """OWNER D-62 (verifier): the schema lets a Cortex answer carry steps; their latency column
     is a Cortex latency figure too, so the steps table says so. MCP step tables do not."""
-    caveat = CORTEX_LATENCY_CAVEAT.replace("'", "&#x27;")
+    caveat = cortex_latency_caveat(THAILAND).replace("'", "&#x27;")
     cortex = rec("q-001", "wrong", backend="cortex_analyst")
     cortex = cortex.model_copy(
         update={"answer": cortex.answer.model_copy(update={"steps": (f.step(0),)})}
     )
     mcp = rec("q-002", "wrong")
-    page = html(summary(), [cortex, mcp])
+    page = html(summary(), [cortex, mcp], snowflake_region=THAILAND)
     items = {
         m.group(1): m.group(0)
         for m in re.finditer(r'<details data-backend="(\w+)".*?</details>', page, re.S)

@@ -1,0 +1,89 @@
+{
+  "schema_version": "1.0",
+  "kind": "smoke_measurement",
+  "node": "R3.1",
+  "criterion": "RUN-05",
+  "run_id": "smoke-20261117T070039Z-769d2c",
+  "command": "agentic-analytics smoke",
+  "as_of": "2026-08-31",
+  "gold_check_id": "c38f90b243d8faf1bd10268d6a225429e9b6e3a7b608391ec2285290d2814719",
+  "git_sha": "30e192e3052e7a7f458e046ef51352f0fe07575f",
+  "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+  "questions": [
+    "q-001",
+    "q-002",
+    "q-021",
+    "q-022",
+    "q-041",
+    "q-042",
+    "q-061",
+    "q-062",
+    "q-082",
+    "q-084",
+    "q-101",
+    "q-102"
+  ],
+  "per_backend": {
+    "claude_mcp": {
+      "correct": 8,
+      "of": 12,
+      "accuracy": {
+        "point": 0.6666666666666666,
+        "lo": 0.4166666666666667,
+        "hi": 0.9166666666666666
+      },
+      "answer_from_rows_violations": 4,
+      "policy_violations": 0,
+      "errors": {},
+      "latency_p50_ms": 7611,
+      "latency_p95_ms": 8848,
+      "cost_per_correct_usd": 0.0256376375
+    },
+    "gpt_mcp": {
+      "correct": 11,
+      "of": 12,
+      "accuracy": {
+        "point": 0.9166666666666666,
+        "lo": 0.75,
+        "hi": 1.0
+      },
+      "answer_from_rows_violations": 0,
+      "policy_violations": 0,
+      "errors": {},
+      "latency_p50_ms": 7189,
+      "latency_p95_ms": 8879,
+      "cost_per_correct_usd": 0.006839590909090909
+    },
+    "cortex_analyst": {
+      "correct": 8,
+      "of": 12,
+      "accuracy": {
+        "point": 0.6666666666666666,
+        "lo": 0.4166666666666667,
+        "hi": 0.9166666666666666
+      },
+      "answer_from_rows_violations": 0,
+      "policy_violations": 0,
+      "errors": {},
+      "latency_p50_ms": 4657,
+      "latency_p95_ms": 11046,
+      "cost_per_correct_usd": 0.3015
+    }
+  },
+  "spend": {
+    "model_usd": 0.280337,
+    "estimate_model_usd": 0.95,
+    "cap_usd": 2.0,
+    "snowflake_trial_credits": 0.804
+  },
+  "misses_checked_by_hand": {
+    "claude_mcp q-002, q-022": "used ClickHouse's approximate median() (285,000 vs exact 280,000); its answer says the figure is approximate; the examples fix teaches quantileExactInclusive",
+    "claude_mcp q-101, q-102": "ambiguous questions answered with both readings instead of asking back; numbers from earlier tool calls not in the final result are flagged by answer-from-rows, as designed (B1)",
+    "gpt_mcp q-101": "ambiguous question answered (town reading) without asking back; q-102 asked back (correct)",
+    "cortex_analyst q-082, q-084": "percent change returned as a fraction (-0.2001) where the question asks for percent (-20.01)",
+    "cortex_analyst q-101, q-102": "ambiguous questions answered without asking back"
+  },
+  "scorer_defects_found": 0,
+  "note": "Smoke questions are the fixed 12 of RUN-05; one trial each, so intervals are wide and these are not benchmark results.",
+  "code_note": "git_sha 30e192e is the HEAD the run started from; the runner itself was R3.1's uncommitted work at that time (committed later with R3.1, after D-78's ledger change and the verifier fixes, which do not change scoring)."
+}

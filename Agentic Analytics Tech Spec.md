@@ -430,10 +430,12 @@ def ask(question: str, backends: list[BackendName], mode: Literal["replay", "liv
 | `CLICKHOUSE_ADMIN_USER`, `CLICKHOUSE_ADMIN_PASSWORD` | Loader and role setup only |
 | `CLICKHOUSE_CLOUD_API_KEY`, `CLICKHOUSE_CLOUD_API_SECRET` | `setup clickhouse` only, through `clickhousectl`: an optional, owner-only, short-lived admin Cloud API key, deleted after setup (OWNER D-55) |
 | `SNOWFLAKE_ACCOUNT`, `SNOWFLAKE_RO_USER`, `SNOWFLAKE_RO_PRIVATE_KEY_PATH`, `SNOWFLAKE_WAREHOUSE` | Executor, Cortex client |
+| `SNOWFLAKE_RO_PRIVATE_KEY` | The read-only key as PEM text, used only when `SNOWFLAKE_RO_PRIVATE_KEY_PATH` is absent: the hosted demo's Streamlit secret (D-57); never logged or printed |
 | `SNOWFLAKE_ADMIN_USER`, `SNOWFLAKE_ADMIN_PRIVATE_KEY_PATH` | Loader, semantic view, role setup only |
 | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST` | Tracing |
 | `DEMO_PASSCODE`, `EVALKIT_DEMO_DATABASE_URL` | Demo guard |
 | `DEMO_OWNER_PASSCODE`, `DEMO_OWNER_CAP_USD` | Owner measurement budget for the p95 proof (OWNER D-53) |
+| `DEMO_LIVE_BACKENDS`, `DEMO_CONTACT_URL` | Demo live compute switch (comma list of backends or `all`; empty or missing = saved answers only) and the owner-request link (https, default GitHub Issues); not secret (OWNER D-59, D-60) |
 
 ---
 

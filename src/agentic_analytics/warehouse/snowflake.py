@@ -8,13 +8,19 @@ size of the full result, so `rows_total` is exact without a second query (a coun
 fallback when the driver does not report it). `query_id` is the statement's `sfqid`, also taken
 from the error when a statement fails. Warehouse errors come back as `Execution(error=...)`;
 unreadable keys and rejected credentials raise `WarehouseConfigError`.
+
+The read-only key comes from a file (`SNOWFLAKE_RO_PRIVATE_KEY_PATH`, local runs) or, when that
+variable is absent, from the PEM text itself (`SNOWFLAKE_RO_PRIVATE_KEY`, a Streamlit secret on
+the hosted demo, which has no key file; D-57). `ro_key_from_env` picks one; the text never
+appears in a repr, an error message or a log line.
 """
 
 from __future__ import annotations
 
 import logging
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass, field
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
@@ -41,6 +47,43 @@ log = logging.getLogger(__name__)
 TIMEOUT_ERRNOS = frozenset({604, 630})  # SQL execution canceled; statement timeout reached
 TIMEOUT_SQLSTATES = frozenset({"57014"})
 QUERY_TAG = "agentic-analytics"
+KEY_PATH_ENV = "SNOWFLAKE_RO_PRIVATE_KEY_PATH"
+KEY_TEXT_ENV = "SNOWFLAKE_RO_PRIVATE_KEY"  # D-57: the PEM text, for a host with no key file
+
+
+@dataclass(frozen=True)
+class KeySource:
+    """Where the read-only private key comes from: a file path or the PEM text (never shown)."""
+
+    path: str | None = None
+    text: str | None = field(default=None, repr=False)
+
+    def __post_init__(self) -> None:
+        if (self.path is None) == (self.text is None):
+            raise ValueError("give the key's path or its text, not both")
+
+    @property
+    def label(self) -> str:
+        return KEY_PATH_ENV if self.path is not None else KEY_TEXT_ENV
+
+
+def pem_text(raw: str) -> str:
+    """The PEM text from a secret: surrounding blanks removed, and `\\n` escapes turned into line
+    breaks when the value was pasted on one line."""
+    text = raw.strip()
+    if "\n" not in text and "\\n" in text:
+        text = text.replace("\\n", "\n")
+    return text
+
+
+def ro_key_from_env(environ: Mapping[str, str]) -> KeySource | None:
+    """`SNOWFLAKE_RO_PRIVATE_KEY_PATH` when set, else `SNOWFLAKE_RO_PRIVATE_KEY` (the PEM text),
+    else None."""
+    path = (environ.get(KEY_PATH_ENV) or "").strip()
+    if path:
+        return KeySource(path=path)
+    text = pem_text(environ.get(KEY_TEXT_ENV) or "")
+    return KeySource(text=text) if text else None
 
 
 def classify(exc: BaseException) -> ErrorKind:
@@ -63,19 +106,32 @@ def _is_config(exc: BaseException) -> bool:
     return isinstance(errno, int) and 390100 <= errno < 390200  # authentication and login errors
 
 
-def load_private_key(path: str | Path, passphrase: str | None = None) -> bytes:
-    """Read a PEM private key and return unencrypted PKCS#8 DER bytes for the connector."""
+def load_private_key(
+    path: str | Path | None, passphrase: str | None = None, *, text: str | None = None
+) -> bytes:
+    """Read a PEM private key (from `path`, or from its `text`) and return unencrypted PKCS#8 DER
+    bytes for the connector. A failure on `text` names the variable and the exception type only,
+    with no chained cause (the key text must never reach a message or a traceback)."""
     from cryptography.hazmat.primitives import serialization
 
-    try:
-        data = Path(path).read_bytes()
-        key = serialization.load_pem_private_key(
-            data, password=passphrase.encode("utf-8") if passphrase else None
-        )
-    except (OSError, ValueError, TypeError) as e:
-        raise WarehouseConfigError(
-            f"cannot load the Snowflake private key at {path} ({type(e).__name__})"
-        ) from e
+    password = passphrase.encode("utf-8") if passphrase else None
+    if text is not None:
+        try:
+            key = serialization.load_pem_private_key(text.encode("utf-8"), password=password)
+        except (ValueError, TypeError, UnicodeError) as e:
+            raise WarehouseConfigError(
+                f"cannot load the Snowflake private key in {KEY_TEXT_ENV} ({type(e).__name__})"
+            ) from None
+    else:
+        if path is None:
+            raise WarehouseConfigError(f"set {KEY_PATH_ENV} or {KEY_TEXT_ENV}")
+        try:
+            data = Path(path).read_bytes()
+            key = serialization.load_pem_private_key(data, password=password)
+        except (OSError, ValueError, TypeError) as e:
+            raise WarehouseConfigError(
+                f"cannot load the Snowflake private key at {path} ({type(e).__name__})"
+            ) from e
     return key.private_bytes(
         serialization.Encoding.DER,
         serialization.PrivateFormat.PKCS8,
@@ -90,10 +146,11 @@ class SnowflakeExecutor:
         self,
         account: str,
         user: str,
-        private_key_path: str | Path,
+        private_key_path: str | Path | None,
         warehouse: str,
         role: str,
         *,
+        private_key_text: str | None = None,
         connect: Callable[..., Any] | None = None,
         database: str | None = None,
         private_key_passphrase: str | None = None,
@@ -102,7 +159,10 @@ class SnowflakeExecutor:
     ) -> None:
         self._account = account
         self._user = user
+        if (private_key_path is None) == (private_key_text is None):
+            raise ValueError("give the private key's path or its text, not both")
         self._key_path = private_key_path
+        self._key_text = private_key_text  # D-57; never in repr or messages
         self._passphrase = private_key_passphrase
         self.warehouse = warehouse
         self.role = role
@@ -122,7 +182,7 @@ class SnowflakeExecutor:
             "account": self._account,
             "user": self._user,
             "authenticator": "SNOWFLAKE_JWT",
-            "private_key": load_private_key(self._key_path, self._passphrase),
+            "private_key": load_private_key(self._key_path, self._passphrase, text=self._key_text),
             "warehouse": self.warehouse,
             "role": self.role,
             "login_timeout": 60,
@@ -236,4 +296,13 @@ class SnowflakeExecutor:
                     log.debug("cursor close failed", exc_info=True)
 
 
-__all__ = ["SnowflakeExecutor", "classify", "load_private_key"]
+__all__ = [
+    "KEY_PATH_ENV",
+    "KEY_TEXT_ENV",
+    "KeySource",
+    "SnowflakeExecutor",
+    "classify",
+    "load_private_key",
+    "pem_text",
+    "ro_key_from_env",
+]
