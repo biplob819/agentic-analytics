@@ -148,13 +148,13 @@ The screen puts both platforms side by side on the same question, so a reviewer 
 
 ## Data flow
 
-&#91;embedded content: data flow · question to scored answer on both backends\]
+![Data flow: question to scored answer on both backends](docs/assets/dataflow.svg)
 
 The ClickHouse lane runs an agent that discovers the schema through MCP tools; the Snowflake lane hands the question to Cortex Analyst, which writes SQL from the semantic view. Both result sets meet at `sql_match`, which compares them with the gold results computed earlier on the same data.
 
 ## Technical architecture
 
-&#91;embedded content: technical architecture · components, services, hosting\]
+![Technical architecture: components, services, hosting](docs/assets/architecture.svg)
 
 The same pattern as EvalKit: one package, three thin front ends.
 

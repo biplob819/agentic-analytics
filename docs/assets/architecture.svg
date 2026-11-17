@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="1200" height="760" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">Agentic Analytics architecture</title>
+  <desc id="d">One Python package, agentic-analytics, with a CLI, a static dashboard and a Streamlit demo as front ends. Inside: loaders, read-only executors with a SQL guard, the ClickHouse remote MCP client, Claude and GPT adapters, the agent loop and the Cortex Analyst client, the runner with its answer cache, scorers, aggregate and report. External services: ClickHouse Cloud with its remote MCP server, Snowflake with Cortex Analyst, the Anthropic and OpenAI APIs, EvalKit as the eval engine, optional Langfuse traces, GitHub Pages, Streamlit Community Cloud, PyPI and a Postgres spend counter.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+    <style>
+      .pkg{fill:#f8fafc;stroke:#334155;stroke-width:1.5}
+      .mod{fill:#ffffff;stroke:#94a3b8;stroke-width:1.2}
+      .ext{fill:#ffffff;stroke:#64748b;stroke-width:1.2;stroke-dasharray:5 4}
+      .ch{fill:#fff8e1;stroke:#d4a017;stroke-width:1.5}
+      .sf{fill:#e8f4fd;stroke:#2b8ac6;stroke-width:1.5}
+      .ek{fill:#ecfdf3;stroke:#2f9e5b;stroke-width:1.5}
+      .fe{fill:#f5f3ff;stroke:#7c6bd6;stroke-width:1.5}
+      .h{font-size:15px;font-weight:600;fill:#0f172a}
+      .m{font-size:13px;font-weight:600;fill:#0f172a}
+      .s{font-size:12px;fill:#334155}
+      .lane{font-size:13px;font-weight:600;fill:#64748b;letter-spacing:.04em}
+      .e{stroke:#475569;stroke-width:1.4;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1200" height="760" fill="#ffffff"/>
+  <text x="40" y="44" font-size="22" font-weight="700" fill="#0f172a">Agentic Analytics: architecture</text>
+  <text x="40" y="68" class="s">One package (PyPI: agentic-analytics, CLI: agentic-analytics / aa), three thin front ends, read-only access to both warehouses.</text>
+
+  <!-- front ends -->
+  <text x="40" y="110" class="lane">FRONT ENDS</text>
+  <rect x="40" y="122" width="350" height="70" rx="10" class="fe"/>
+  <text x="56" y="150" class="h">CLI</text>
+  <text x="56" y="172" class="s">setup · doctor · load · gold · smoke · run · report</text>
+  <rect x="425" y="122" width="350" height="70" rx="10" class="fe"/>
+  <text x="441" y="150" class="h">Static dashboard</text>
+  <text x="441" y="172" class="s">self-contained HTML per run, on GitHub Pages</text>
+  <rect x="810" y="122" width="350" height="70" rx="10" class="fe"/>
+  <text x="826" y="150" class="h">Streamlit demo</text>
+  <text x="826" y="172" class="s">saved answers by default; live behind a passcode</text>
+
+  <!-- package -->
+  <rect x="40" y="216" width="1120" height="276" rx="14" class="pkg"/>
+  <text x="58" y="242" class="h">agentic_analytics (Python 3.12, uv)</text>
+
+  <rect x="58" y="258" width="200" height="64" rx="8" class="mod"/>
+  <text x="72" y="282" class="m">load + parity</text>
+  <text x="72" y="302" class="s">both engines, fingerprints</text>
+  <rect x="274" y="258" width="200" height="64" rx="8" class="mod"/>
+  <text x="288" y="282" class="m">executors + SQL guard</text>
+  <text x="288" y="302" class="s">one SELECT, read-only roles</text>
+  <rect x="490" y="258" width="200" height="64" rx="8" class="mod"/>
+  <text x="504" y="282" class="m">questions + gold</text>
+  <text x="504" y="302" class="s">bank, lint, gold check</text>
+  <rect x="706" y="258" width="200" height="64" rx="8" class="mod"/>
+  <text x="720" y="282" class="m">semantic layer</text>
+  <text x="720" y="302" class="s">YAML → Snowflake view</text>
+  <rect x="922" y="258" width="220" height="64" rx="8" class="mod"/>
+  <text x="936" y="282" class="m">fixes (frozen)</text>
+  <text x="936" y="302" class="s">descriptions, examples, self-check</text>
+
+  <rect x="58" y="340" width="200" height="64" rx="8" class="mod"/>
+  <text x="72" y="364" class="m">MCP client</text>
+  <text x="72" y="384" class="s">3 allow-listed tools, row cap</text>
+  <rect x="274" y="340" width="200" height="64" rx="8" class="mod"/>
+  <text x="288" y="364" class="m">model adapters + cost</text>
+  <text x="288" y="384" class="s">Claude and GPT tool calling</text>
+  <rect x="490" y="340" width="200" height="64" rx="8" class="mod"/>
+  <text x="504" y="364" class="m">backends</text>
+  <text x="504" y="384" class="s">MCP agent loop, Cortex client</text>
+  <rect x="706" y="340" width="200" height="64" rx="8" class="mod"/>
+  <text x="720" y="364" class="m">answer + tracing</text>
+  <text x="720" y="384" class="s">SQL, answer, chart, spans</text>
+  <rect x="922" y="340" width="220" height="64" rx="8" class="mod"/>
+  <text x="936" y="364" class="m">runner + cache</text>
+  <text x="936" y="384" class="s">workers, resume, cost cap</text>
+
+  <rect x="58" y="420" width="308" height="56" rx="8" class="mod"/>
+  <text x="72" y="444" class="m">scorers</text>
+  <text x="72" y="462" class="s">result match, clarification, rows, policy</text>
+  <rect x="382" y="420" width="308" height="56" rx="8" class="mod"/>
+  <text x="396" y="444" class="m">aggregate</text>
+  <text x="396" y="462" class="s">intervals, uplift, consistency, cost</text>
+  <rect x="706" y="420" width="436" height="56" rx="8" class="mod"/>
+  <text x="720" y="444" class="m">report + demo</text>
+  <text x="720" y="462" class="s">dashboard, README figures, ask() with guard and replay</text>
+
+  <path class="e" d="M215,192 L215,214"/>
+  <path class="e" d="M600,192 L600,214"/>
+  <path class="e" d="M985,192 L985,214"/>
+
+  <!-- external -->
+  <text x="40" y="530" class="lane">SERVICES</text>
+  <rect x="40" y="542" width="260" height="92" rx="10" class="ch"/>
+  <text x="56" y="568" class="h">ClickHouse Cloud</text>
+  <text x="56" y="590" class="s">remote MCP server (API key)</text>
+  <text x="56" y="608" class="s">analytics_ro: readonly, 30 s,</text>
+  <text x="56" y="624" class="s">memory and thread limits fixed</text>
+  <rect x="320" y="542" width="260" height="92" rx="10" class="sf"/>
+  <text x="336" y="568" class="h">Snowflake</text>
+  <text x="336" y="590" class="s">Cortex Analyst REST, key-pair JWT</text>
+  <text x="336" y="608" class="s">semantic view, ANALYTICS_RO role,</text>
+  <text x="336" y="624" class="s">X-Small warehouse, 60 s suspend</text>
+  <rect x="600" y="542" width="260" height="92" rx="10" class="ext"/>
+  <text x="616" y="568" class="h">Model APIs</text>
+  <text x="616" y="590" class="s">Anthropic: Claude Sonnet 5.5</text>
+  <text x="616" y="608" class="s">OpenAI: GPT-6.1 Sol (Responses)</text>
+  <text x="616" y="624" class="s">spend cap per run, ledger</text>
+  <rect x="880" y="542" width="280" height="92" rx="10" class="ek"/>
+  <text x="896" y="568" class="h">EvalKit (eval engine)</text>
+  <text x="896" y="590" class="s">sql_match scorer, bootstrap stats,</text>
+  <text x="896" y="608" class="s">cost, retries, demo guard; gates,</text>
+  <text x="896" y="624" class="s">compare and run ledger next</text>
+
+  <rect x="40" y="654" width="1120" height="70" rx="10" class="ext"/>
+  <text x="56" y="680" class="h">Hosting and release</text>
+  <text x="56" y="702" class="s">GitHub (code, CI, Pages dashboard) · PyPI trusted publishing on a reviewed tag · Streamlit Community Cloud (demo, secrets in its store)</text>
+  <text x="56" y="718" class="s">Postgres spend counter shared with EvalKit's demo · Langfuse traces (optional; public for sample questions)</text>
+
+  <path class="e" d="M170,492 L170,540"/>
+  <path class="e" d="M450,492 L450,540"/>
+  <path class="e" d="M730,492 L730,540"/>
+  <path class="e" d="M1020,492 L1020,540"/>
+</svg>

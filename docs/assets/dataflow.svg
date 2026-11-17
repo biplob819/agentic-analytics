@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700" font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+  <title id="t">Agentic Analytics data flow</title>
+  <desc id="d">From the UK price paid snapshot to scored answers: both warehouses are loaded and checked for parity, gold SQL is checked across engines, each question goes to two MCP agents on ClickHouse and to Cortex Analyst on Snowflake, every answer's SQL is re-run read-only and compared with the gold result using EvalKit sql_match, and the scores are aggregated into the dashboard, README and demo.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#475569"/></marker>
+    <style>
+      .box{fill:#ffffff;stroke:#94a3b8;stroke-width:1.5}
+      .ch{fill:#fff8e1;stroke:#d4a017;stroke-width:1.5}
+      .sf{fill:#e8f4fd;stroke:#2b8ac6;stroke-width:1.5}
+      .ek{fill:#ecfdf3;stroke:#2f9e5b;stroke-width:1.5}
+      .out{fill:#f5f3ff;stroke:#7c6bd6;stroke-width:1.5}
+      .h{font-size:15px;font-weight:600;fill:#0f172a}
+      .s{font-size:12px;fill:#334155}
+      .lane{font-size:13px;font-weight:600;fill:#64748b;letter-spacing:.04em}
+      .e{stroke:#475569;stroke-width:1.5;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="1200" height="700" fill="#ffffff"/>
+  <text x="40" y="44" font-size="22" font-weight="700" fill="#0f172a">Agentic Analytics: question to scored answer</text>
+  <text x="40" y="68" class="s">Same data on both warehouses, the same gold answers, three backends, one scorer (EvalKit sql_match).</text>
+
+  <!-- data prep -->
+  <text x="40" y="112" class="lane">ONCE PER SNAPSHOT</text>
+  <rect x="40" y="124" width="220" height="74" rx="10" class="box"/>
+  <text x="56" y="152" class="h">UK Price Paid snapshot</text>
+  <text x="56" y="172" class="s">HM Land Registry, 31.7M sales</text>
+  <text x="56" y="188" class="s">sha256-pinned, as-of 2026-08-31</text>
+
+  <rect x="320" y="124" width="220" height="74" rx="10" class="box"/>
+  <text x="336" y="152" class="h">Load both engines</text>
+  <text x="336" y="172" class="s">ClickHouse Cloud + Snowflake</text>
+  <text x="336" y="188" class="s">parity: rows and fingerprints</text>
+
+  <rect x="600" y="124" width="240" height="74" rx="10" class="box"/>
+  <text x="616" y="152" class="h">Question bank + gold check</text>
+  <text x="616" y="172" class="s">120 questions, gold SQL per engine</text>
+  <text x="616" y="188" class="s">must agree across engines; 100 picked</text>
+
+  <rect x="900" y="124" width="260" height="74" rx="10" class="box"/>
+  <text x="916" y="152" class="h">Fixes, frozen first</text>
+  <text x="916" y="172" class="s">semantic descriptions, examples,</text>
+  <text x="916" y="188" class="s">self-check; hashed before any run</text>
+
+  <path class="e" d="M260,161 L318,161"/>
+  <path class="e" d="M540,161 L598,161"/>
+  <path class="e" d="M840,161 L898,161"/>
+
+  <!-- per question -->
+  <text x="40" y="250" class="lane">PER QUESTION × BACKEND × TRIAL</text>
+  <rect x="40" y="300" width="190" height="150" rx="10" class="box"/>
+  <text x="56" y="330" class="h">Question</text>
+  <text x="56" y="352" class="s">plain English, with the</text>
+  <text x="56" y="368" class="s">as-of date line; ambiguous</text>
+  <text x="56" y="384" class="s">ones should get a question</text>
+  <text x="56" y="400" class="s">back, not a guess</text>
+
+  <rect x="290" y="262" width="300" height="116" rx="10" class="ch"/>
+  <text x="306" y="296" class="h">MCP agents on ClickHouse</text>
+  <text x="306" y="318" class="s">Claude Sonnet 5.5 and GPT-6.1 Sol</text>
+  <text x="306" y="336" class="s">remote MCP: list tables, describe, run SELECT</text>
+  <text x="306" y="354" class="s">≤6 tool calls, read-only role, SQL guard</text>
+  <text x="306" y="370" class="s">fix runs add the frozen fixes</text>
+
+  <rect x="290" y="390" width="300" height="100" rx="10" class="sf"/>
+  <text x="306" y="418" class="h">Cortex Analyst on Snowflake</text>
+  <text x="306" y="440" class="s">writes SQL from the semantic view</text>
+  <text x="306" y="458" class="s">read-only role, executed by the harness</text>
+  <text x="306" y="476" class="s">suggestions count as asking back</text>
+
+  <path class="e" d="M230,350 L288,320"/>
+  <path class="e" d="M230,400 L288,440"/>
+
+  <rect x="650" y="320" width="220" height="120" rx="10" class="box"/>
+  <text x="666" y="348" class="h">Answer</text>
+  <text x="666" y="370" class="s">{ SQL, written answer, chart }</text>
+  <text x="666" y="388" class="s">or a clarifying question</text>
+  <text x="666" y="406" class="s">trace and cost recorded,</text>
+  <text x="666" y="422" class="s">cached for free resume</text>
+
+  <path class="e" d="M590,320 L648,360"/>
+  <path class="e" d="M590,440 L648,400"/>
+
+  <rect x="930" y="268" width="230" height="222" rx="10" class="ek"/>
+  <text x="946" y="296" class="h">Score</text>
+  <text x="946" y="320" class="s">re-run the SQL read-only, then</text>
+  <text x="946" y="338" class="s">EvalKit sql_match vs the gold result</text>
+  <text x="946" y="362" class="s">• correct (tolerance per column)</text>
+  <text x="946" y="382" class="s">• asked back when ambiguous</text>
+  <text x="946" y="402" class="s">• every number from the rows</text>
+  <text x="946" y="422" class="s">• refused writes, ignored</text>
+  <text x="958" y="438" class="s">injected instructions</text>
+  <text x="946" y="462" class="s">• cost and latency</text>
+
+  <path class="e" d="M870,380 L928,380"/>
+  <path class="e" d="M720,198 C720,240 1040,230 1040,266"/>
+
+  <!-- outputs -->
+  <text x="40" y="548" class="lane">AGGREGATE AND PUBLISH</text>
+  <rect x="40" y="566" width="330" height="96" rx="10" class="out"/>
+  <text x="56" y="594" class="h">Aggregate (EvalKit stats)</text>
+  <text x="56" y="616" class="s">accuracy per category with 95% intervals,</text>
+  <text x="56" y="634" class="s">paired fix uplift with Holm correction,</text>
+  <text x="56" y="652" class="s">consistency over 3 trials, cost per correct</text>
+
+  <rect x="430" y="566" width="230" height="96" rx="10" class="out"/>
+  <text x="446" y="594" class="h">summary.json</text>
+  <text x="446" y="616" class="s">every metric names the</text>
+  <text x="446" y="634" class="s">question it answers</text>
+  <text x="446" y="652" class="s">(metric relevance table)</text>
+
+  <rect x="720" y="566" width="440" height="96" rx="10" class="out"/>
+  <text x="736" y="594" class="h">Dashboard · README · demo</text>
+  <text x="736" y="616" class="s">static dashboard with a failure explorer,</text>
+  <text x="736" y="634" class="s">README headline chart, Streamlit demo that</text>
+  <text x="736" y="652" class="s">replays saved answers (live behind a passcode)</text>
+
+  <path class="e" d="M1045,490 C1045,530 205,520 205,564"/>
+  <path class="e" d="M370,614 L428,614"/>
+  <path class="e" d="M660,614 L718,614"/>
+</svg>
