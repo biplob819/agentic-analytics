@@ -1,0 +1,8 @@
+# Streamlit settings for the hosted demo (D-57; Streamlit Community Cloud reads this file from the
+# repository root, where it runs `demo/app.py`). Secrets never go here: they live in the app's
+# secret store (`scripts/streamlit_secrets.py | pbcopy`), and `.streamlit/secrets.toml` is ignored.
+
+[client]
+# An uncaught exception shows a generic message, never its text or traceback (which can quote a
+# URL, a path or a provider message); the page already shows errors in its own words (D-96).
+showErrorDetails = "none"

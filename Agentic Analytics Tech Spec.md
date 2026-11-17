@@ -648,7 +648,7 @@ Status vocabulary: `not-started | spec | building | green`. Changelog lines read
 
 ### 12.2 Build graph: 25 nodes in five waves
 
-**Must scope: 22 nodes,** W0.1 to B3.3, with N1.7 (OWNER D-55). **Should scope (US7): 2 nodes,** D4.1 and D4.2. The whole graph is built in one pass (OWNER D-20). B3.3 publishes v0.1.0 to PyPI (OWNER D-27). **Monitoring (OWNER D-74): 1 node,** M4.1, added after the owner asked how the evals are monitored and improved.
+**Must scope: 22 nodes,** W0.1 to B3.3, with N1.7 (OWNER D-55). **Should scope (US7): 2 nodes,** D4.1 and D4.2. Since OWNER D-93, B3.3 depends on D4.2 (its DEM-15 measures the deployed page), so the release waits on both Should nodes. The whole graph is built in one pass (OWNER D-20). B3.3 publishes v0.1.0 to PyPI (OWNER D-27). **Monitoring (OWNER D-74): 1 node,** M4.1, added after the owner asked how the evals are monitored and improved.
 
 | Node | Title | Depends on | Deliverable (what exists when it is green) | Stories |
 | --- | --- | --- | --- | --- |
@@ -673,9 +673,9 @@ Status vocabulary: `not-started | spec | building | green`. Changelog lines read
 | **F3.2** | Fix runs and uplift | F3.1, R3.2 | Fix runs, uplift table, hand-labelled failure taxonomy | US2, US4 |
 | **B3.1** | Dashboard | M2.1, A2.3 | Static dashboard: category × backend, uplift, cost, clarification, failure explorer | US1–US5 |
 | **B3.2** | README, deploy and write-up figures | B3.1, F3.2, M4.1 | README headline, Cloudflare Pages deploy, decision log, data card, figures for the write-up | US6 |
-| **B3.3** | Open-source release v0.1.0 | B3.2 | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0 | US6, US8 |
+| **B3.3** | Open-source release v0.1.0 | B3.2, D4.2 | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0, the hosted demo deployed with its live p95 (DEM-15, D-93) | US6, US7, US8 |
 | **D4.1** | `ask()` and guard | A2.3, R3.1 | `ask()`, replay cache, live path behind EvalKit's guard, warm-up | US7 |
-| **D4.2** | Demo page | D4.1, B3.1 | Streamlit app from this repo (D-57), measured live p95 | US7 |
+| **D4.2** | Demo page | D4.1, B3.1 | Streamlit app from this repo (D-57), packaged for deploy, with the p95 tool (the deployed live p95 is DEM-15 in B3.3, D-93) | US7 |
 | **M4.1** | Monitoring and EvalKit reuse | R3.2, B3.1 | Scheduled smoke gated by `evalkit gate`, run history and drift through EvalKit's ledger and compare, metrics-summary export, `attack_outcome` probe scoring, step efficiency, upstreamed scorers with parity tests (OWNER D-74, D-75) | US1, US5 |
 
 Waves: **W0** harness → **N1** foundations → **Q2/A2/S2/M2** benchmark, backends, scoring → **R3/F3/B3** runs, fixes, reporting → **D4/M4** demo and monitoring.
@@ -723,6 +723,7 @@ graph LR
   A23 --> D41[D4.1 ask + guard]
   R31 --> D41
   D41 --> D42[D4.2 Demo page]
+  D42 --> B33
   B31 --> D42
   R32 --> M41[M4.1 Monitoring + EvalKit reuse]
   B31 --> M41
@@ -775,9 +776,9 @@ graph LR
 | 19 | F3.2 |  |
 | 20 | M4.1 | added by OWNER D-74; needs the baseline runs; before B3.2 so the README covers monitoring |
 | 21 | B3.2 |  |
-| 22 | B3.3 | v0.1.0 on PyPI; Must scope complete |
-| 23 | D4.1 |  |
-| 24 | D4.2 |  |
+| 22 | D4.1 |  |
+| 23 | D4.2 | before B3.3, which measures its deployed page (DEM-15, OWNER D-93) |
+| 24 | B3.3 | v0.1.0 on PyPI; Must scope complete |
 | 25 | N1.7 | added by OWNER D-55; can run any time after N1.2 |
 
 ### 12.4 Capability catalog
@@ -1023,6 +1024,7 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 | OSS-05 | CONTRIBUTING, SECURITY (key handling, reporting), CODE_OF_CONDUCT, issue and PR templates | D-27 |
 | OSS-06 | Privacy statement: no telemetry; data goes only to the providers and warehouses the user configures | D-27 |
 | OSS-07 | Tag v0.1.0, semver policy, install test against the published package | D-27 |
+| DEM-15 | Deployed on Streamlit Community Cloud with secrets in the host store; live page-mode p95 under 30 s over 20 owner-budget asks, no timed-out or errored panel | NFR2, D-93 |
 
 **D4.1 `ask()` and guard**
 
@@ -1042,7 +1044,7 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 | DEM-02 | Two panels: SQL, answer, chart, cost, trace link | US7, B5 |
 | DEM-03 | Passcode live mode with a budget line | US7 |
 | DEM-04 | Licence credit and the honest Cortex line | NFR6, C1 |
-| DEM-05 | Deployed with secrets in the host store. Live p95 under 30 seconds over 20 asks | NFR2 |
+| DEM-05 | Deploy packaging: the p95 measurement tool (page and in-process modes, spend-capped, recorded), the host's secrets list, the `demo/` entry and pinned requirements; the deployed live p95 is DEM-15 (D-93) | NFR2, D-93 |
 | DEM-06 | Visitor own key after the passcode: Anthropic for the Claude panel, OpenAI for the GPT panel, format-checked offline, per-request SDK clients with no SDK retries, on the benchmark's fixed models and effort; never on the owner passcode | OWNER D-56, H15 |
 | DEM-07 | Own-key spend: keyed panels' model calls off the $3/day budget; warehouse spend under its own daily limit (`agentic-analytics-byok`) with the rate limit; a failing key fails only its panel, never falling back to the owner's key | OWNER D-56, D-17, H15 |
 | DEM-08 | The key in session memory only: never in logs, traces, exports, caches, the spend ledger, exception text or object reprs; redacted on the page; "Forget my key" clears it | OWNER D-56, NFR3, H15 |

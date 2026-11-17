@@ -22,6 +22,14 @@ dependencies = [
     "pyjwt>=2.9",
 ]
 
+[project.optional-dependencies]
+# D-57: the hosted demo (Streamlit Community Cloud installs demo/requirements.txt, pinned to
+# these as locked in uv.lock; tests/demo/test_deploy.py keeps the two in step)
+demo = [
+    "psycopg[binary]>=3.3",
+    "streamlit>=1.67",
+]
+
 [project.urls]
 Homepage = "https://github.com/biplob819/agentic-analytics"
 

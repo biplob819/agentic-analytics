@@ -375,6 +375,15 @@ def test_a_failed_agent_panel_is_charged_its_real_cost(tmp_path, budgeted):
     assert actual == pytest.approx(panel.cost_usd) and 0 < actual < reserved
 
 
+def _rendered(panel) -> str:
+    from agentic_analytics.demo import page as P
+    from tests.demo.helpers import FakeSt
+
+    st = FakeSt()
+    P.render_panel(st, P.panel_view(panel, live=True))
+    return json.dumps([[a, k] for _, a, k in st.calls], default=str)
+
+
 @pytest.mark.parametrize(
     "exc",
     [
@@ -392,7 +401,7 @@ def test_provider_error_text_never_reaches_a_panel_or_the_page(exc):
     ctx = context_with({"claude_mcp": model}, ("claude_mcp",))
     (panel,) = A.ask_panels("Which town?", ("claude_mcp",), "live", ctx=ctx)
     assert not panel.ok
-    assert SECRET not in panel.model_dump_json()
+    assert SECRET not in panel.model_dump_json() and "sk-ant" not in _rendered(panel)
 
 
 def test_a_failing_cortex_call_never_shows_its_message(monkeypatch):
@@ -403,7 +412,29 @@ def test_a_failing_cortex_call_never_shows_its_message(monkeypatch):
     ctx = fake_context(("cortex_analyst",))
     (panel,) = A.ask_panels("Which town?", ("cortex_analyst",), "live", ctx=ctx)
     assert panel.note == "failed (RuntimeError)" and panel.cost_usd == panel.bound_usd
-    assert SECRET not in panel.model_dump_json()
+    assert SECRET not in panel.model_dump_json() and "sk-ant" not in _rendered(panel)
+
+
+def test_the_page_redacts_a_secret_even_if_one_reached_a_panel():
+    from agentic_analytics.demo import page as P
+    from agentic_analytics.tracing import Redactor
+
+    leaked = AnalyticsAnswer(
+        backend="claude_mcp", model_snapshot="m", sql=None,
+        answer="", clarification=f"key {SECRET}?", suggestions=(f"try {SECRET}",),
+    )  # fmt: skip
+    panel = A.Panel(backend="claude_mcp", answer=leaked, cost_usd=0.0, latency_ms=1,
+                    note=f"note {SECRET}")  # fmt: skip
+    v = P.panel_view(panel)
+    shown = json.dumps([v.answer, v.suggestions, v.notes])
+    assert SECRET not in shown and "REDACTED" in shown
+    with_sql = leaked.model_copy(update={"sql": f"SELECT '{SECRET}'", "suggestions": ()})
+    assert SECRET not in (P.panel_view(panel.model_copy(update={"answer": with_sql})).sql or "")
+    custom = P.panel_view(
+        panel.model_copy(update={"note": "pw hunter22-long-secret"}),
+        redactor=Redactor({"DEMO_PASSCODE": "hunter22-long-secret"}),
+    )
+    assert "hunter22-long-secret" not in json.dumps(custom.notes)
 
 
 # ---- the question's characters ------------------------------------------------------------------

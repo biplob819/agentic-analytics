@@ -45,7 +45,7 @@ def test_catalog_matches_tech_spec_capabilities():
         if m:
             expected.append((m.group(1), node, f"{m.group(2)} [{m.group(3)}]"))
     caps = load_catalog()
-    assert len(expected) == 155  # SET D-55, DEM-06..14 D-56..D-60, MON-01..06 D-74/D-75
+    assert len(expected) == 156  # SET D-55, DEM-06..15 D-56..D-60/D-93, MON-01..06 D-74/D-75
     assert [(c.cap_id, c.node, c.note) for c in caps] == expected
 
 

@@ -1,0 +1,2074 @@
+{
+ "attribution": "Contains HM Land Registry data © Crown copyright and database right 2021. This data is licensed under the Open Government Licence v3.0.",
+ "backends": [
+  "claude_mcp",
+  "cortex_analyst"
+ ],
+ "config": {
+  "as_of": "2026-08-31",
+  "backends": [
+   "claude_mcp",
+   "cortex_analyst"
+  ],
+  "concurrency": {
+   "claude_mcp": 4,
+   "cortex_analyst": 2
+  },
+  "effort": "medium",
+  "fixes": [],
+  "max_cost_usd": 25.0,
+  "max_tool_calls": 6,
+  "max_turns": 10,
+  "models": {
+   "claude_mcp": "claude-sonnet-5-5"
+  },
+  "row_cap_exec": 10000,
+  "row_cap_model": 50,
+  "seed": 0,
+  "snowflake_region": "AWS_AP_SOUTHEAST_7",
+  "trials": 1
+ },
+ "created_at": "2026-11-17T09:54:54.190204Z",
+ "entries": [
+  {
+   "category": "aggregation",
+   "panels": [
+    {
+     "answer": {
+      "answer": "861,782 property sales were recorded in 2023. This is the count of rows in the uk.uk_price_paid table with a sale date in 2023. I took that table to cover England and Wales.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 861782
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "count()",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in England and Wales in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8J8FEXUrTTFMxgaHSB8",
+      "sql": "SELECT count() FROM uk.uk_price_paid WHERE date >= '2023-01-01' AND date < '2024-01-01'",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 2423,
+        "rows_returned": null,
+        "tokens_in": 2467,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "SELECT count() FROM uk.uk_price_paid WHERE date >= '2023-01-01' AND date < '2024-01-01'"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 874,
+        "rows_returned": 1,
+        "tokens_in": 4387,
+        "tokens_out": 94,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "861,782 property sales were recorded in 2023. This is the count of rows in the uk.uk_price_paid table with a sale date in 2023. I took that table to cover England and Wales.",
+         "clarification": null,
+         "sql": "SELECT count() FROM uk.uk_price_paid WHERE date >= '2023-01-01' AND date < '2024-01-01'",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 1838,
+        "rows_returned": null,
+        "tokens_in": 4523,
+        "tokens_out": 222,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.016405522222222226,
+     "execution_error": null,
+     "latency_ms": 15245,
+     "note": null,
+     "rows": {
+      "columns": [
+       "count()"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        861782
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 861782.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 861782
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "SALES_COUNT",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in England and Wales in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nHow many property sales (sales count) were recorded in England and Wales in the calendar year 2023?",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "9c87ab8c-b740-4c99-9525-36c5fa113a39",
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS sales_count\n    WHERE uk_price_paid.year = 2023\n)\n -- Generated by Cortex Analyst (request_id: 9c87ab8c-b740-4c99-9525-36c5fa113a39)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20171416666666667,
+     "execution_error": null,
+     "latency_ms": 4578,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "SALES_COUNT"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        861782
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "How many property sales were recorded in England and Wales in 2023?",
+   "question_id": "q-001",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "time",
+   "panels": [
+    {
+     "answer": {
+      "answer": "Property sales recorded in 2024 by month number: 1: 56,616; 2: 62,233; 3: 73,690; 4: 65,269; 5: 77,779; 6: 76,538; 7: 82,340; 8: 88,184; 9: 80,131; 10: 96,133; 11: 89,035; 12: 84,266.",
+      "backend": "claude_mcp",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8J9KcjDCE5rgBVcHwTD",
+      "sql": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE date >= '2024-01-01' AND date < '2025-01-01' GROUP BY month ORDER BY month",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1633,
+        "rows_returned": null,
+        "tokens_in": 2470,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE date >= '2024-01-01' AND date < '2025-01-01' GROUP BY month ORDER BY month"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 1012,
+        "rows_returned": 12,
+        "tokens_in": 4390,
+        "tokens_out": 123,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "Property sales recorded in 2024 by month number: 1: 56,616; 2: 62,233; 3: 73,690; 4: 65,269; 5: 77,779; 6: 76,538; 7: 82,340; 8: 88,184; 9: 80,131; 10: 96,133; 11: 89,035; 12: 84,266.",
+         "clarification": "",
+         "sql": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE date >= '2024-01-01' AND date < '2025-01-01' GROUP BY month ORDER BY month",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 2082,
+        "rows_returned": null,
+        "tokens_in": 4638,
+        "tokens_out": 303,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.017308483333333336,
+     "execution_error": null,
+     "latency_ms": 11203,
+     "note": null,
+     "rows": {
+      "columns": [
+       "month",
+       "sales"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        1,
+        56616
+       ],
+       [
+        2,
+        62233
+       ],
+       [
+        3,
+        73690
+       ],
+       [
+        4,
+        65269
+       ],
+       [
+        5,
+        77779
+       ],
+       [
+        6,
+        76538
+       ],
+       [
+        7,
+        82340
+       ],
+       [
+        8,
+        88184
+       ],
+       [
+        9,
+        80131
+       ],
+       [
+        10,
+        96133
+       ],
+       [
+        11,
+        89035
+       ],
+       [
+        12,
+        84266
+       ]
+      ]
+     },
+     "rows_total": 12,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "12 rows returned; first: SALES_COUNT: 56616, MONTH_NUMBER: 1",
+      "backend": "cortex_analyst",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nHow many property sales were recorded in the calendar year 2024, grouped by month number (1–12)?",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "caeb6db9-9dc5-490d-8cd4-330c537520e2",
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS sales_count\n    DIMENSIONS DATE_PART('month', uk_price_paid.date) AS month_number\n    WHERE YEAR(uk_price_paid.date) = 2024\n)\nORDER BY month_number ASC NULLS LAST\n -- Generated by Cortex Analyst (request_id: caeb6db9-9dc5-490d-8cd4-330c537520e2)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20155583333333335,
+     "execution_error": null,
+     "latency_ms": 4238,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "SALES_COUNT",
+       "MONTH_NUMBER"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        56616,
+        1
+       ],
+       [
+        62233,
+        2
+       ],
+       [
+        73690,
+        3
+       ],
+       [
+        65269,
+        4
+       ],
+       [
+        77779,
+        5
+       ],
+       [
+        76538,
+        6
+       ],
+       [
+        82340,
+        7
+       ],
+       [
+        88184,
+        8
+       ],
+       [
+        80131,
+        9
+       ],
+       [
+        96133,
+        10
+       ],
+       [
+        89035,
+        11
+       ],
+       [
+        84266,
+        12
+       ]
+      ]
+     },
+     "rows_total": 12,
+     "timed_out": false
+    }
+   ],
+   "question": "How many property sales were recorded in 2024, by month number (1–12)?",
+   "question_id": "q-021",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "geography",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The median price of a detached house in the town of Manchester in 2024 was £370,000. This is based on 1,260 detached sales. The median is the approximate value that ClickHouse's median() function returns.",
+      "backend": "claude_mcp",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8JA73iK2ha1AQXvJKCC",
+      "sql": "select median(price), count() from uk.uk_price_paid where town='MANCHESTER' and type='detached' and date>='2024-01-01' and date<'2025-01-01'",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1672,
+        "rows_returned": null,
+        "tokens_in": 2470,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "select median(price), count() from uk.uk_price_paid where town='MANCHESTER' and type='detached' and date>='2024-01-01' and date<'2025-01-01'"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 838,
+        "rows_returned": 1,
+        "tokens_in": 4390,
+        "tokens_out": 105,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The median price of a detached house in the town of Manchester in 2024 was £370,000. This is based on 1,260 detached sales. The median is the approximate value that ClickHouse's median() function returns.",
+         "clarification": null,
+         "sql": "select median(price), count() from uk.uk_price_paid where town='MANCHESTER' and type='detached' and date>='2024-01-01' and date<'2025-01-01'",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 2212,
+        "rows_returned": null,
+        "tokens_in": 4547,
+        "tokens_out": 237,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.01636501111111111,
+     "execution_error": null,
+     "latency_ms": 11809,
+     "note": null,
+     "rows": {
+      "columns": [
+       "median(price)",
+       "count()"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        370000.0,
+        1260
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 370000.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 370000
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "MEDIAN_PRICE",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "What was the median price of a detached house in the town of Manchester in 2024?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nWhat was the median price of a detached house in the town of MANCHESTER in the calendar year 2024?",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "1b109f71-a360-4f66-84e7-4660d29c0bb3",
+      "sql": "WITH __uk_price_paid AS (\n  SELECT\n    date,\n    town,\n    type,\n    YEAR(date) AS year,\n    price\n  FROM ANALYTICS.UK.UK_PRICE_PAID\n)\nSELECT\n  MEDIAN(price) AS median_price\nFROM __uk_price_paid\nWHERE\n  type = 'detached' AND UPPER(town) = 'MANCHESTER' AND year = 2024\n -- Generated by Cortex Analyst (request_id: 1b109f71-a360-4f66-84e7-4660d29c0bb3)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20124583333333335,
+     "execution_error": null,
+     "latency_ms": 3657,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "MEDIAN_PRICE"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        370000
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "What was the median price of a detached house in the town of Manchester in 2024?",
+   "question_id": "q-041",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "top_n",
+   "panels": [
+    {
+     "answer": {
+      "answer": "Top 10 towns by median price in 2024 (towns with at least 500 sales):\n1. Ascot: £699,950 (509 sales)\n2. Pinner: £687,500 (558)\n3. Leatherhead: £655,000 (870)\n4. Twickenham: £625,000 (903)\n5. Rickmansworth: £622,492.5 (616)\n6. Kingston upon Thames: £581,500 (746)\n7. Ruislip: £570,000 (663)\n8. Barnet: £565,500 (892)\n9. St Albans: £565,000 (1,790)\n10. London: £563,368 (66,833)",
+      "backend": "claude_mcp",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8JB56AFBW97fYz8521h",
+      "sql": "select town, count() c, median(price) m from uk.uk_price_paid where date>='2024-01-01' and date<'2025-01-01' group by town having c>=500 order by m desc limit 10",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1810,
+        "rows_returned": null,
+        "tokens_in": 2479,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "select town, count() c, median(price) m from uk.uk_price_paid where date>='2024-01-01' and date<'2025-01-01' group by town having c>=500 order by m desc limit 10"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 925,
+        "rows_returned": 10,
+        "tokens_in": 4399,
+        "tokens_out": 111,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "Top 10 towns by median price in 2024 (towns with at least 500 sales):\n1. Ascot: £699,950 (509 sales)\n2. Pinner: £687,500 (558)\n3. Leatherhead: £655,000 (870)\n4. Twickenham: £625,000 (903)\n5. Rickmansworth: £622,492.5 (616)\n6. Kingston upon Thames: £581,500 (746)\n7. Ruislip: £570,000 (663)\n8. Barnet: £565,500 (892)\n9. St Albans: £565,000 (1,790)\n10. London: £563,368 (66,833)",
+         "clarification": "",
+         "sql": "select town, count() c, median(price) m from uk.uk_price_paid where date>='2024-01-01' and date<'2025-01-01' group by town having c>=500 order by m desc limit 10",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 2868,
+        "rows_returned": null,
+        "tokens_in": 4726,
+        "tokens_out": 385,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.018222644444444443,
+     "execution_error": null,
+     "latency_ms": 12440,
+     "note": null,
+     "rows": {
+      "columns": [
+       "town",
+       "c",
+       "m"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        "ASCOT",
+        509,
+        699950.0
+       ],
+       [
+        "PINNER",
+        558,
+        687500.0
+       ],
+       [
+        "LEATHERHEAD",
+        870,
+        655000.0
+       ],
+       [
+        "TWICKENHAM",
+        903,
+        625000.0
+       ],
+       [
+        "RICKMANSWORTH",
+        616,
+        622492.5
+       ],
+       [
+        "KINGSTON UPON THAMES",
+        746,
+        581500.0
+       ],
+       [
+        "RUISLIP",
+        663,
+        570000.0
+       ],
+       [
+        "BARNET",
+        892,
+        565500.0
+       ],
+       [
+        "ST ALBANS",
+        1790,
+        565000.0
+       ],
+       [
+        "LONDON",
+        66833,
+        563368.0
+       ]
+      ]
+     },
+     "rows_total": 10,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "10 rows returned; first: TOWN: ASCOT, SALES_COUNT: 509, MEDIAN_PRICE: 699950",
+      "backend": "cortex_analyst",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nWhich 10 towns had the highest median sale price in 2024, among towns with at least 500 sales in 2024?",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "930d9df3-aadf-4773-b2ff-aa3e7f0396d9",
+      "sql": "WITH __uk_price_paid AS (\n  SELECT\n    date,\n    town,\n    YEAR(date) AS year,\n    price\n  FROM ANALYTICS.UK.UK_PRICE_PAID\n)\nSELECT\n  town,\n  COUNT(price) AS sales_count,\n  MEDIAN(price) AS median_price\nFROM __uk_price_paid\nWHERE\n  year = 2024\nGROUP BY\n  town\nHAVING\n  COUNT(price) >= 500\nORDER BY\n  median_price DESC NULLS LAST\nLIMIT 10\n -- Generated by Cortex Analyst (request_id: 930d9df3-aadf-4773-b2ff-aa3e7f0396d9)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.2012341666666667,
+     "execution_error": null,
+     "latency_ms": 3822,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "TOWN",
+       "SALES_COUNT",
+       "MEDIAN_PRICE"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        "ASCOT",
+        509,
+        699950
+       ],
+       [
+        "PINNER",
+        558,
+        687500
+       ],
+       [
+        "LEATHERHEAD",
+        870,
+        655000
+       ],
+       [
+        "TWICKENHAM",
+        903,
+        625000
+       ],
+       [
+        "RICKMANSWORTH",
+        616,
+        622492.5
+       ],
+       [
+        "KINGSTON UPON THAMES",
+        746,
+        581500
+       ],
+       [
+        "RUISLIP",
+        663,
+        570000
+       ],
+       [
+        "BARNET",
+        892,
+        565500
+       ],
+       [
+        "ST ALBANS",
+        1790,
+        565000
+       ],
+       [
+        "LONDON",
+        66833,
+        565000
+       ]
+      ]
+     },
+     "rows_total": 10,
+     "timed_out": false
+    }
+   ],
+   "question": "Which 10 towns had the highest median price in 2024, among towns with at least 500 sales that year?",
+   "question_id": "q-061",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "yoy",
+   "panels": [
+    {
+     "answer": {
+      "answer": "Median price paid in England and Wales: 2023 was £273,000 and 2024 was £282,000, a rise of 3.3%.",
+      "backend": "claude_mcp",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8JC7ZmtnPcrfjyDmYPC",
+      "sql": "WITH a AS (SELECT median(if(toYear(date)=2023,price,NULL)) m23, median(if(toYear(date)=2024,price,NULL)) m24 FROM uk.uk_price_paid WHERE date>='2023-01-01' AND date<'2025-01-01') SELECT m23, m24, round((m24-m23)/m23*100,2) pct FROM a",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1903,
+        "rows_returned": null,
+        "tokens_in": 2487,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "WITH a AS (SELECT median(if(toYear(date)=2023,price,NULL)) m23, median(if(toYear(date)=2024,price,NULL)) m24 FROM uk.uk_price_paid WHERE date>='2023-01-01' AND date<'2025-01-01') SELECT m23, m24, round((m24-m23)/m23*100,2) pct FROM a"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 867,
+        "rows_returned": 1,
+        "tokens_in": 4407,
+        "tokens_out": 195,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "Median price paid in England and Wales: 2023 was £273,000 and 2024 was £282,000, a rise of 3.3%.",
+         "clarification": null,
+         "sql": "WITH a AS (SELECT median(if(toYear(date)=2023,price,NULL)) m23, median(if(toYear(date)=2024,price,NULL)) m24 FROM uk.uk_price_paid WHERE date>='2023-01-01' AND date<'2025-01-01') SELECT m23, m24, round((m24-m23)/m23*100,2) pct FROM a",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 2712,
+        "rows_returned": null,
+        "tokens_in": 4661,
+        "tokens_out": 290,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.017939800000000002,
+     "execution_error": null,
+     "latency_ms": 14241,
+     "note": null,
+     "rows": {
+      "columns": [
+       "m23",
+       "m24",
+       "pct"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        273765.0,
+        283000.0,
+        3.37
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "YEAR_2023: 2023, YEAR_2024: 2024, MEDIAN_PRICE_2023: 275000, MEDIAN_PRICE_2024: 280000, ABSOLUTE_CHANGE: 5000, PCT_CHANGE: 0.018181818",
+      "backend": "cortex_analyst",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nShow the median price paid in England and Wales in 2023 and in 2024, and the percentage change from 2023 to 2024.",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "8ecac420-9e96-4ff5-b2d2-7b86bd5badfc",
+      "sql": "WITH median_2023 AS (\n    SELECT *\n    FROM SEMANTIC_VIEW(\n        ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n        METRICS median_price\n        WHERE uk_price_paid.year = 2023\n    )\n),\nmedian_2024 AS (\n    SELECT *\n    FROM SEMANTIC_VIEW(\n        ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n        METRICS median_price\n        WHERE uk_price_paid.year = 2024\n    )\n)\nSELECT\n    2023 AS year_2023,\n    2024 AS year_2024,\n    median_2023.median_price AS median_price_2023,\n    median_2024.median_price AS median_price_2024,\n    median_2024.median_price - median_2023.median_price AS absolute_change,\n    (median_2024.median_price - median_2023.median_price) / NULLIF(median_2023.median_price, 0) AS pct_change\nFROM median_2023\nCROSS JOIN median_2024\n -- Generated by Cortex Analyst (request_id: 8ecac420-9e96-4ff5-b2d2-7b86bd5badfc)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.2013125,
+     "execution_error": null,
+     "latency_ms": 4509,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "YEAR_2023",
+       "YEAR_2024",
+       "MEDIAN_PRICE_2023",
+       "MEDIAN_PRICE_2024",
+       "ABSOLUTE_CHANGE",
+       "PCT_CHANGE"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        2023,
+        2024,
+        275000,
+        280000,
+        5000,
+        0.018181818
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "Show the median price paid in England and Wales in 2023 and in 2024, and the percentage change from 2023 to 2024.",
+   "question_id": "q-081",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "ambiguous",
+   "panels": [
+    {
+     "answer": {
+      "answer": "In 2025, the average price paid in the Leeds district was about £321,928, across 13,011 sales. The median was £238,000. If you meant only the town of Leeds, the average was about £325,240 across 10,900 sales, with a median of £234,000.",
+      "backend": "claude_mcp",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8JD1o2ycej4YcfBG9Md",
+      "sql": "select count() c, avg(price) a, median(price) m from uk.uk_price_paid where district='LEEDS' and date>='2025-01-01' and date<'2026-01-01'",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1891,
+        "rows_returned": null,
+        "tokens_in": 2460,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "select 'town' k, count() c, avg(price) a, median(price) m from uk.uk_price_paid where town='LEEDS' and date>='2025-01-01' and date<'2026-01-01'\nunion all select 'district', count(), avg(price), median(price) from uk.uk_price_paid where district='LEEDS' and date>='2025-01-01' and date<'2026-01-01'"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 1045,
+        "rows_returned": 2,
+        "tokens_in": 4380,
+        "tokens_out": 188,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "In 2025, the average price paid in the Leeds district was about £321,928, across 13,011 sales. The median was £238,000. If you meant only the town of Leeds, the average was about £325,240 across 10,900 sales, with a median of £234,000.",
+         "clarification": null,
+         "sql": "select count() c, avg(price) a, median(price) m from uk.uk_price_paid where district='LEEDS' and date>='2025-01-01' and date<'2026-01-01'",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 2123,
+        "rows_returned": null,
+        "tokens_in": 4655,
+        "tokens_out": 257,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.017547733333333333,
+     "execution_error": null,
+     "latency_ms": 11594,
+     "note": null,
+     "rows": {
+      "columns": [
+       "c",
+       "a",
+       "m"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        13011,
+        321927.8857889478,
+        238000.0
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 325239.684679.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 325239.684679
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "title": "AVERAGE_PRICE",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "What was the average price in Leeds last year?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nWhat was the average price paid for properties in Leeds (town = 'LEEDS') in the last full calendar year 2025?",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "323d0355-b587-46c3-8c20-8a33f6e23ba3",
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS average_price\n    WHERE uk_price_paid.town = 'LEEDS'\n    AND YEAR(uk_price_paid.date) = 2025\n)\n -- Generated by Cortex Analyst (request_id: 323d0355-b587-46c3-8c20-8a33f6e23ba3)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20114500000000002,
+     "execution_error": null,
+     "latency_ms": 3345,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "AVERAGE_PRICE"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        325239.684679
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "What was the average price in Leeds last year?",
+   "question_id": "q-101",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "aggregation",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The median price paid in 2024 was £280,000. That covers 932,214 recorded sales in the dataset. The median is the engine's approximate `median()` function, not an exact calculation.",
+      "backend": "claude_mcp",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8JDouBf2kXYotHbDuCJ",
+      "sql": "SELECT median(price) m, count() c FROM uk.uk_price_paid WHERE date>='2024-01-01' AND date<'2025-01-01'",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1434,
+        "rows_returned": null,
+        "tokens_in": 2468,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "SELECT median(price) m, count() c FROM uk.uk_price_paid WHERE date>='2024-01-01' AND date<'2025-01-01'"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 1032,
+        "rows_returned": 1,
+        "tokens_in": 4388,
+        "tokens_out": 100,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The median price paid in 2024 was £280,000. That covers 932,214 recorded sales in the dataset. The median is the engine's approximate `median()` function, not an exact calculation.",
+         "clarification": null,
+         "sql": "SELECT median(price) m, count() c FROM uk.uk_price_paid WHERE date>='2024-01-01' AND date<'2025-01-01'",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 2163,
+        "rows_returned": null,
+        "tokens_in": 4536,
+        "tokens_out": 228,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.005705572222222222,
+     "execution_error": null,
+     "latency_ms": 12002,
+     "note": null,
+     "rows": {
+      "columns": [
+       "m",
+       "c"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        282000.0,
+        932214
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 280000.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 280000
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "MEDIAN_PRICE",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "What was the median price paid for a property in England and Wales in 2024?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nWhat was the median price paid for a property in England and Wales in the calendar year 2024?",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "ce71d887-c11e-446d-bdae-b03ed3ade256",
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS median_price\n    WHERE YEAR(uk_price_paid.date) = 2024\n)\n -- Generated by Cortex Analyst (request_id: ce71d887-c11e-446d-bdae-b03ed3ade256)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20114,
+     "execution_error": null,
+     "latency_ms": 2954,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "MEDIAN_PRICE"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        280000
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "What was the median price paid for a property in England and Wales in 2024?",
+   "question_id": "q-002",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "time",
+   "panels": [
+    {
+     "answer": {
+      "answer": "Median price paid in 2023 by month (£), across all property types. ClickHouse's median() is approximate.\n1: 280,000\n2: 273,000\n3: 270,000\n4: 270,000\n5: 267,500\n6: 280,000\n7: 280,000\n8: 282,500\n9: 282,000\n10: 275,000\n11: 275,000\n12: 275,000",
+      "backend": "claude_mcp",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8JEep2ZaPMVYEBNRjqX",
+      "sql": "SELECT toMonth(date) m, median(price) med, count() n FROM uk.uk_price_paid WHERE date>='2023-01-01' AND date<'2024-01-01' GROUP BY m ORDER BY m",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1663,
+        "rows_returned": null,
+        "tokens_in": 2468,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "SELECT toMonth(date) m, median(price) med, count() n FROM uk.uk_price_paid WHERE date>='2023-01-01' AND date<'2024-01-01' GROUP BY m ORDER BY m"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 895,
+        "rows_returned": 12,
+        "tokens_in": 4388,
+        "tokens_out": 123,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "Median price paid in 2023 by month (£), across all property types. ClickHouse's median() is approximate.\n1: 280,000\n2: 273,000\n3: 270,000\n4: 270,000\n5: 267,500\n6: 280,000\n7: 280,000\n8: 282,500\n9: 282,000\n10: 275,000\n11: 275,000\n12: 275,000",
+         "clarification": null,
+         "sql": "SELECT toMonth(date) m, median(price) med, count() n FROM uk.uk_price_paid WHERE date>='2023-01-01' AND date<'2024-01-01' GROUP BY m ORDER BY m",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 3167,
+        "rows_returned": null,
+        "tokens_in": 4686,
+        "tokens_out": 310,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.017489472222222226,
+     "execution_error": null,
+     "latency_ms": 11364,
+     "note": null,
+     "rows": {
+      "columns": [
+       "m",
+       "med",
+       "n"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        1,
+        280000.0,
+        64621
+       ],
+       [
+        2,
+        270000.0,
+        64013
+       ],
+       [
+        3,
+        270000.0,
+        80522
+       ],
+       [
+        4,
+        271500.0,
+        56590
+       ],
+       [
+        5,
+        269250.0,
+        61404
+       ],
+       [
+        6,
+        276095.0,
+        79786
+       ],
+       [
+        7,
+        279972.5,
+        72228
+       ],
+       [
+        8,
+        285000.0,
+        79889
+       ],
+       [
+        9,
+        280000.0,
+        78652
+       ],
+       [
+        10,
+        275000.0,
+        76775
+       ],
+       [
+        11,
+        275000.0,
+        74433
+       ],
+       [
+        12,
+        276765.0,
+        72869
+       ]
+      ]
+     },
+     "rows_total": 12,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "12 rows returned; first: MEDIAN_PRICE: 275000, MONTH_NUMBER: 1",
+      "backend": "cortex_analyst",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nWhat was the median price paid in the calendar year 2023, broken down by month number (1 through 12)?",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "053f5c3c-f37d-425e-922f-1e915a92afc6",
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS median_price\n    DIMENSIONS DATE_PART('month', uk_price_paid.date) AS month_number\n    WHERE YEAR(uk_price_paid.date) = 2023\n)\nORDER BY month_number ASC NULLS LAST\n -- Generated by Cortex Analyst (request_id: 053f5c3c-f37d-425e-922f-1e915a92afc6)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.2012091666666667,
+     "execution_error": null,
+     "latency_ms": 3704,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "MEDIAN_PRICE",
+       "MONTH_NUMBER"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        275000,
+        1
+       ],
+       [
+        270000,
+        2
+       ],
+       [
+        270000,
+        3
+       ],
+       [
+        270000,
+        4
+       ],
+       [
+        270000,
+        5
+       ],
+       [
+        278000,
+        6
+       ],
+       [
+        280000,
+        7
+       ],
+       [
+        285000,
+        8
+       ],
+       [
+        285000,
+        9
+       ],
+       [
+        278000,
+        10
+       ],
+       [
+        273000,
+        11
+       ],
+       [
+        275000,
+        12
+       ]
+      ]
+     },
+     "rows_total": 12,
+     "timed_out": false
+    }
+   ],
+   "question": "What was the median price paid in 2023, by month number (1–12)?",
+   "question_id": "q-022",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "geography",
+   "panels": [
+    {
+     "answer": {
+      "answer": "There were 9,785 property sales recorded in the town of Leeds in 2023.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 9785
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "count()",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in the town of Leeds in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8JFVGKojASCiv1iXqKA",
+      "sql": "SELECT count() FROM uk.uk_price_paid WHERE upper(town)='LEEDS' AND toYear(date)=2023",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1684,
+        "rows_returned": null,
+        "tokens_in": 2469,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "SELECT count() FROM uk.uk_price_paid WHERE upper(town)='LEEDS' AND toYear(date)=2023"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 880,
+        "rows_returned": 1,
+        "tokens_in": 4389,
+        "tokens_out": 106,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "There were 9,785 property sales recorded in the town of Leeds in 2023.",
+         "clarification": "",
+         "sql": "SELECT count() FROM uk.uk_price_paid WHERE upper(town)='LEEDS' AND toYear(date)=2023",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 1811,
+        "rows_returned": null,
+        "tokens_in": 4537,
+        "tokens_out": 188,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.015633977777777777,
+     "execution_error": null,
+     "latency_ms": 9328,
+     "note": null,
+     "rows": {
+      "columns": [
+       "count()"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        9785
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 9785.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 9785
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "SALES_COUNT",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in the town of Leeds in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nHow many property sales were recorded in the town of Leeds (LEEDS) in the calendar year 2023?",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "78e7d6bd-2a6a-4009-98c7-a1cd546b1b50",
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS sales_count\n    WHERE uk_price_paid.town = 'LEEDS'\n    AND YEAR(uk_price_paid.date) = 2023\n)\n -- Generated by Cortex Analyst (request_id: 78e7d6bd-2a6a-4009-98c7-a1cd546b1b50)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20117500000000002,
+     "execution_error": null,
+     "latency_ms": 3273,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "SALES_COUNT"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        9785
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "How many property sales were recorded in the town of Leeds in 2023?",
+   "question_id": "q-042",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "top_n",
+   "panels": [
+    {
+     "answer": {
+      "answer": "Top 5 towns by number of sales in 2023: London (59,855), Manchester (14,473), Bristol (13,357), Birmingham (12,081), Nottingham (11,665).",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "label": "LONDON",
+          "value": 59855
+         },
+         {
+          "label": "MANCHESTER",
+          "value": 14473
+         },
+         {
+          "label": "BRISTOL",
+          "value": 13357
+         },
+         {
+          "label": "BIRMINGHAM",
+          "value": 12081
+         },
+         {
+          "label": "NOTTINGHAM",
+          "value": 11665
+         }
+        ]
+       },
+       "encoding": {
+        "x": {
+         "field": "value",
+         "title": "c",
+         "type": "quantitative"
+        },
+        "y": {
+         "field": "label",
+         "sort": null,
+         "title": "town",
+         "type": "nominal"
+        }
+       },
+       "mark": {
+        "type": "bar"
+       },
+       "title": "Which 5 towns recorded the most property sales in 2023?",
+       "usermeta": {
+        "chart": "bar",
+        "rows_shown": 5,
+        "rows_total": 5
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req_011Ch8JGBRYdoseeuehnzFsi",
+      "sql": "select town, count() c from uk.uk_price_paid where date>='2023-01-01' and date<'2024-01-01' group by town order by c desc limit 5",
+      "steps": [
+       {
+        "arguments": {
+         "database": "uk"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1777,
+        "rows_returned": null,
+        "tokens_in": 2467,
+        "tokens_out": 49,
+        "tool": "list_tables",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "query": "select town, count() c from uk.uk_price_paid where date>='2023-01-01' and date<'2024-01-01' group by town order by c desc limit 5"
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 895,
+        "rows_returned": 5,
+        "tokens_in": 4387,
+        "tokens_out": 99,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "Top 5 towns by number of sales in 2023: London (59,855), Manchester (14,473), Bristol (13,357), Birmingham (12,081), Nottingham (11,665).",
+         "clarification": null,
+         "sql": "select town, count() c from uk.uk_price_paid where date>='2023-01-01' and date<'2024-01-01' group by town order by c desc limit 5",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 2,
+        "latency_ms": 1964,
+        "rows_returned": null,
+        "tokens_in": 4595,
+        "tokens_out": 229,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.016123577777777776,
+     "execution_error": null,
+     "latency_ms": 9538,
+     "note": null,
+     "rows": {
+      "columns": [
+       "town",
+       "c"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        "LONDON",
+        59855
+       ],
+       [
+        "MANCHESTER",
+        14473
+       ],
+       [
+        "BRISTOL",
+        13357
+       ],
+       [
+        "BIRMINGHAM",
+        12081
+       ],
+       [
+        "NOTTINGHAM",
+        11665
+       ]
+      ]
+     },
+     "rows_total": 5,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "5 rows returned; first: SALES_COUNT: 59855, TOWN: LONDON",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "label": "LONDON",
+          "value": 59855
+         },
+         {
+          "label": "MANCHESTER",
+          "value": 14473
+         },
+         {
+          "label": "BRISTOL",
+          "value": 13357
+         },
+         {
+          "label": "BIRMINGHAM",
+          "value": 12081
+         },
+         {
+          "label": "NOTTINGHAM",
+          "value": 11665
+         }
+        ]
+       },
+       "encoding": {
+        "x": {
+         "field": "value",
+         "title": "SALES_COUNT",
+         "type": "quantitative"
+        },
+        "y": {
+         "field": "label",
+         "sort": null,
+         "title": "TOWN",
+         "type": "nominal"
+        }
+       },
+       "mark": {
+        "type": "bar"
+       },
+       "title": "Which 5 towns recorded the most property sales in 2023?",
+       "usermeta": {
+        "chart": "bar",
+        "rows_shown": 5,
+        "rows_total": 5
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "This is our interpretation of your question:\n\nWhich 5 towns recorded the most property sales (by count of transactions) in the calendar year 2023?",
+      "model_snapshot": "claude-sonnet-4-6",
+      "request_id": "c7c629b8-cde9-4a5f-ba61-939773b99129",
+      "sql": "SELECT *\nFROM SEMANTIC_VIEW(\n    ANALYTICS.UK.UK_PRICE_PAID_SEMANTIC\n    METRICS sales_count\n    DIMENSIONS uk_price_paid.town\n    WHERE uk_price_paid.year = 2023\n)\nORDER BY sales_count DESC NULLS LAST\nLIMIT 5\n -- Generated by Cortex Analyst (request_id: c7c629b8-cde9-4a5f-ba61-939773b99129)\n;",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20120083333333336,
+     "execution_error": null,
+     "latency_ms": 3471,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "SALES_COUNT",
+       "TOWN"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        59855,
+        "LONDON"
+       ],
+       [
+        14473,
+        "MANCHESTER"
+       ],
+       [
+        13357,
+        "BRISTOL"
+       ],
+       [
+        12081,
+        "BIRMINGHAM"
+       ],
+       [
+        11665,
+        "NOTTINGHAM"
+       ]
+      ]
+     },
+     "rows_total": 5,
+     "timed_out": false
+    }
+   ],
+   "question": "Which 5 towns recorded the most property sales in 2023?",
+   "question_id": "q-062",
+   "stamp": {
+    "as_of": "2026-08-31",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  }
+ ],
+ "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+ "kind": "demo_cache",
+ "label": "",
+ "pack": "uk_price_paid@1.0",
+ "schema_version": "1.0",
+ "synthetic": false
+}

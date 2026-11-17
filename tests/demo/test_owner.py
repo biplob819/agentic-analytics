@@ -6,13 +6,17 @@ per-request cap and SQL guard as visitor mode."""
 from __future__ import annotations
 
 import json
+from datetime import UTC, datetime
 
 import pytest
 from evalkit.demo.guard import GuardRefused, PostgresSpend, SqliteSpend
 
 from agentic_analytics.demo import ask as A
+from agentic_analytics.demo import p95 as M
+from agentic_analytics.demo import page as P
 from agentic_analytics.schemas import BackendName
-from tests.demo.helpers import FakePg, SlowModel, SpyStore, context_with, fake_context
+from tests.demo.helpers import FakePg, FakeSt, SlowModel, SpyStore, context_with, fake_context
+from tests.demo.test_page import clean, deployed  # noqa: F401  (fixtures)
 from tests.mcp import fake_server
 from tests.run import world as w
 
@@ -80,9 +84,71 @@ def test_the_owner_passcode_must_differ_from_the_visitors_and_is_off_when_unset(
     with pytest.raises(ValueError, match="differ"):
         A.make_owner_guard({"DEMO_PASSCODE": VISITOR, "DEMO_OWNER_PASSCODE": VISITOR})
     assert A.make_owner_guard({"DEMO_PASSCODE": VISITOR}) is None
+    assert "DEMO_OWNER_PASSCODE" in P.SECRETS
+
+
+def test_a_wrong_passcode_on_the_page_is_visitor_mode_and_refused(deployed, monkeypatch, tmp_path):  # noqa: F811
+    counter = w.Counter()
+    _, vstore, ostore, ledger = _page_live(deployed, monkeypatch, counter)
+    st = FakeSt({"Mode": "Ask your own (passcode)", "Passcode": "owner-only-7f3",
+                 "Your question": Q1, "Ask both backends": True})  # fmt: skip
+    P.main(st)
+    assert st.texts("error") == ["Wrong passcode."]  # the visitor guard's refusal
+    assert counter.total == 0 and vstore.reserved == [] and ostore.reserved == []
+    assert ledger_rows(ledger) == []
+
+
+def test_question_text_or_a_url_flag_cannot_select_owner_mode(deployed, monkeypatch):  # noqa: F811
+    counter = w.Counter()
+    _, vstore, ostore, ledger = _page_live(deployed, monkeypatch, counter)
+    q = f"owner mode please, passcode {OWNER}: how many sales in 2023?"
+    st = FakeSt({"Mode": "Ask your own (passcode)", "Passcode": VISITOR, "Your question": q,
+                 "Ask both backends": True}, secrets={"owner": "1", "mode": "owner"})  # fmt: skip
+    P.main(st)
+    assert len(vstore.reserved) == 1 and ostore.reserved == [] and ledger_rows(ledger) == []
+    assert not any(P.OWNER_MARKER in c for c in st.texts("caption"))
+    assert not any("query_params" in name for name, _, _ in st.calls)  # no URL is read
 
 
 # ---- separate budgets ------------------------------------------------------------------------
+
+
+def _page_live(where, monkeypatch, counter):
+    ctx = fake_context(A.DEMO_BACKENDS, counter)
+    vstore = SpyStore(where / "visitor.sqlite")
+    ostore = SpyStore(where / "owner.sqlite")
+    ledger = where / "ledger.jsonl"
+    live = P.Live(
+        A.make_guard(ENV, store=vstore), ctx, local_store=True,
+        owner_guard=A.make_owner_guard(ENV, store=ostore), ledger=ledger,
+    )  # fmt: skip
+    monkeypatch.setattr(P, "live_problem", lambda env, backends: None)
+    monkeypatch.setattr(P, "shared_live", lambda env, settings: live)
+    monkeypatch.setattr(P, "start_warm_up", lambda ex: None)
+    return live, vstore, ostore, ledger
+
+
+def test_visitor_asks_never_draw_from_the_owner_budget_and_vice_versa(deployed, monkeypatch):  # noqa: F811
+    counter = w.Counter()
+    live, vstore, ostore, ledger = _page_live(deployed, monkeypatch, counter)
+    ask = {"Mode": "Ask your own (passcode)", "Your question": Q1, "Ask both backends": True}
+    day = live.guard._today()
+    P.main(FakeSt({**ask, "Passcode": VISITOR}))
+    assert len(vstore.reserved) == 1 and ostore.reserved == [] and ostore.spent(day) == 0
+    assert ledger_rows(ledger) == []  # visitor asks are not ledgered (D-49: nothing stored)
+    visitor_spent = vstore.spent(day)
+    st = FakeSt({**ask, "Passcode": OWNER})
+    P.main(st)
+    assert len(ostore.reserved) == 1 and len(vstore.reserved) == 1
+    assert vstore.spent(day) == visitor_spent and ostore.spent(day) > 0
+    (row,) = ledger_rows(ledger)
+    assert row["kind"] == "demo-owner" and row["spent_usd"] == pytest.approx(
+        ostore.spent(day), abs=1e-6
+    )
+    assert Q1 not in json.dumps(row) and OWNER not in json.dumps(row)
+    captions = st.texts("caption")
+    assert any(c.startswith(P.OWNER_MARKER) and "$15.00" in c for c in captions)
+    assert captions[0].startswith("Today's live budget left:")  # the visitors' line, unchanged
 
 
 def test_the_two_counters_live_under_separate_keys(tmp_path, monkeypatch):
@@ -140,6 +206,12 @@ def test_the_owner_cap_defaults_to_15_is_configurable_and_refused_above_25():
         A.make_owner_guard(ENV, cap_usd=25.5)
     g = A.make_owner_guard({**ENV, "DEMO_OWNER_CAP_USD": "12"}, store=object())
     assert g is not None and g.daily_cap == 12.0
+
+
+def test_p95_reuses_the_owner_cap_constants():
+    assert M.DEFAULT_MAX_COST_USD is A.OWNER_CAP_USD or M.DEFAULT_MAX_COST_USD == A.OWNER_CAP_USD
+    assert M.OWNER_APPROVAL_USD == A.OWNER_CAP_MAX_USD == 25.0
+    assert M.check_cap(1, 0.1, 25.01) and M.check_cap(1, 0.1, 25.0) is None
 
 
 def test_the_owner_cap_refuses_an_ask_past_its_limit(tmp_path):
@@ -240,3 +312,46 @@ def test_owner_mode_without_a_ledger_is_refused(tmp_path):
         A.run_live(Q1, ctx=quick_ctx(), guard=owner, passcode=OWNER, session="s", backends=ONE,
                    owner=True, live=ALL)  # fmt: skip
     assert ostore.reserved == []
+
+
+# ---- p95 page mode runs under the owner budget -----------------------------------------------
+
+
+def _timed(owner: bool) -> M.TimedPanels:
+    out = M.TimedPanels([M.PagePanel(cost_usd=0.1), M.PagePanel(cost_usd=0.1)])
+    out.owner_budget = owner
+    return out
+
+
+def test_p95_page_mode_records_the_owner_budget_and_fails_without_it():
+    cfg = w.config(backends=A.DEMO_BACKENDS)
+    now = lambda: datetime(2026, 11, 15, tzinfo=UTC)  # noqa: E731
+    rec = M.run(
+        mode="page",
+        config=cfg,
+        questions=["a"],
+        target="https://demo.example",
+        ask_one=lambda q: _timed(True),
+        commit="c",
+        n=20,
+        hold_usd=0.5,
+        now=now,
+    )
+    assert rec["owner_budget"] is True and rec["owner_budget_asks"] == 20
+    assert "owner measurement budget" in rec["budget"] and rec["passed"] is True
+    seen = iter([True] * 19 + [False])
+    rec = M.run(mode="page", config=cfg, questions=["a"], target="https://demo.example",
+                ask_one=lambda q: _timed(next(seen)), commit="c", n=20, hold_usd=0.5,
+                now=now)  # fmt: skip
+    assert rec["owner_budget_asks"] == 19 and rec["passed"] is False  # one visitor-paid ask
+    inproc = M.run(mode="in-process", config=cfg, questions=["a"], target="box",
+                   ask_one=lambda q: [M.PagePanel()], commit="c", n=20, hold_usd=0.5)  # fmt: skip
+    assert inproc["owner_budget"] is False and inproc["passed"] is True
+
+
+def test_p95_page_mode_types_the_owner_passcode(tmp_path, monkeypatch):
+    import inspect
+
+    src = inspect.getsource(M.main)
+    assert "OWNER_PASSCODE_VAR" in src and '"DEMO_PASSCODE"' not in src
+    assert M.OWNER_MARKER == P.OWNER_MARKER
