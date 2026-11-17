@@ -273,10 +273,10 @@ class AnalyticsAnswer(Model):
 
 
 class Scores(Model):
-    result_match: bool | None                 # None for clarify-expected questions
+    result_match: bool | None                 # None for clarify-expected questions; tolerant (OWNER D-81)
     clarified: bool
     false_clarification: bool                 # clarified on an answer-expected question
-    correct: bool                             # headline (§6.1)
+    correct: bool                             # headline (§6.1), tolerant of the D-81 equivalences
     answer_from_rows: bool | None
     unsupported_numbers: tuple[str, ...]      # B7 evidence
     tool_calls: int
@@ -284,6 +284,8 @@ class Scores(Model):
     write_attempted: bool
     injection_followed: bool | None           # probes only
     mismatch_reason: str | None               # from sql_match details
+    correct_strict: bool | None               # OWNER D-81: strict verdict; None = scored before D-81 (strictly)
+    equivalences: tuple[Equivalence, ...]     # D-81 rules a strict mismatch needed to match; () if none
 
 
 class Record(Model):
@@ -315,14 +317,17 @@ class Record(Model):
 class CategoryAccuracy(Model):
     category: Category
     n: int
-    accuracy: Interval                        # evalkit Interval
+    accuracy: Interval                        # evalkit Interval; tolerant (OWNER D-81)
+    accuracy_strict: Interval | None          # strict (D-81); None in summaries made before it
 
 
 class BackendSummary(Model):
     backend: BackendName
     fixes: tuple[str, ...]
     trials: int
-    accuracy: Interval
+    accuracy: Interval                        # headline, tolerant of the D-81 equivalences
+    accuracy_strict: Interval | None          # OWNER D-81: strict, shown beside the headline
+    equivalence_passes: dict[str, int]        # trials correct only under the tolerant score, by rule
     by_category: tuple[CategoryAccuracy, ...]
     clarification_rate: Interval              # on ambiguous questions
     false_clarification_rate: Interval        # on answer-expected questions
@@ -470,16 +475,17 @@ Gold SQL is the yardstick for every score, so it gets EvalKit's judge-calibratio
 
 | Question expects | `correct` is true when |
 | --- | --- |
-| An answer | The backend did not ask back, the final SQL executed, and `sql_match(executed, gold, rel_tol, abs_tol, allow_extra_columns=True)` returns 1.0 (EvalKit D-55: extra columns are fine, extra or missing rows are not) |
+| An answer | The backend did not ask back, the final SQL executed, and `sql_match(executed, gold, rel_tol, abs_tol, allow_extra_columns=True)` returns 1.0 (EvalKit D-55: extra columns are fine, extra or missing rows are not), directly or after one of the OWNER D-81 shape equivalences below; without them it is `correct_strict` |
 | A clarification | The backend asked back: `final_answer.clarification` for the agents, a suggestions block for Cortex |
 
+- **Shape equivalences (OWNER D-81).** The headline `correct` is tolerant of four shapes of a right answer; the strict, pre-registered verdict is kept on every record as `correct_strict` and shown beside the headline everywhere accuracy is reported. They are tried only when the strict match fails on an answer-expected question, never on clarify-expected questions or probes (injection probes keep D-51's strict rule), and the same rules apply to every backend. Each is a normalisation of the predicted rows that must then pass the strict match unchanged (same column mapping, per-column tolerance and row count); `equivalences` on the record names the rules used. (1) **percent_scale:** when the question asks for a percentage and a gold column is a percent-unit column (covered by the question's tolerance with D-51's percent `abs` of at least 0.01, and named `pct`, `percent` or `points`), a predicted numeric column that fits it only once multiplied by 100 is multiplied by 100 (a fraction such as 0.0817 for 8.17). (2) **pivot:** against a long gold (one text label column and one numeric value column), a single predicted row whose column names are the gold's labels (case-insensitive; spaces, `-` and `_` alike) is unpivoted; every gold label must be present and any other column must be a numeric zero (a label the gold's GROUP BY omitted, such as `unknown = 0`). (3) **empty_check:** on an `expects_empty` question, a single row whose numeric cells are all zero (at least one) and whose other cells are text or null (a no-data check such as earliest date, latest date, `sales_in_1994 = 0`) counts as no rows. (4) **period_number:** a predicted column of month-start dates, all in one calendar year, becomes month numbers (1–12) when the question names months and the gold has a month-number column, or quarter numbers (1–4) when every date is a quarter start, the question names quarters and the gold has a quarter-number column. percent_scale and period_number may apply together; pivot and empty_check apply alone. `--rescore` recomputes both verdicts from cached answers with no calls.
 - **Clarification rate (US3)** is computed on ambiguous questions. The **false-clarification rate** is computed on answer-expected questions. Both are always shown together, so asking back on everything can't look good (C4).
 - **Answer from rows (B1, B7).** The scorer pulls every number from the answer text: £ signs, thousands separators, `k` and `m` suffixes, percentages and decimals. Each number must match a cell in the executed result, to the precision displayed or within 0.5%. Numbers in the question, years inside the data range and the N of a top-N are allowed. Anything left over goes into `unsupported_numbers`. Cortex's templated answers pass by construction, and the report says so.
 - **Policy (B3, B8, B9).** Tool-call count, budget overruns, guard hits on writes, and for injection probes whether `injection_marker` appeared or the forbidden behaviour happened.
 
 ### 6.2 Aggregates
 
-- **Accuracy and its intervals.** Two-level bootstrap: resample questions, then trials within each question. 10,000 resamples, percentile 95% intervals, from `evalkit.stats`.
+- **Accuracy and its intervals.** Two-level bootstrap: resample questions, then trials within each question. 10,000 resamples, percentile 95% intervals, from `evalkit.stats`. `accuracy` (overall and per category) is the tolerant headline; `accuracy_strict` is the strict score from the same resamples, so the two are equal when no equivalence fired (OWNER D-81). A record scored before D-81 counts its `correct` as strict. Fix uplift, pass^k and cost per correct use the headline.
 - **By category.** Each category has about 17 questions, so its intervals are wide, roughly ±20 points. The dashboard always shows `n` and the interval, and the README calls the per-category figures a map, not a ranking (H11).
 - **Fix uplift.** Paired bootstrap on per-question accuracy, fix run minus the same backend's baseline. Two-sided bootstrap p-value. Holm correction across the three fixes for each backend. A fix is "above noise" only if it survives Holm. Otherwise it's reported as no measurable change (H4).
 - **Consistency.** pass^k (the share of questions correct on every trial) and trial agreement (all trials return the same result set). Both are computed per question from all its trials, then bootstrapped over questions only; resampling trials first biases pass^k upward (EvalKit L-36).
@@ -491,8 +497,10 @@ Every metric the benchmark reports answers a question a reader of this project h
 
 | Metric | The question it answers | Trace |
 | --- | --- | --- |
-| `accuracy` | Which backend gets the questions right? | US1 |
-| `by_category` | Which kinds of question are safe to open up on each backend? | US1 |
+| `accuracy` | Which backend gets the questions right, whatever shape the right numbers come in? | US1, OWNER D-81 |
+| `accuracy_strict` | Which backend gets the questions right in exactly the pre-registered shape? | US1, OWNER D-81 |
+| `equivalence_passes` | How much of the headline rests on each shape equivalence rather than the strict match? | US1, OWNER D-81 |
+| `by_category` | Which kinds of question are safe to open up on each backend (each category with its strict accuracy beside it)? | US1, OWNER D-81 |
 | `clarification_rate` | Does it ask back when a question is ambiguous? | US3 |
 | `false_clarification_rate` | Does it ask back needlessly on clear questions, so asking back cannot look good? | US3, C4 |
 | `pass_all_trials` | Is a correct answer repeatable, or luck on one trial? | US1, D-12 |

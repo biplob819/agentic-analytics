@@ -83,3 +83,6 @@ Format: `[TYPE] [NODE] — summary`. Types: FEAT, FIX, DOCS, HARNESS, MEASURE.
 - [DOCS] [W0.1] — D-76: EvalKit admitted both scorers into v0.3.0 (its D-65, B5.13); trend and drift come with EvalKit v0.4.0 (B5.7); the v0.1.0 tag waits for both
 - [HARNESS] [W0.1] — L-11: watch CI after every push and run changed nodes' tests on 3.11 too; MON-05 carries EvalKit's per-model efficiency block (EvalKit D-67)
 - [HARNESS] [D4.1] — independent verifier round 2 GREEN (30 of 36 mutants killed, the rest nits); decisions D-82..D-88
+- [FIX] [S2.1] — OWNER D-81: tolerant headline scoring with four narrow shape equivalences (percent_scale, pivot, empty_check, period_number), tried only after a strict miss on answer-expected questions; `correct_strict` and the rules used are kept on every record
+- [FEAT] [M2.1] — `accuracy_strict` (overall and per category) beside the tolerant headline, and `equivalence_passes` per rule; the dashboard shows strict beside tolerant (B3.1)
+- [HARNESS] [S2.1] — independent verifier GREEN for OWNER D-81 (68 constructed false-pass attempts rejected; strict reproduces all 1,065 baseline verdicts); a summary of records scored before D-81 shows no strict pair; tests for the percent sign, 'percentile', ordered rescues, unnamed quarters and strict-first labelling

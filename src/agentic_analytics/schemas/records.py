@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import Annotated, Any, Literal
 
 from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
@@ -26,12 +26,17 @@ from agentic_analytics.schemas._base import (
 )
 from agentic_analytics.schemas.answers import AnalyticsAnswer, Execution
 
+# OWNER D-81: the shape equivalences under which a result that failed the strict match still
+# matches (Tech Spec §6.1), in the ruling's order.
+Equivalence = Literal["percent_scale", "pivot", "empty_check", "period_number"]
+EQUIVALENCES: tuple[Equivalence, ...] = ("percent_scale", "pivot", "empty_check", "period_number")
+
 
 class Scores(Model):
-    result_match: StrictBool | None  # None for clarify-expected questions
+    result_match: StrictBool | None  # None for clarify-expected questions; tolerant (D-81)
     clarified: StrictBool
     false_clarification: StrictBool
-    correct: StrictBool
+    correct: StrictBool  # the headline: tolerant of the D-81 equivalences
     answer_from_rows: StrictBool | None
     unsupported_numbers: tuple[str, ...] = ()
     tool_calls: NonNegInt
@@ -39,6 +44,11 @@ class Scores(Model):
     write_attempted: StrictBool
     injection_followed: StrictBool | None = None
     mismatch_reason: str | None = None
+    # OWNER D-81: `correct` under the strict, pre-registered match (no equivalences). None on
+    # records scored before D-81, which were scored strictly: their `correct` is the strict one.
+    correct_strict: StrictBool | None = None
+    # the equivalences that turned a strict mismatch into `result_match=True`; () when none did
+    equivalences: tuple[Equivalence, ...] = ()
 
     @model_validator(mode="after")
     def _consistent(self) -> Scores:
@@ -51,7 +61,27 @@ class Scores(Model):
             raise ValueError("false_clarification means clarifying on an answer-expected question")
         if self.answer_from_rows is True and self.unsupported_numbers:
             raise ValueError("answer_from_rows cannot hold with unsupported numbers")
+        if list(self.equivalences) != sorted(set(self.equivalences), key=EQUIVALENCES.index):
+            raise ValueError(
+                "equivalences must be unique and in the order " + ", ".join(EQUIVALENCES)
+            )
+        if self.equivalences:
+            if self.result_match is not True or self.correct_strict is not False:
+                raise ValueError("an equivalence turns a strict mismatch into a result match")
+        elif self.correct_strict is not None and self.correct_strict != self.correct:
+            raise ValueError("without an equivalence the strict and headline scores agree")
         return self
+
+    @model_serializer(mode="wrap")
+    def _omit_uncomputed(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """The D-81 fields are left out while unset, so a record scored before them keeps the
+        exact format it had (stored records, fixtures and the bundled example)."""
+        data = handler(self)
+        if data.get("correct_strict", 0) is None:
+            del data["correct_strict"]
+        if "equivalences" in data and not data["equivalences"]:
+            del data["equivalences"]
+        return data
 
 
 UNSET_OMITTED = ("ask_wall_ms", "analyst_latency_ms")

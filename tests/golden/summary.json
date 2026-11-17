@@ -17,11 +17,22 @@
         "lo": 0.3611111111111111,
         "hi": 0.8611111111111112
       },
+      "accuracy_strict": {
+        "point": 0.611111111111111,
+        "lo": 0.3611111111111111,
+        "hi": 0.8611111111111112
+      },
+      "equivalence_passes": {},
       "by_category": [
         {
           "category": "aggregation",
           "n": 2,
           "accuracy": {
+            "point": 0.3333333333333333,
+            "lo": 0.0,
+            "hi": 0.8333333333333333
+          },
+          "accuracy_strict": {
             "point": 0.3333333333333333,
             "lo": 0.0,
             "hi": 0.8333333333333333
@@ -34,12 +45,22 @@
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
           }
         },
         {
           "category": "geography",
           "n": 2,
           "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
@@ -52,6 +73,11 @@
             "point": 0.3333333333333333,
             "lo": 0.0,
             "hi": 0.6666666666666666
+          },
+          "accuracy_strict": {
+            "point": 0.3333333333333333,
+            "lo": 0.0,
+            "hi": 0.6666666666666666
           }
         },
         {
@@ -61,12 +87,22 @@
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
           }
         },
         {
           "category": "ambiguous",
           "n": 2,
           "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
@@ -107,11 +143,22 @@
         "lo": 0.4166666666666667,
         "hi": 0.9166666666666666
       },
+      "accuracy_strict": {
+        "point": 0.6666666666666666,
+        "lo": 0.4166666666666667,
+        "hi": 0.9166666666666666
+      },
+      "equivalence_passes": {},
       "by_category": [
         {
           "category": "aggregation",
           "n": 2,
           "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
@@ -124,12 +171,22 @@
             "point": 0.6666666666666666,
             "lo": 0.16666666666666666,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.6666666666666666,
+            "lo": 0.16666666666666666,
+            "hi": 1.0
           }
         },
         {
           "category": "geography",
           "n": 2,
           "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
@@ -142,6 +199,11 @@
             "point": 0.3333333333333333,
             "lo": 0.0,
             "hi": 0.8333333333333333
+          },
+          "accuracy_strict": {
+            "point": 0.3333333333333333,
+            "lo": 0.0,
+            "hi": 0.8333333333333333
           }
         },
         {
@@ -151,12 +213,22 @@
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
           }
         },
         {
           "category": "ambiguous",
           "n": 2,
           "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
@@ -195,11 +267,22 @@
         "lo": 0.3055555555555555,
         "hi": 0.8333333333333334
       },
+      "accuracy_strict": {
+        "point": 0.5833333333333334,
+        "lo": 0.3055555555555555,
+        "hi": 0.8333333333333334
+      },
+      "equivalence_passes": {},
       "by_category": [
         {
           "category": "aggregation",
           "n": 2,
           "accuracy": {
+            "point": 0.16666666666666666,
+            "lo": 0.0,
+            "hi": 0.6666666666666666
+          },
+          "accuracy_strict": {
             "point": 0.16666666666666666,
             "lo": 0.0,
             "hi": 0.6666666666666666
@@ -212,12 +295,22 @@
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
           }
         },
         {
           "category": "geography",
           "n": 2,
           "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
@@ -230,6 +323,11 @@
             "point": 0.8333333333333333,
             "lo": 0.3333333333333333,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8333333333333333,
+            "lo": 0.3333333333333333,
+            "hi": 1.0
           }
         },
         {
@@ -239,12 +337,22 @@
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
           }
         },
         {
           "category": "ambiguous",
           "n": 2,
           "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
@@ -287,11 +395,22 @@
         "lo": 0.47222222222222227,
         "hi": 0.9166666666666666
       },
+      "accuracy_strict": {
+        "point": 0.7222222222222222,
+        "lo": 0.47222222222222227,
+        "hi": 0.9166666666666666
+      },
+      "equivalence_passes": {},
       "by_category": [
         {
           "category": "aggregation",
           "n": 2,
           "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
@@ -304,12 +423,22 @@
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
           }
         },
         {
           "category": "geography",
           "n": 2,
           "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
@@ -322,6 +451,11 @@
             "point": 0.8333333333333333,
             "lo": 0.3333333333333333,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8333333333333333,
+            "lo": 0.3333333333333333,
+            "hi": 1.0
           }
         },
         {
@@ -331,12 +465,22 @@
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
           }
         },
         {
           "category": "ambiguous",
           "n": 2,
           "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
@@ -377,11 +521,22 @@
         "lo": 0.5,
         "hi": 1.0
       },
+      "accuracy_strict": {
+        "point": 0.75,
+        "lo": 0.5,
+        "hi": 1.0
+      },
+      "equivalence_passes": {},
       "by_category": [
         {
           "category": "aggregation",
           "n": 2,
           "accuracy": {
+            "point": 0.5,
+            "lo": 0.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 0.5,
             "lo": 0.0,
             "hi": 1.0
@@ -394,12 +549,22 @@
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
           }
         },
         {
           "category": "geography",
           "n": 2,
           "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
@@ -412,6 +577,11 @@
             "point": 0.0,
             "lo": 0.0,
             "hi": 0.0
+          },
+          "accuracy_strict": {
+            "point": 0.0,
+            "lo": 0.0,
+            "hi": 0.0
           }
         },
         {
@@ -421,12 +591,22 @@
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
           }
         },
         {
           "category": "ambiguous",
           "n": 2,
           "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
             "point": 1.0,
             "lo": 1.0,
             "hi": 1.0

@@ -42,7 +42,7 @@ margin:12px 0;overflow-x:auto}
 table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 th{font-weight:600}caption{text-align:left;color:var(--muted);padding-bottom:6px}
-.ci,.n,.muted{color:var(--muted);font-size:.9em}
+.ci,.n,.strict,.muted{color:var(--muted);font-size:.9em}
 td.heat strong{font-size:1.05em}
 .h0{background:var(--h0)}.h1{background:var(--h1)}.h2{background:var(--h2)}
 .h3{background:var(--h3)}.h4{background:var(--h4)}

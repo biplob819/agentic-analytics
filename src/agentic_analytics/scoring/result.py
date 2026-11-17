@@ -135,7 +135,17 @@ def match_result(
         return False, f"execution failed: {execution.error}"
     if execution.truncated:
         return False, f"result truncated: {len(execution.result.rows)} of {execution.rows_total}"
-    predicted = execution.result
+    return match_rows(execution.result, gold, tolerance=tolerance, ordered=ordered)
+
+
+def match_rows(
+    predicted: ResultSet,
+    gold: ResultSet,
+    *,
+    tolerance: Tolerance,
+    ordered: bool,
+) -> tuple[bool, str | None]:
+    """Compare executed rows with a gold result (the strict rules above): (matched, reason)."""
     n_gold, n_pred = len(gold.columns), len(predicted.columns)
     if len(predicted.rows) != len(gold.rows):
         return False, f"row_count (gold={len(gold.rows)}, predicted={len(predicted.rows)})"

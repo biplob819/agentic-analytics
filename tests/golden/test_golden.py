@@ -35,6 +35,10 @@ def test_golden_run_reproduces_the_stored_summary(tmp_path):
     got = (rd(out) / "summary.json").read_bytes()
     assert got == (GOLDEN / "summary.json").read_bytes()
     assert scores_digest(rd(out)) == (GOLDEN / "scores.json").read_text(encoding="utf-8")
+    # OWNER D-81: no equivalence fires on the golden answers, so strict equals the headline
+    for line in (rd(out) / "records.jsonl").read_text(encoding="utf-8").splitlines():
+        sc = json.loads(line)["scores"]
+        assert sc["correct_strict"] == sc["correct"] and "equivalences" not in sc
 
 
 def test_golden_run_exercises_trials_fixes_and_scorer_edges():

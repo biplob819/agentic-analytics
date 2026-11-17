@@ -17,7 +17,7 @@ from agentic_analytics.schemas.answers import AgentStep, AnalyticsAnswer, Execut
 from agentic_analytics.schemas.config import ConfigError, RunConfig, load_run_config
 from agentic_analytics.schemas.pack import DatasetPack
 from agentic_analytics.schemas.questions import GoldResult, Probe, Question, Tolerance
-from agentic_analytics.schemas.records import Record, Scores
+from agentic_analytics.schemas.records import EQUIVALENCES, Equivalence, Record, Scores
 from agentic_analytics.schemas.summary import (
     BackendSummary,
     CategoryAccuracy,
@@ -28,6 +28,7 @@ from agentic_analytics.schemas.summary import (
 __all__ = [
     "ENGINES",
     "ENGINE_OF",
+    "EQUIVALENCES",
     "FIX_NAMES",
     "MCP_BACKENDS",
     "SCHEMA_VERSION",
@@ -40,6 +41,7 @@ __all__ = [
     "ConfigError",
     "DatasetPack",
     "Engine",
+    "Equivalence",
     "Execution",
     "FixName",
     "FixUplift",

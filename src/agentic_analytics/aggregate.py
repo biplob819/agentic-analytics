@@ -5,7 +5,8 @@ matrix per question count (EvalKit D-37), so all metrics in a run share their re
 whole summary is reproducible from its inputs and seed.
 
 - Accuracy (overall and by category) uses a two-level bootstrap: resample questions with the
-  shared matrix, then resample trials within each drawn question (AGG-01, AGG-02).
+  shared matrix, then resample trials within each drawn question (AGG-01, AGG-02). The headline
+  is tolerant of the OWNER D-81 shape equivalences; the strict score is reported beside it.
 - Rates, pass^k and uplifts are computed per question from all of its trials and bootstrapped
   over questions only (EK L-36): trials are never resampled before an any() or all().
 - Float totals use `math.fsum` (EK L-27); money inputs are checked finite and non-negative
@@ -170,26 +171,69 @@ def two_level_interval(
     return interval_from(point, boot_means)
 
 
-def _correct_values(by_q: ByQuestion, ids: Iterable[str]) -> list[list[float]]:
-    return [[1.0 if r.scores.correct else 0.0 for r in by_q[q]] for q in ids]
+def scored_under_d81(records: Iterable[Record]) -> bool:
+    """True when every record carries D-81's strict verdict (scored, or rescored, after D-81)."""
+    return all(r.scores.correct_strict is not None for r in records)
 
 
-def accuracy(by_q: ByQuestion, boot: Bootstrap, key: str) -> Interval:
-    """AGG-01: share correct, each question weighted equally, two-level bootstrap interval."""
-    return two_level_interval(_correct_values(by_q, by_q), boot, key)
+def correct_strict(record: Record) -> bool:
+    """The strict, pre-registered verdict (OWNER D-81). A record scored before D-81 has no
+    `correct_strict`; it was scored strictly, so its `correct` is the strict verdict."""
+    s = record.scores
+    return s.correct if s.correct_strict is None else s.correct_strict
+
+
+def _correct_values(
+    by_q: ByQuestion, ids: Iterable[str], *, strict: bool = False
+) -> list[list[float]]:
+    return [
+        [1.0 if (correct_strict(r) if strict else r.scores.correct) else 0.0 for r in by_q[q]]
+        for q in ids
+    ]
+
+
+def accuracy(by_q: ByQuestion, boot: Bootstrap, key: str, *, strict: bool = False) -> Interval:
+    """AGG-01: share correct, each question weighted equally, two-level bootstrap interval.
+
+    The headline is tolerant of the D-81 equivalences; `strict=True` gives the strict score.
+    Both draw from the same streams (same `key`), so equal verdicts give equal intervals."""
+    return two_level_interval(_correct_values(by_q, by_q, strict=strict), boot, key)
 
 
 def category_accuracy(
-    by_q: ByQuestion, questions: Mapping[str, Question], boot: Bootstrap, key: str
+    by_q: ByQuestion,
+    questions: Mapping[str, Question],
+    boot: Bootstrap,
+    key: str,
+    *,
+    strict: bool = True,
 ) -> tuple[CategoryAccuracy, ...]:
-    """AGG-02: accuracy per category that has questions, with `n` and a two-level interval."""
+    """AGG-02: accuracy per category that has questions, with `n` and a two-level interval,
+    tolerant (the headline) and strict (D-81)."""
     out: list[CategoryAccuracy] = []
     for cat in CATEGORIES:
         ids = [q for q in by_q if questions[q].category == cat]
         if ids:
-            iv = two_level_interval(_correct_values(by_q, ids), boot, f"{key}:{cat}")
-            out.append(CategoryAccuracy(category=cat, n=len(ids), accuracy=iv))
+            k = f"{key}:{cat}"
+            iv = two_level_interval(_correct_values(by_q, ids), boot, k)
+            st = two_level_interval(_correct_values(by_q, ids, strict=True), boot, k)
+            out.append(
+                CategoryAccuracy(
+                    category=cat, n=len(ids), accuracy=iv, accuracy_strict=st if strict else None
+                )
+            )
     return tuple(out)
+
+
+def equivalence_passes(records: Iterable[Record]) -> dict[str, int]:
+    """D-81: trials correct only under the tolerant score, by the rules they needed
+    ("percent_scale", or "percent_scale+period_number" when two applied together)."""
+    counts: dict[str, int] = {}
+    for r in records:
+        if r.scores.correct and not correct_strict(r):
+            k = "+".join(r.scores.equivalences)
+            counts[k] = counts.get(k, 0) + 1
+    return dict(sorted(counts.items()))
 
 
 # AGG-04
@@ -448,6 +492,7 @@ def backend_summary(
     backend, fixes = key
     flat = [r for t in by_q.values() for r in t]
     label = f"{backend}:{'+'.join(fixes)}"
+    d81 = scored_under_d81(r for r in flat if r.question_id in questions)
     clar, false_clar = clarification_rates(by_q, questions, boot)
     lat = [latency_ms(r) for r in flat]
     return BackendSummary(
@@ -455,7 +500,11 @@ def backend_summary(
         fixes=fixes,
         trials=max(len(t) for t in by_q.values()),
         accuracy=accuracy(by_q, boot, label),
-        by_category=category_accuracy(by_q, questions, boot, label),
+        # D-81: strict beside tolerant only when every question record was scored under D-81;
+        # records scored before it have no tolerant verdict, so the pair would mislabel strict
+        accuracy_strict=accuracy(by_q, boot, label, strict=True) if d81 else None,
+        equivalence_passes=equivalence_passes(flat),
+        by_category=category_accuracy(by_q, questions, boot, label, strict=d81),
         clarification_rate=clar,
         false_clarification_rate=false_clar,
         pass_all_trials=pass_all_trials(by_q, boot),

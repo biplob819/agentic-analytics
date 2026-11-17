@@ -14,6 +14,7 @@ from agentic_analytics.scoring.policy import (
 )
 from agentic_analytics.scoring.result import match_result, result_match
 from agentic_analytics.scoring.score import score_record
+from agentic_analytics.scoring.tolerant import tolerant_match
 
 __all__ = [
     "FINAL_ANSWER_TOOL",
@@ -33,5 +34,6 @@ __all__ = [
     "reexecute",
     "result_match",
     "score_record",
+    "tolerant_match",
     "unsupported_numbers",
 ]

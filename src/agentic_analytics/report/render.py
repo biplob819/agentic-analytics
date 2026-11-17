@@ -193,22 +193,36 @@ def _iv_cell(iv: Interval) -> str:
     return f'<strong>{pct(iv.point)}</strong> <span class="ci">{pct_ci(iv)}</span>'
 
 
+def _strict_cell(b: BackendSummary) -> str:
+    """OWNER D-81: the strict accuracy beside the tolerant headline, and what the gap is made of."""
+    if b.accuracy_strict is None:
+        return '<td class="muted">— not computed</td>'
+    passes = ", ".join(f"{_e(k)} {v}" for k, v in b.equivalence_passes.items())
+    extra = f' <span class="n">tolerant-only passes: {passes}</span>' if passes else ""
+    return f"<td>{_iv_cell(b.accuracy_strict)}{extra}</td>"
+
+
 def _overview(summary: RunSummary) -> str:
     rows = []
     for b in summary.backends:
         errors = ", ".join(f"{_e(k)} {v}" for k, v in sorted(b.errors.items())) or "none"
         rows.append(
             f'<tr><th scope="row">{_e(config_label(b.backend, b.fixes))}</th>'
-            f"<td>{_iv_cell(b.accuracy)}</td><td>{_iv_cell(b.pass_all_trials)}</td>"
+            f"<td>{_iv_cell(b.accuracy)}</td>{_strict_cell(b)}<td>{_iv_cell(b.pass_all_trials)}</td>"
             f"<td>{pct(b.trial_agreement)}</td><td>{b.trials}</td><td>{errors}</td>"
             f"<td>{b.answer_from_rows_violations}</td><td>{b.policy_violations}</td></tr>"
         )
     return (
         '<div class="card"><table id="configs"><caption>Every configuration in the run. Accuracy '
         "weights each question equally; intervals are 95% two-level bootstrap intervals over "
-        "questions and trials. pass^k is the share of questions correct on every trial.</caption>"
+        "questions and trials. Accuracy is the headline and accepts four shapes of a right "
+        "answer (OWNER D-81): a percentage returned as a fraction, a one-row pivot of a "
+        "per-label count, a zero-count check on a question with no data, and month or quarter "
+        "start dates for month or quarter numbers. Strict accuracy is the pre-registered score "
+        "without them. pass^k is the share of questions correct on every trial.</caption>"
         '<thead><tr><th scope="col">Configuration</th><th scope="col">Accuracy</th>'
-        '<th scope="col">pass^k</th><th scope="col">Trial agreement</th>'
+        '<th scope="col">Strict accuracy</th><th scope="col">pass^k</th>'
+        '<th scope="col">Trial agreement</th>'
         '<th scope="col">Trials</th><th scope="col">Errors</th>'
         '<th scope="col">Answer-from-rows violations</th><th scope="col">Policy violations</th>'
         "</tr></thead><tbody>" + "".join(rows) + "</tbody></table></div>"
@@ -288,9 +302,10 @@ def heat_band(point: float) -> str:
     return f"h{min(4, max(0, int(point * 5)))}"
 
 
-def _heat_cell(iv: Interval, n: int | None) -> str:
+def _heat_cell(iv: Interval, n: int | None, strict: Interval | None = None) -> str:
     n_txt = f' <span class="n">n = {n}</span>' if n is not None else ""
-    return f'<td class="heat {heat_band(iv.point)}">{_iv_cell(iv)}{n_txt}</td>'
+    s_txt = f' <span class="strict">strict {pct(strict.point)}</span>' if strict else ""
+    return f'<td class="heat {heat_band(iv.point)}">{_iv_cell(iv)}{n_txt}{s_txt}</td>'
 
 
 def _baselines(summary: RunSummary) -> list[BackendSummary]:
@@ -314,10 +329,15 @@ def _categories(summary: RunSummary, example: bool = False) -> str:
         for b in base:
             ca = next((c for c in b.by_category if c.category == cat), None)
             cells.append(
-                _heat_cell(ca.accuracy, ca.n) if ca else '<td class="missing">— not run</td>'
+                _heat_cell(ca.accuracy, ca.n, ca.accuracy_strict)
+                if ca
+                else '<td class="missing">— not run</td>'
             )
         rows.append(f'<tr><th scope="row">{cat}</th>{"".join(cells)}</tr>')
-    overall = "".join(_heat_cell(b.accuracy, sum(c.n for c in b.by_category) or None) for b in base)
+    overall = "".join(
+        _heat_cell(b.accuracy, sum(c.n for c in b.by_category) or None, b.accuracy_strict)
+        for b in base
+    )
     rows.append(f'<tr><th scope="row">Overall</th>{overall}</tr>')
     ns = sorted({c.n for b in base for c in b.by_category})
     span = "few" if not ns else (f"{ns[0]}" if ns[0] == ns[-1] else f"{ns[0]}–{ns[-1]}")
@@ -326,7 +346,8 @@ def _categories(summary: RunSummary, example: bool = False) -> str:
         f"question category: point estimate, 95% interval and n (questions). With {span} "
         "questions per category the intervals are wide (often ±20 points), so read this as a "
         "map, not a ranking. Shading repeats the printed number in five bands (darker green is "
-        f"higher).{single}</caption><thead><tr>"
+        "higher). Where shown, strict is the pre-registered score without the D-81 shape "
+        f"equivalences.{single}</caption><thead><tr>"
         f'<th scope="col">Category</th>{head}</tr></thead><tbody>'
         + "".join(rows)
         + "</tbody></table></div>"
@@ -378,7 +399,9 @@ def _categories(summary: RunSummary, example: bool = False) -> str:
         )
         data_rows = "".join(
             f'<tr><th scope="row">{_e(fixes_label(b.fixes))}</th><td>{c.category}</td>'
-            f"<td>{pct(c.accuracy.point)}</td><td>{pct_range(c.accuracy)}</td><td>{c.n}</td></tr>"
+            f"<td>{pct(c.accuracy.point)}</td><td>{pct_range(c.accuracy)}</td>"
+            f"<td>{pct(c.accuracy_strict.point) if c.accuracy_strict else '—'}</td>"
+            f"<td>{c.n}</td></tr>"
             for b in configs
             for c in b.by_category
         )
@@ -386,7 +409,8 @@ def _categories(summary: RunSummary, example: bool = False) -> str:
             f'<div class="card"><h3>{_e(name)}</h3>{svg}<details><summary>Data for this chart'
             f'</summary><div><table id="cat-{backend}-data"><thead><tr>'
             '<th scope="col">Fix set</th><th scope="col">Category</th>'
-            '<th scope="col">Accuracy</th><th scope="col">95% CI</th><th scope="col">n</th>'
+            '<th scope="col">Accuracy</th><th scope="col">95% CI</th>'
+            '<th scope="col">Strict accuracy</th><th scope="col">n</th>'
             f"</tr></thead><tbody>{data_rows}</tbody></table></div></details></div>"
         )
     return table + "".join(charts_html)
@@ -911,6 +935,8 @@ def vega_lite_specs(summary: RunSummary, *, example: bool = False) -> dict[str, 
             "accuracy": c.accuracy.point,
             "lo": c.accuracy.lo,
             "hi": c.accuracy.hi,
+            # OWNER D-81: the strict score beside it, when the summary has one
+            **({"accuracy_strict": c.accuracy_strict.point} if c.accuracy_strict else {}),
         }
         for b in summary.backends
         for c in b.by_category

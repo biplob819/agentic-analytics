@@ -3,10 +3,16 @@
 from __future__ import annotations
 
 from datetime import date
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from evalkit.schemas import Interval
-from pydantic import Field, StringConstraints, model_validator
+from pydantic import (
+    Field,
+    SerializerFunctionWrapHandler,
+    StringConstraints,
+    model_serializer,
+    model_validator,
+)
 
 from agentic_analytics.schemas._base import (
     FIX_NAMES,
@@ -29,14 +35,28 @@ from agentic_analytics.schemas._base import (
 class CategoryAccuracy(Model):
     category: Category
     n: PosInt
-    accuracy: Interval
+    accuracy: Interval  # tolerant of the OWNER D-81 equivalences (the headline)
+    accuracy_strict: Interval | None = None  # strict (D-81); None in summaries made before it
+
+    @model_serializer(mode="wrap")
+    def _omit_uncomputed(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """A summary made before D-81 keeps its exact format."""
+        data = handler(self)
+        if data.get("accuracy_strict", 0) is None:
+            del data["accuracy_strict"]
+        return data
 
 
 class BackendSummary(Model):
     backend: BackendName
     fixes: tuple[FixName, ...] = ()
     trials: PosInt
-    accuracy: Interval
+    accuracy: Interval  # tolerant of the OWNER D-81 equivalences (the headline)
+    # OWNER D-81: the strict, pre-registered accuracy, shown beside the headline; None in
+    # summaries made before it
+    accuracy_strict: Interval | None = None
+    # trials correct only under the tolerant score, by the equivalences they needed
+    equivalence_passes: FrozenMap[NonNegInt] = Field(default_factory=dict)
     by_category: tuple[CategoryAccuracy, ...]
     clarification_rate: Interval
     false_clarification_rate: Interval
@@ -48,6 +68,16 @@ class BackendSummary(Model):
     cost_per_correct_usd: NonNegFloat | None  # None when nothing was correct
     latency_p50_ms: NonNegInt
     latency_p95_ms: NonNegInt
+
+    @model_serializer(mode="wrap")
+    def _omit_uncomputed(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """A summary made before D-81 (no strict accuracy) keeps its exact format."""
+        data = handler(self)
+        if data.get("accuracy_strict", 0) is None:
+            del data["accuracy_strict"]
+            if not data.get("equivalence_passes"):
+                data.pop("equivalence_passes", None)
+        return data
 
     @model_validator(mode="after")
     def _consistent(self) -> BackendSummary:
