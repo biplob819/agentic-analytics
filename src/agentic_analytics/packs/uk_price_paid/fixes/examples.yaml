@@ -1,0 +1,65 @@
+# The `examples` fix (F3.1 FIX-02, Tech Spec §7): five question-and-SQL pairs put in the MCP
+# agents' prompt. They teach the table's conventions (uppercase place names, the stored enum
+# values, exact functions, date filtering, the new-build flag and tenure) through lookups and
+# listings, and deliberately demonstrate none of the output formulas the benchmark scores (no
+# per-year counts, averages, medians or percentage changes as answers, no top-N with a LIMIT;
+# D-52). FIX-03 checks that no question shares more than half its word 3-grams with a benchmark
+# question, that no SQL's literal-free skeleton shares more than half its 6-grams with any gold
+# SQL or interpretation, and (live) that no result set equals a gold result.
+#
+# Frozen with fixes/self_check.yaml and the rendered prompt blocks in fixes/FROZEN.json before
+# the first baseline run (FIX-05, OWNER D-13). Editing this file afterwards fails gate 8 unless
+# the change is re-frozen with a logged reason.
+#
+# Verification status: each SQL passes Q2.1's ClickHouse writing rules offline; the live run
+# (1-200 rows, no gold result equal) is pending the ClickHouse account.
+schema_version: "1.0"
+engine: clickhouse
+examples:
+  - id: ex-1
+    question: Which local authority districts appear on sales whose post town is Bath?
+    sql: >-
+      SELECT DISTINCT district
+      FROM uk.uk_price_paid
+      WHERE town = 'BATH'
+      ORDER BY district
+
+  - id: ex-2
+    question: List every combination of property type and tenure exactly as the values are stored.
+    sql: >-
+      SELECT DISTINCT type, duration
+      FROM uk.uk_price_paid
+      ORDER BY toString(type), toString(duration)
+
+  - id: ex-3
+    question: >-
+      Which localities in the county of Cumbria had an exact median sale price above £400,000
+      during 2018?
+    sql: >-
+      SELECT locality
+      FROM uk.uk_price_paid
+      WHERE county = 'CUMBRIA' AND locality != ''
+        AND date >= toDate('2018-01-01') AND date < toDate('2019-01-01')
+      GROUP BY locality
+      HAVING quantileExactInclusive(0.5)(price) > 400000
+      ORDER BY locality
+
+  - id: ex-4
+    question: >-
+      List the sales on Royal Crescent in Bath during 2019 with the date, the price and the house
+      name or number, earliest first.
+    sql: >-
+      SELECT date, price, addr1
+      FROM uk.uk_price_paid
+      WHERE town = 'BATH' AND street = 'ROYAL CRESCENT'
+        AND date >= toDate('2019-01-01') AND date < toDate('2020-01-01')
+      ORDER BY date, addr1
+
+  - id: ex-5
+    question: Which full postcodes in Salford had a new-build leasehold flat sold in April 2021?
+    sql: >-
+      SELECT DISTINCT postcode1, postcode2
+      FROM uk.uk_price_paid
+      WHERE town = 'SALFORD' AND is_new = 1 AND duration = 'leasehold' AND type = 'flat'
+        AND date BETWEEN toDate('2021-04-01') AND toDate('2021-04-30')
+      ORDER BY postcode1, postcode2

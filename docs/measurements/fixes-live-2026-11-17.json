@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "kind": "fixes_live",
+  "node": "F3.1",
+  "ran_at": "2026-11-17",
+  "pack": "uk_price_paid@1.0",
+  "as_of": "2026-08-31",
+  "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+  "gold_check_id": "c38f90b243d8faf1bd10268d6a225429e9b6e3a7b608391ec2285290d2814719",
+  "command": "AA_LIVE=1 pytest tests/fixes -k live",
+  "executor": "ClickHouse read-only executor (aa_ro, analytics_ro)",
+  "results": {
+    "FIX-02": "the five examples run on ClickHouse and each returns 1-200 rows (test_live_examples_run_nonempty_and_leak_no_gold)",
+    "FIX-03": "no example's result set equals a gold result of the selected questions, renamed columns and reordered rows included (test_live_no_example_result_equals_a_gold_result; planted equal result flagged by test_live_shape_flags_a_planted_result_equal_to_gold)",
+    "FIX-04": "self-check false-positive rate over the real gold results 0.0% (0/84), limit 5%, with all eight rules: the stats query ran live through the read-only executor (row_count 31,702,685, dates 1995-01-01 to 2026-09-30), so count_above_rows and date_out_of_range were exercised (test_live_false_positive_rate_over_real_gold_results, re-run after verifier round 1; the first run passed no stats and covered six rules)"
+  },
+  "refreeze_needed": false,
+  "spend": "ClickHouse Cloud trial only (read-only queries); no model calls, no Snowflake"
+}

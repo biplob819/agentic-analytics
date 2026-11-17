@@ -1,0 +1,44 @@
+# The `self-check` fix (F3.1 FIX-04, Tech Spec §7): implausibility rules over the result of the
+# agent's final SQL. agentic_analytics.fixes.self_check runs the SQL once, read-only, applies
+# these rules and sends one feedback turn (A2.1) while MCP calls remain (B3, E8).
+#
+# Frozen with fixes/examples.yaml and the descriptions block in fixes/FROZEN.json (FIX-05).
+schema_version: "1.0"
+engine: clickhouse
+
+# One row: the table's row count and date range (for count_above_rows and date_out_of_range).
+stats_sql: >-
+  SELECT count() AS row_count, min(date) AS min_date, max(date) AS max_date
+  FROM uk.uk_price_paid
+
+# A price level outside £1,000-£10m (1995 street-level medians can be a few thousand pounds).
+price_range: {min: 1000, max: 10000000}
+# A column explicitly named as a percentage change beyond ±500 (percent units).
+max_change_pct: 500
+
+# Output column names that mark a column (Python regular expressions). The price rule applies
+# only to names that denote a price level and are not a change or a scaled value.
+name_patterns:
+  price: '(?i)(avg|average|mean|median).*price|price.*(avg|average|mean|median)'
+  price_exclude: '(?i)change|diff|pct|percent|ratio|share|growth|_k$|_m$|_thousands?$'
+  change: '(?i)^(pct_change|yoy_pct)$'
+  year: '(?i)^(year|yr|calendar_year|sale_year)$'
+
+preamble: >-
+  Self-check before you finish: the result of your SQL looks implausible.
+closing: >-
+  Check the filters (place names are stored in uppercase), the date range relative to the
+  as-of date and the aggregation. If the result is right after all, call final_answer again
+  with the same SQL; otherwise fix the query first.
+
+messages:
+  zero_rows: It returned no rows.
+  zero_aggregate: Every number in the result is 0, so the filters probably matched nothing.
+  null_aggregate: The aggregate column {column} is NULL, so no rows matched the filters.
+  price_out_of_range: >-
+    {column} is £{value}, outside the plausible range for an average or median price
+    (£{min} to £{max}).
+  count_above_rows: '{column} is {value}, more than the {rows} rows in the whole table.'
+  date_out_of_range: '{column} holds {value}, outside the data range ({min} to {max}).'
+  change_beyond_limit: '{column} is {value}%, a change beyond ±{limit}%.'
+  execution_failed: 'The query did not run ({error}).'

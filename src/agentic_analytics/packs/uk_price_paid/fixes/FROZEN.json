@@ -1,0 +1,18 @@
+{
+  "blocks": {
+    "descriptions": "4b0664c1e513edefcb5dae6228a2d86d631ba77313227bf5299e488c2f0e132c",
+    "examples": "8069ae56dbc8ca467c45db562c9a3c638abda63de0e5b1a502df0454fb7cfa7e",
+    "self_check": "ba6100a06d9adb176efc82a311820bac5534f4b81024fce83b8a3c84f6a6523f"
+  },
+  "files": {
+    "fixes/examples.yaml": "c29ae3fc7651f8146b8c97a37b8944a827ae07ad9c0fa4a27f0aa520a73a6f0a",
+    "fixes/self_check.yaml": "ba6100a06d9adb176efc82a311820bac5534f4b81024fce83b8a3c84f6a6523f"
+  },
+  "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+  "frozen_at": "2026-11-16T21:30:49.738648Z",
+  "kind": "fix_freeze",
+  "pack": "uk_price_paid@1.0",
+  "reason": "D-48 re-freeze after the owner's semantic-layer review (OWNER D-67): 'area' dropped from district synonyms, as-of wording per D-50; pre-baseline",
+  "rules_sha256": "8322fc0a0a36e134d7c4496c30724697a30dcd35af69d2096959c5444545bbd6",
+  "schema_version": "1.0"
+}
