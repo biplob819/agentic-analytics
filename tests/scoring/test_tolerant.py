@@ -457,3 +457,77 @@ def test_text_month_labels_match_month_numbers_and_quarter_labels_never_do():
     assert tolerant_match(two_years, MONTHS, q(MONTH_Q, category="time")) == ()
     not_months = ex(("month", "sales"), (("Marchy 2016", 70), ("Aprilish 2016", 80)))
     assert tolerant_match(not_months, MONTHS, q(MONTH_Q, category="time")) == ()
+
+
+# -- D-91: false passes found by EvalKit B5.15's fuzzing ---------------------------------------
+
+
+def test_percentile_and_points_columns_are_not_percent_columns():
+    tol = Tolerance(rel=0.005, abs=0.01)
+    p95 = rs(("latency_percentile_95",), ((1.23,),))
+    run = ex(("latency_percentile_95",), ((0.0123,),))
+    assert tolerant_match(run, p95, q("What percentage latency was the 95th?", tolerance=tol)) == ()
+    loyalty = rs(("avg_loyalty_points",), ((1230.0,),))
+    assert (
+        tolerant_match(
+            ex(("avg_loyalty_points",), ((12.3,),)), loyalty, q("What % of points?", tolerance=tol)
+        )
+        == ()
+    )
+    change = rs(("change_points",), ((1.5,),))
+    assert tolerant_match(
+        ex(("change_points",), ((0.015,),)),
+        change,
+        q("By how many percentage points?", tolerance=tol),
+    ) == ("percent_scale",)
+
+
+def test_a_question_saying_not_percent_does_not_ask_for_one():
+    text = "What share of 2023 sales were new builds (as a fraction, not %)?"
+    assert (
+        tolerant_match(ex(("new_build_pct",), ((0.113892,),)), PCT_GOLD, q(text, tolerance=PCT))
+        == ()
+    )
+
+
+def test_quarter_reading_needs_a_gold_quarter_column():
+    gold = rs(("month", "sales"), ((2, 10),))
+    text = "Which month of the first quarter of 2024 had the most sales?"
+    run = ex(("month", "sales"), (("2024-04-01", 10),))
+    assert tolerant_match(run, gold, q(text, category="time")) == ()
+
+
+def test_dates_must_be_in_a_year_the_question_names():
+    gold = rs(("month", "sales"), ((3, 70),))
+    run = ex(("month", "sales"), (("2023-03-01", 70),))
+    assert (
+        tolerant_match(run, gold, q("How many sales in each month of 2024?", category="time")) == ()
+    )
+    ok = ex(("month", "sales"), (("2024-03-01", 70),))
+    assert tolerant_match(
+        ok, gold, q("How many sales in each month of 2024?", category="time")
+    ) == ("period_number",)
+
+
+def test_month_numbers_must_land_on_a_gold_month_column():
+    gold = rs(("rank", "sales"), ((3, 70),))
+    run = ex(("month", "sales"), (("2024-03-01", 70),))
+    assert tolerant_match(run, gold, q("Sales by month of 2024?", category="time")) == ()
+
+
+def test_empty_check_rejects_error_text_and_zero_measures():
+    empty = rs(("month", "median_price"), ())
+    qq = q("What was the median price in each month of 1993?", category="time", expects_empty=True)
+    assert tolerant_match(ex(("status", "n"), (("ERROR: table missing", 0),)), empty, qq) == ()
+    assert tolerant_match(ex(("avg_price",), ((0.0,),)), empty, qq) == ()
+    ok = ex(("earliest_sale_date", "sales_in_1993"), (("1995-01-01", 0),))
+    assert tolerant_match(ok, empty, qq) == ("empty_check",)
+
+
+def test_pivot_rejects_a_zero_total_column():
+    gold = rs(("duration", "sales"), (("freehold", 5), ("leasehold", 3)))
+    text = "How many sales for each tenure?"
+    run = ex(("freehold", "leasehold", "total"), ((5, 3, 0),))
+    assert tolerant_match(run, gold, q(text)) == ()
+    ok = ex(("freehold", "leasehold", "unknown"), ((5, 3, 0),))
+    assert tolerant_match(ok, gold, q(text)) == ("pivot",)

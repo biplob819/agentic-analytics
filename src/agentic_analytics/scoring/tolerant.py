@@ -49,7 +49,15 @@ from agentic_analytics.scoring.result import _Column, _is_num, match_rows
 PERCENT_ABS = 0.01  # D-51: a percent-unit column's absolute tolerance
 PERCENT_SCALE = 100
 _ASKS_PERCENT = re.compile(r"\bper\s?cent(?:age)?s?\b|%", re.IGNORECASE)
-_PERCENT_COLUMN = re.compile(r"pct|percent|points", re.IGNORECASE)
+_NOT_PERCENT = re.compile(
+    r"\bnot\s+(?:as\s+|in\s+)?(?:a\s+)?(?:%|per\s?cent(?:age)?s?\b)", re.IGNORECASE
+)
+_PERCENT_TOKENS = frozenset({"pct", "percent", "percentage"})
+_TOKEN = re.compile(r"[a-z]+|\d+", re.ASCII)
+_COUNT_UNSAFE = frozenset({"avg", "average", "mean", "median", "price", "amount", "value", "sum"})
+_TOTAL_NAMES = frozenset({"total", "sum", "all", "overall", "grand_total", "count"})
+_ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}(?:[T ][\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?", re.ASCII)
+_YEAR = re.compile(r"\b(19\d{2}|20\d{2})\b", re.ASCII)
 _NAMES_MONTHS = re.compile(r"\bmonths?\b", re.IGNORECASE)
 _NAMES_QUARTERS = re.compile(r"\bquarters?\b", re.IGNORECASE)
 _PERIOD_START = re.compile(
@@ -58,6 +66,8 @@ _PERIOD_START = re.compile(
 _PLAIN_NUMBER = re.compile(r"\s*[-+]?\d+(?:\.\d+)?\s*", re.ASCII)
 _SEPARATORS = re.compile(r"[\s_-]+")
 QUARTER_STARTS = frozenset({1, 4, 7, 10})
+_MONTH_COLUMN = frozenset({"month", "mon", "mm"})
+_QUARTER_COLUMN = frozenset({"quarter", "qtr", "q"})
 
 Variant = tuple[tuple[Equivalence, ...], ResultSet]
 
@@ -112,15 +122,27 @@ def _column(rs: ResultSet, i: int) -> list[Any]:
 # 1. percent_scale
 
 
+def _tokens(name: str) -> set[str]:
+    return set(_TOKEN.findall(name.casefold()))
+
+
+def _is_percent_name(name: str) -> bool:
+    """A percent column by name: a pct/percent/percentage token, or a percentage-point change
+    (``change_points``). "percentile" and ``loyalty_points`` are not (D-91)."""
+    t = _tokens(name)
+    return bool(t & _PERCENT_TOKENS) or {"points", "change"} <= t
+
+
 def _gold_percent_columns(gold: ResultSet, question: Question) -> list[int]:
     tol = question.tolerance
-    if tol.abs < PERCENT_ABS or not _ASKS_PERCENT.search(question.text):
+    asks = _ASKS_PERCENT.search(question.text) and not _NOT_PERCENT.search(question.text)
+    if tol.abs < PERCENT_ABS or not asks:
         return []
     covered = None if tol.columns is None else {c.casefold() for c in tol.columns}
     return [
         j
         for j, name in enumerate(gold.columns)
-        if (covered is None or name.casefold() in covered) and _PERCENT_COLUMN.search(name)
+        if (covered is None or name.casefold() in covered) and _is_percent_name(name)
     ]
 
 
@@ -178,8 +200,8 @@ def pivot(predicted: ResultSet, gold: ResultSet) -> ResultSet | None:
         if key in labels:
             pair = (labels[key], cell) if label_col == 0 else (cell, labels[key])
             long.append(pair)
-        elif not (_is_num(cell) and cell == 0):
-            return None  # an extra label must be one the gold omitted, so zero
+        elif key in _TOTAL_NAMES or not (_is_num(cell) and cell == 0):
+            return None  # an extra label must be one the gold omitted, so zero; never a total
     return ResultSet(columns=gold.columns, rows=tuple(long))
 
 
@@ -204,6 +226,13 @@ def empty_check(predicted: ResultSet, gold: ResultSet, question: Question) -> Re
         return None
     if any(_numeric(c) is None and not (c is None or isinstance(c, str)) for c in row):
         return None  # booleans and nested values are not a no-data check
+    for name, cell in zip(predicted.columns, row, strict=True):
+        if _numeric(cell) is not None:
+            # D-91: a zero count, not a zero measure (avg_price = 0.0)
+            if (_is_num(cell) and not float(cell).is_integer()) or _tokens(name) & _COUNT_UNSAFE:
+                return None
+        elif isinstance(cell, str) and not _ISO_DATE.fullmatch(cell.strip()):
+            return None  # D-91: only the dates of a no-data check, never an error message
     return ResultSet(columns=gold.columns, rows=())
 
 
@@ -279,9 +308,11 @@ def _period_starts(values: Sequence[Any]) -> list[tuple[int | None, int, bool] |
     return out if any(p is not None for p in out) else None
 
 
-def _has_numbers(gold: ResultSet, top: int) -> bool:
-    """A gold column whose every cell is an integer in 1..top."""
+def _has_numbers(gold: ResultSet, top: int, names: frozenset[str]) -> bool:
+    """A gold period column (named month or quarter, D-91) whose cells are integers in 1..top."""
     for j in range(len(gold.columns)):
+        if not _tokens(gold.columns[j]) & names:
+            continue
         cells = _column(gold, j)
         if cells and all(_is_num(v) and float(v).is_integer() and 1 <= v <= top for v in cells):
             return True
@@ -300,14 +331,30 @@ def period_columns(
         # one calendar year: the cells' stated years (a bare "Q1" states none) are a single year
         if starts is not None and len({p[0] for p in starts if p is not None and p[0]}) <= 1:
             dates[i] = starts
+    # D-91: when the question names years, the dates' stated year must be one of them
+    named_years = {int(y) for y in _YEAR.findall(question.text)}
+    if named_years:
+        dates = {
+            i: s
+            for i, s in dates.items()
+            if all(p is None or p[0] is None or p[0] in named_years for p in s)
+        }
     if not dates:
         return []
     out: list[dict[int, list[Any]]] = []
     no_quarter_labels = not any(p is not None and p[2] for s in dates.values() for p in s)
-    if _NAMES_MONTHS.search(question.text) and _has_numbers(gold, 12) and no_quarter_labels:
+    if (
+        _NAMES_MONTHS.search(question.text)
+        and _has_numbers(gold, 12, _MONTH_COLUMN)
+        and no_quarter_labels
+    ):
         out.append({i: [None if p is None else p[1] for p in s] for i, s in dates.items()})
     quarter_starts = all(p is None or p[1] in QUARTER_STARTS for s in dates.values() for p in s)
-    if quarter_starts and _NAMES_QUARTERS.search(question.text) and _has_numbers(gold, 4):
+    if (
+        quarter_starts
+        and _NAMES_QUARTERS.search(question.text)
+        and _has_numbers(gold, 4, _QUARTER_COLUMN)
+    ):
         quarters = {
             i: [None if p is None else (p[1] - 1) // 3 + 1 for p in s] for i, s in dates.items()
         }
