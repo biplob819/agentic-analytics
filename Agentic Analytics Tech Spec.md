@@ -485,6 +485,31 @@ Gold SQL is the yardstick for every score, so it gets EvalKit's judge-calibratio
 - **Consistency.** pass^k (the share of questions correct on every trial) and trial agreement (all trials return the same result set). Both are computed per question from all its trials, then bootstrapped over questions only; resampling trials first biases pass^k upward (EvalKit L-36).
 - **Cost per correct.** (model $ + Cortex message credits × $/credit + allocated warehouse credits × $/credit) ÷ correct answers. See §9.
 
+### 6.3 Metric relevance (OWNER D-75)
+
+Every metric the benchmark reports answers a question a reader of this project has. Each row names that question and its trace; a metric with no row is dropped or justified here before it ships, and `tests/harness/test_metric_relevance.py` fails when a summary field has no row. EvalKit capabilities are added when this project needs them (EvalKit D-63), never the other way round.
+
+| Metric | The question it answers | Trace |
+| --- | --- | --- |
+| `accuracy` | Which backend gets the questions right? | US1 |
+| `by_category` | Which kinds of question are safe to open up on each backend? | US1 |
+| `clarification_rate` | Does it ask back when a question is ambiguous? | US3 |
+| `false_clarification_rate` | Does it ask back needlessly on clear questions, so asking back cannot look good? | US3, C4 |
+| `pass_all_trials` | Is a correct answer repeatable, or luck on one trial? | US1, D-12 |
+| `trial_agreement` | Do repeated asks return the same result? | US1, D-12 |
+| `answer_from_rows_violations` | Does the written answer state numbers the query never returned? | US3, B1, B7 |
+| `policy_violations` | Did it try a write, overrun its budget or follow an injection? | B3, B8, B9 |
+| `errors` | Which failures were the system's (timeouts, refusals, SQL errors) rather than wrong answers? | US4 |
+| `cost_per_correct_usd` | What does a correct answer cost, model and warehouse together? | US5 |
+| `latency_p50_ms` | How long does a typical answer take? | US7, NFR2 |
+| `latency_p95_ms` | How long do the slow answers take (the demo's 30 s line)? | US7, NFR2 |
+| `uplifts` | Which fix is worth the investment, measured alone? | US2 |
+| `probes` | Does each backend refuse writes and ignore injected instructions? | B8, B9 |
+| `total_cost_usd` | What did the run cost? | US5 |
+| `total_credits` | How many warehouse credits did it use? | US5 |
+| `step_efficiency` (M4.1) | How many tool calls beyond the minimum does an agent spend per answer (a cost and latency driver)? | US5, US7 |
+| `drift` (M4.1) | Did a later run move outside the baseline's band? | US1, OWNER D-74 |
+
 ---
 
 ## 7. Fixes protocol
@@ -566,6 +591,7 @@ Each single run stays under $25, so it needs no extra approval (EvalKit rule). E
 - **Wake-up (H13).** ClickHouse Cloud idles, and waking it can take tens of seconds. Opening live mode sends one `SELECT 1` as a warm-up, so the first question doesn't pay for the wake.
 - **Logging and secrets.** Logs hold aggregates only: timestamp, backends, latency, cost. Keys live in Streamlit secrets, and the browser only ever receives answers.
 - **Banner.** It shows the licence credit and one honest line: "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned."
+- **Visitor own keys (OWNER D-56).** After the visitor passcode (never the owner passcode), a visitor may give an Anthropic key (the Claude panel) and/or an OpenAI key (the GPT panel). Keys are format-checked offline and kept only in that browser session's memory until "Forget my key"; they are never logged, traced, cached, ledgered or written to disk. Each ask builds new SDK clients on the key with `max_retries=0`, on the benchmark's fixed models and effort. A keyed panel's model calls are billed to the visitor, not the $3/day budget; the ask's warehouse spend (ClickHouse compute, Cortex message and Snowflake compute) is held against its own daily limit under the key `agentic-analytics-byok`, with the per-session rate limit. A bad, out-of-quota or rate-limited key fails its panel with a fixed message and never falls back to the owner's key. The page says the key goes to the Streamlit server for this session only and that the visitor pays their provider directly.
 
 ---
 
@@ -612,9 +638,9 @@ agentic-analytics/
 
 Status vocabulary: `not-started | spec | building | green`. Changelog lines read `[TYPE] [NODE] — summary`.
 
-### 12.2 Build graph: 24 nodes in five waves
+### 12.2 Build graph: 25 nodes in five waves
 
-**Must scope: 22 nodes,** W0.1 to B3.3, with N1.7 (OWNER D-55). **Should scope (US7): 2 nodes,** D4.1 and D4.2. The whole graph is built in one pass (OWNER D-20). B3.3 publishes v0.1.0 to PyPI (OWNER D-27).
+**Must scope: 22 nodes,** W0.1 to B3.3, with N1.7 (OWNER D-55). **Should scope (US7): 2 nodes,** D4.1 and D4.2. The whole graph is built in one pass (OWNER D-20). B3.3 publishes v0.1.0 to PyPI (OWNER D-27). **Monitoring (OWNER D-74): 1 node,** M4.1, added after the owner asked how the evals are monitored and improved.
 
 | Node | Title | Depends on | Deliverable (what exists when it is green) | Stories |
 | --- | --- | --- | --- | --- |
@@ -638,12 +664,13 @@ Status vocabulary: `not-started | spec | building | green`. Changelog lines read
 | **F3.1** | Fixes as flags | A2.1, N1.4, Q2.2 | Three fixes, frozen hashes, leak check, self-check rules | US2 |
 | **F3.2** | Fix runs and uplift | F3.1, R3.2 | Fix runs, uplift table, hand-labelled failure taxonomy | US2, US4 |
 | **B3.1** | Dashboard | M2.1, A2.3 | Static dashboard: category × backend, uplift, cost, clarification, failure explorer | US1–US5 |
-| **B3.2** | README, deploy and write-up figures | B3.1, F3.2 | README headline, Cloudflare Pages deploy, decision log, data card, figures for the write-up | US6 |
+| **B3.2** | README, deploy and write-up figures | B3.1, F3.2, M4.1 | README headline, Cloudflare Pages deploy, decision log, data card, figures for the write-up | US6 |
 | **B3.3** | Open-source release v0.1.0 | B3.2 | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0 | US6, US8 |
 | **D4.1** | `ask()` and guard | A2.3, R3.1 | `ask()`, replay cache, live path behind EvalKit's guard, warm-up | US7 |
-| **D4.2** | Demo page | D4.1, B3.1 | Streamlit page in `portfolio-demos`, measured live p95 | US7 |
+| **D4.2** | Demo page | D4.1, B3.1 | Streamlit app from this repo (D-57), measured live p95 | US7 |
+| **M4.1** | Monitoring and EvalKit reuse | R3.2, B3.1 | Scheduled smoke gated by `evalkit gate`, run history and drift through EvalKit's ledger and compare, metrics-summary export, `attack_outcome` probe scoring, step efficiency, upstreamed scorers with parity tests (OWNER D-74, D-75) | US1, US5 |
 
-Waves: **W0** harness → **N1** foundations → **Q2/A2/S2/M2** benchmark, backends, scoring → **R3/F3/B3** runs, fixes, reporting → **D4** demo.
+Waves: **W0** harness → **N1** foundations → **Q2/A2/S2/M2** benchmark, backends, scoring → **R3/F3/B3** runs, fixes, reporting → **D4/M4** demo and monitoring.
 
 ### 12.3 Node map, levels and build order
 
@@ -689,6 +716,9 @@ graph LR
   R31 --> D41
   D41 --> D42[D4.2 Demo page]
   B31 --> D42
+  R32 --> M41[M4.1 Monitoring + EvalKit reuse]
+  B31 --> M41
+  M41 --> B32
 ```
 
 **Dependency levels.** A node can start once every node it depends on, all in earlier levels, is green.
@@ -704,7 +734,7 @@ graph LR
 | 6 | A2.3, F3.1 |
 | 7 | R3.1, B3.1 |
 | 8 | R3.2, D4.1 |
-| 9 | F3.2, D4.2 |
+| 9 | F3.2, D4.2, M4.1 |
 | 10 | B3.2 |
 | 11 | B3.3 |
 
@@ -735,11 +765,12 @@ graph LR
 | 17 | R3.1 | includes the smoke run |
 | 18 | R3.2 |  |
 | 19 | F3.2 |  |
-| 20 | B3.2 |  |
-| 21 | B3.3 | v0.1.0 on PyPI; Must scope complete |
-| 22 | D4.1 |  |
-| 23 | D4.2 |  |
-| 24 | N1.7 | added by OWNER D-55; can run any time after N1.2 |
+| 20 | M4.1 | added by OWNER D-74; needs the baseline runs; before B3.2 so the README covers monitoring |
+| 21 | B3.2 |  |
+| 22 | B3.3 | v0.1.0 on PyPI; Must scope complete |
+| 23 | D4.1 |  |
+| 24 | D4.2 |  |
+| 25 | N1.7 | added by OWNER D-55; can run any time after N1.2 |
 
 ### 12.4 Capability catalog
 
@@ -999,11 +1030,31 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 
 | Cap | Capability | Trace |
 | --- | --- | --- |
-| DEM-01 | Streamlit page in `portfolio-demos` with a sample question already answered | US7 |
+| DEM-01 | Streamlit app from this repo (D-57) with a sample question already answered | US7 |
 | DEM-02 | Two panels: SQL, answer, chart, cost, trace link | US7, B5 |
 | DEM-03 | Passcode live mode with a budget line | US7 |
 | DEM-04 | Licence credit and the honest Cortex line | NFR6, C1 |
 | DEM-05 | Deployed with secrets in the host store. Live p95 under 30 seconds over 20 asks | NFR2 |
+| DEM-06 | Visitor own key after the passcode: Anthropic for the Claude panel, OpenAI for the GPT panel, format-checked offline, per-request SDK clients with no SDK retries, on the benchmark's fixed models and effort; never on the owner passcode | OWNER D-56, H15 |
+| DEM-07 | Own-key spend: keyed panels' model calls off the $3/day budget; warehouse spend under its own daily limit (`agentic-analytics-byok`) with the rate limit; a failing key fails only its panel, never falling back to the owner's key | OWNER D-56, D-17, H15 |
+| DEM-08 | The key in session memory only: never in logs, traces, exports, caches, the spend ledger, exception text or object reprs; redacted on the page; "Forget my key" clears it | OWNER D-56, NFR3, H15 |
+| DEM-09 | Own-key notice (Streamlit server, this session only, not stored, the visitor pays the provider); live mode still off on the synthetic cache; p95 page mode and the owner budget unchanged | OWNER D-56, OWNER D-53 |
+| DEM-10 | Live switch: `DEMO_LIVE_BACKENDS` names the live backends (a comma list or `all`; empty or missing means none; an unknown name is an error shown to the owner and keeps every backend off); `DEMO_CONTACT_URL` is an https link, never an email, default the repo's GitHub Issues; `run_live(live=)` refuses a backend that is not live before anything else | OWNER D-58, OWNER D-59, OWNER D-60 |
+| DEM-11 | Saved answers by default: a backend that is not live shows the saved answer and builds no service, executor, guard or budget and connects to nothing; near the top and on each panel the page says the answers are saved answers from the benchmark run and that live querying on Snowflake and ClickHouse is switched off to save compute, with the owner-request link | OWNER D-59, OWNER D-60 |
+| DEM-12 | Live needs a valid passcode AND the backend live: the passcode box and own-key fields are always shown; a valid visitor or owner passcode while compute is off says so, links the request and connects nothing; own keys never replace the passcode; only live backends are built and asked; live stays off on the synthetic cache; p95 refuses unless its backends are live | OWNER D-60, OWNER D-56, OWNER D-53 |
+| DEM-13 | Its own Streamlit Community Cloud app: repo-root `demo/app.py` (puts `src/` on the path, calls the page's `main`) and `demo/requirements.txt` pinned to uv.lock (core dependencies, the `demo` extra, the EvalKit git pin), kept in step by a test; the Snowflake read-only key read from its PEM text (`SNOWFLAKE_RO_PRIVATE_KEY`) when the `_PATH` variable is absent, never logged or shown | D-57, E6 |
+| DEM-14 | `scripts/streamlit_secrets.py | pbcopy` writes the hosted demo's Streamlit secrets TOML from `.env`: exactly the page's secrets plus the key file's PEM text, TOML-escaped, never an admin credential or a `.env` comment, and refused when stdout is a terminal | D-57, E6 |
+
+**M4.1 Monitoring and EvalKit reuse**
+
+| Cap | Capability | Trace |
+| --- | --- | --- |
+| MON-01 | Scheduled smoke: a GitHub Actions workflow runs `agentic-analytics smoke` weekly and on manual dispatch, from the `monitoring` environment's secrets, under a $2 cap per run, never on pull requests or forks; it gates the run with `evalkit gate` (EvalKit B5.3) on per-backend accuracy thresholds and records each run's spend in the ledger | OWNER D-74, OWNER D-75, NFR1 |
+| MON-02 | Run history and drift through EvalKit: every run's metrics-summary goes into EvalKit's run ledger (B5.7 LED-01, LED-02); the dashboard's trend page shows accuracy with intervals, cost per correct and p95 latency across runs from `evalkit history`, and a run outside its alarm band is flagged; run pairs are compared with `evalkit compare` (B5.6) | OWNER D-74, OWNER D-75, US1 |
+| MON-03 | Probe scoring through EvalKit `scorers.attack_outcome` (markers as canaries, the MCP allow-list as allowed tools), with a parity test against S2.1's probe verdicts on every recorded probe answer | OWNER D-74, D-2 |
+| MON-04 | Step efficiency: tool calls used against the question's minimum, per backend, from the recorded steps (EvalKit's agent-trajectory `min_steps` idea); cost per success and trial agreement are not repeated, since `cost_per_correct_usd` and `trial_agreement` already answer them (§6.3) | OWNER D-74, OWNER D-75, US5 |
+| MON-05 | Metrics-summary export: `summary.json` is also written in EvalKit's frozen metrics-1 format (B5.3; each §6.3 metric with its interval, unit and trace) with EvalKit's per-model efficiency block where it applies (tokens in/out/reasoning/cached per case, cache-hit share, cost per case, cost per correct, latency p50/p95/p99, retry rate, error rate, eval overhead cost, system cost, labels mode and price date; EvalKit D-67), the input to `evalkit gate`, `compare`, the ledger and EvalKit's cross-project index (B5.5) | OWNER D-75, EvalKit D-62, EvalKit D-67 |
+| MON-06 | Upstreamed scorers: the answer-from-rows check and the clarification scorer run from EvalKit once it ships them (requested under EvalKit D-61 rule 3), with a parity test proving identical scores on every recorded answer before the local copies are removed | OWNER D-75, D-2 |
 
 ### 12.5 Node lifecycle
 
@@ -1099,12 +1150,14 @@ Severity: **C** = would make the headline result wrong or unfair; **H** = would 
 | H12 | Cortex availability on trial accounts and regions is unconfirmed, and Snowflake now points new work at Cortex Agents | §13 |
 | H13 | Waking an idle ClickHouse Cloud service breaks the 30-second p95 in live mode | §10, ASK-04 |
 | H14 | EvalKit's `sql_match` has one global tolerance, while FR7 wants 0.5% on averages only. `stats` and `guard` aren't public API, and v0.1.0 isn't on PyPI yet | `Question.tolerance`, D-2, HAR-06 |
+| H15 | Visitor own keys (OWNER D-56) put a stranger's secret on the demo server, and their asks still spend on the owner's warehouses with no cap of their own | DEM-06, DEM-07, DEM-08, DEM-09 |
+| H16 | A public demo with live mode on by default spends the owner's warehouse and model budget at rest, breaks when a trial lapses, and does not say its answers are recorded (OWNER D-58, D-59, D-60) | DEM-10, DEM-11, DEM-12 |
 | E1 | Schema gaps: no `expected`, tolerance or `top_n` on `Question`; no clarification text, suggestions or error on `AnalyticsAnswer`; no trial, timestamp, git SHA, prompt, fix or gold stamps on `Record` | §3 |
 | E2 | No retry or error taxonomy | §2.6, MCP-05, MOD-05 |
 | E3 | Who writes the chart is unspecified | D-6, ANS-01 |
 | E4 | No cache, resume or rescore story for a run of up to 2,400 asks | D-1, RUN-02 |
 | E5 | No exit codes or dry run for CI and cost control | §4 |
-| E6 | Secrets inventory, and admin keys kept apart from runtime keys | §4 environment table |
+| E6 | Secrets inventory, and admin keys kept apart from runtime keys | §4 environment table, DEM-13, DEM-14 |
 | E7 | Cortex docs spell the content type both `suggestion` and `suggestions` | CTX-02 |
 | E8 | The self-check fix can collide with the six-call cap | §7, FIX-04 |
 | E9 | Account setup was console and Snowsight clicks with secrets copied by hand, and the MCP Query API endpoint's role binding had no check | OWNER D-55, SET-01 to SET-07 |
