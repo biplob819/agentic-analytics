@@ -14,7 +14,7 @@ from dataclasses import asdict, fields
 from pathlib import Path
 from typing import Any
 
-from agentic_analytics.cost import AgentAssumptions
+from agentic_analytics.cost import AgentAssumptions, run_fixsets
 from agentic_analytics.schemas import (
     ENGINE_OF,
     FIX_NAMES,
@@ -84,8 +84,8 @@ def parse_fixes(spec: str) -> tuple[FixName, ...]:
 
 
 def fixsets(cfg: RunConfig) -> tuple[tuple[FixName, ...], ...]:
-    """The baseline, then each configured fix alone."""
-    return ((), *((f,) for f in cfg.fixes))
+    """The fix sets a run asks: see `cost.run_fixsets`, which the estimate shares."""
+    return run_fixsets(cfg)
 
 
 def with_overrides(

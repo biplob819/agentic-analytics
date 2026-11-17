@@ -850,3 +850,27 @@ def test_score_events_carry_the_same_cache_key_as_their_ask(tmp_path):
     asks = {e["job"]: e["cache_key"] for e in events if e["event"] == "ask"}
     scores = {e["job"]: e["cache_key"] for e in events if e["event"] == "score"}
     assert asks and asks == scores
+
+
+def test_fix_all_adds_one_all_together_set_and_the_estimate_counts_it():
+    """§7 and D-34: `--fix all` asks each fix alone and all fixes together, never pairs."""
+    from agentic_analytics.cost import estimate_run
+    from agentic_analytics.run.config import fixsets, parse_fixes, with_overrides
+    from tests.run.world import config
+
+    cfg = config()
+    every = with_overrides(cfg, fixes=parse_fixes("all"))
+    assert fixsets(every) == (
+        (),
+        ("descriptions",),
+        ("examples",),
+        ("self_check",),
+        ("descriptions", "examples", "self_check"),
+    )
+    two = with_overrides(cfg, fixes=parse_fixes("descriptions,examples"))
+    assert fixsets(two) == ((), ("descriptions",), ("examples",))
+    none = with_overrides(cfg, fixes=())
+    mcp = {ln.backend: ln.asks for ln in estimate_run(every, 10).lines}
+    base = {ln.backend: ln.asks for ln in estimate_run(none, 10).lines}
+    for backend, asks in base.items():
+        assert mcp[backend] == (5 * asks if backend != "cortex_analyst" else asks)

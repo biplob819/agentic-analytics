@@ -13,12 +13,12 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from importlib import resources
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 from evalkit.cost import Price, call_cost, load_prices, price_for
 
-from agentic_analytics.schemas import MCP_BACKENDS, RunConfig
+from agentic_analytics.schemas import FIX_NAMES, MCP_BACKENDS, FixName, RunConfig
 
 
 def _money(x: float, what: str) -> float:
@@ -140,6 +140,17 @@ def agent_question_cost(price: Price, a: AgentAssumptions) -> float:
     return per_turn * a.turns
 
 
+def run_fixsets(cfg: RunConfig) -> tuple[tuple[FixName, ...], ...]:
+    """The baseline, then each configured fix alone, then, when every fix is configured
+    (`--fix all`), all fixes together: §7 records an `all` run, never a headline figure, and
+    D-34 puts it in the Holm family. Two-fix combinations are never run (D-34)."""
+    fixes = cast("tuple[FixName, ...]", tuple(cfg.fixes))
+    sets: list[tuple[FixName, ...]] = [(), *((f,) for f in fixes)]
+    if fixes == FIX_NAMES:
+        sets.append(fixes)
+    return tuple(sets)
+
+
 def estimate_run(
     cfg: RunConfig,
     n_questions: int,
@@ -158,7 +169,7 @@ def estimate_run(
     prices = prices if prices is not None else model_prices()
     rates = rates if rates is not None else credit_rates()
     assumptions = assumptions or {}
-    fixsets = 1 + len(cfg.fixes)
+    fixsets = len(run_fixsets(cfg))  # the baseline, each fix alone and `all` (run/config.py)
     lines: list[EstimateLine] = []
     unverified = sorted(k for k, r in rates.items() if not r.verified)
     agent_asks = 0

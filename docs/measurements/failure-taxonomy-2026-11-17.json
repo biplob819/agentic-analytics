@@ -1,0 +1,335 @@
+{
+  "schema_version": "1.0",
+  "kind": "failure_taxonomy",
+  "node": "F3.2",
+  "criterion": "FXR-03",
+  "source_run": "rescore-20261117T110127Z-c89eaa",
+  "labelled_by": "independent agent (Claude), read by hand from records, SQL and gold",
+  "taxonomy": [
+    "wrong_filter",
+    "wrong_column_or_join",
+    "wrong_aggregation",
+    "literal_case",
+    "time_anchoring",
+    "missed_clarification",
+    "other"
+  ],
+  "items": [
+    {
+      "question": "q-002",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "aggregation",
+      "primary": "wrong_aggregation",
+      "secondary": [],
+      "evidence": "Used ClickHouse's approximate median(price) and got 282,000 against the exact gold quantileExactInclusive median of 280,000 (0.71% off, outside the 0.5% tolerance); trials 2 and 3 with the same SQL happened to return 280,000 and passed."
+    },
+    {
+      "question": "q-014",
+      "backend": "claude_mcp",
+      "trial": 2,
+      "category": "aggregation",
+      "primary": "wrong_aggregation",
+      "secondary": [],
+      "evidence": "Filters match the gold (leasehold, terraced/semi-detached/detached, 2024) but approximate median(price) returned 195,000 against the exact gold 193,000 (1.04% off); all three trials fail this way (194,000 / 195,000 / 195,000)."
+    },
+    {
+      "question": "q-022",
+      "backend": "claude_mcp",
+      "trial": 2,
+      "category": "time",
+      "primary": "wrong_aggregation",
+      "secondary": [],
+      "evidence": "Same month/median shape as the gold but approximate median(price) gives e.g. January 280,000 vs gold 275,000 and August 280,250 vs gold 285,000 (1.7-1.8% off); the other two trials fail the same way with an extra count column."
+    },
+    {
+      "question": "q-032",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "time",
+      "primary": "wrong_aggregation",
+      "secondary": [],
+      "evidence": "Correct flat filter and 2015-2024 range, but approximate median(price) returned 2015 = 186,000 vs gold 188,995 and 2016 = 205,000 vs gold 200,000 (1.6% and 2.5% off); all three trials fail."
+    },
+    {
+      "question": "q-040",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "time",
+      "primary": "other",
+      "secondary": [
+        "wrong_filter"
+      ],
+      "evidence": "Submitted a whole-table diagnostic query (select min(date), max(date), count() from uk.uk_price_paid -> 1995-01-01, 2026-09-30, 31,702,685) as the final SQL instead of the 1993 query, so the scored result is one non-empty row although the written answer correctly says 1993 has no data (kept wrong by OWNER D-89 (2)); trials 2 and 3 submitted the 1993 query and passed."
+    },
+    {
+      "question": "q-044",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "geography",
+      "primary": "wrong_aggregation",
+      "secondary": [],
+      "evidence": "County filter (upper(county) IN (...)) and year are right, but approximate median(price) gave West Yorkshire 199,995 vs gold 196,870 (1.59% off); trials 2 and 3 miss on Greater London (505,000 vs 511,000, 1.2%)."
+    },
+    {
+      "question": "q-074",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "top_n",
+      "primary": "wrong_aggregation",
+      "secondary": [],
+      "evidence": "Right top 4 counties and HAVING c>=1000, but approximate median(price) gave Surrey 490,000 vs gold 487,250 (0.56%, just outside the 0.5% tolerance); trial 3 also has Greater London 515,000 vs 511,000."
+    },
+    {
+      "question": "q-089",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "yoy",
+      "primary": "wrong_aggregation",
+      "secondary": [],
+      "evidence": "Anchored correctly (2024 and 2025 against as-of 2026-08-31) but approximate median(price) gave 2025 = 290,000 vs gold 285,000 and pct_change 2.84 vs gold 1.79; all three trials miss (290,750 / 288,000 for 2025)."
+    },
+    {
+      "question": "q-095",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "yoy",
+      "primary": "wrong_aggregation",
+      "secondary": [],
+      "evidence": "Used medianExactIf, a non-interpolating exact median, giving 2024 = 409,995 vs the gold's interpolated 409,497.5 (within tolerance) but pct_change -1.21 vs gold -1.326 (outside 0.5% rel / 0.01 abs); trial 3 with median() returned 409,497.5 and passed."
+    },
+    {
+      "question": "q-098",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "yoy",
+      "primary": "wrong_filter",
+      "secondary": [
+        "wrong_aggregation"
+      ],
+      "evidence": "Returned the 2019 base year as an extra row (WHERE date >= '2019-01-01' with no outer filter to 2020-2024: 6 rows vs gold 5, pct_change null) and its approximate median(price) values also miss (2020 = 225,000 vs gold 220,623)."
+    },
+    {
+      "question": "q-106",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Answered with median_l12m 220,000 and median_all 149,950 (\"I took 'typical' to mean the median\") with clarification null, instead of asking which measure and period the question meant."
+    },
+    {
+      "question": "q-111",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Guessed \"biggest\" = most recorded sales over the whole table (LONDON, 2,401,712 sales) and answered, with clarification null, where the question needs to ask whether size means sales, postcode districts or value."
+    },
+    {
+      "question": "q-114",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Read \"how did the market do\" as UK sales/average/median 2023 vs 2022 (861,782 vs 1,077,406 sales) and answered with clarification null; it offered to rerun but did not ask back."
+    },
+    {
+      "question": "q-117",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Chose average price in 2025 with HAVING sales>=100 (Greater London 768,931) and answered, noting that by median Windsor and Maidenhead (530,000) leads instead, with clarification null."
+    },
+    {
+      "question": "q-120",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Answered with 2025 new-build vs existing means and medians (median 346,746 vs 280,000) with clarification null, instead of asking about measure, period and property type."
+    },
+    {
+      "question": "q-102",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Returned average and median by type for (town = 'LONDON' OR county = 'GREATER LONDON') over all years to 2026-08-31, including flats and 'other' in a 'house' question, with no suggestions block (no clarification)."
+    },
+    {
+      "question": "q-103",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Ranked districts by all-time average_price (CITY OF LONDON 2,229,150 first, LIMIT 10) without a suggestions block, guessing both the area level and the measure."
+    },
+    {
+      "question": "q-104",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Returned 32 rows of all-year YoY changes in average, median and count (2026 vs 2025 average -8.1%) with no suggestions block, rather than asking which period and measure 'recently' means."
+    },
+    {
+      "question": "q-105",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Returned an all-time summary for town = 'MANCHESTER' (521,526 sales, median 120,500) with no suggestions block, guessing town over Greater Manchester and all years over a period."
+    },
+    {
+      "question": "q-106",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Returned the all-time flat median 150,000 (METRICS median_price WHERE type = 'flat') with no suggestions block, rather than asking which measure and period 'typical' means."
+    },
+    {
+      "question": "q-107",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Returned the all-time count of is_new = 1 sales (3,303,172) with no suggestions block, rather than asking for the period."
+    },
+    {
+      "question": "q-110",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Returned count, average, median and total value by type for all years (e.g. terraced 9,374,895 sales, median 123,500) with no suggestions block, rather than asking what to compare and for when."
+    },
+    {
+      "question": "q-113",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Returned the mean, 400,441.04, which equals the pack's first interpretation exactly, but without a suggestions block; the question is pre-registered as clarify-expected (average vs median vs by type)."
+    },
+    {
+      "question": "q-115",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Returned 380 monthly all-time average prices (1995-01 = 68,393 onward) with no suggestions block, rather than asking for the measure and the granularity."
+    },
+    {
+      "question": "q-101",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Picked town = 'LEEDS' and 2025 (average 325,239.68, 10,900 sales) with clarification null, where the pack also accepts district = 'LEEDS' and the median as readings and expects a question back."
+    },
+    {
+      "question": "q-101",
+      "backend": "gpt_mcp",
+      "trial": 2,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Same guess as trial 1 (town = 'LEEDS', 2025, average 325,239.68) with an extra town column; clarification null on all three trials."
+    },
+    {
+      "question": "q-118",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Took 'last month' as July 2026 against as-of 2026-08-31 (296 York sales) and answered with clarification null, where the pack's interpretations differ (August 2026 to date vs July 2026)."
+    },
+    {
+      "question": "q-118",
+      "backend": "gpt_mcp",
+      "trial": 2,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Identical SQL and answer to trial 1 (July 2026, 296 York sales), clarification null; the guess is repeatable rather than random."
+    },
+    {
+      "question": "q-119",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Answered with a trailing 12-month window 2025-09-01 to 2026-08-31 for Surrey detached (median 822,500 via quantileExact, mean 991,989) with clarification null, guessing period and measure."
+    },
+    {
+      "question": "q-119",
+      "backend": "gpt_mcp",
+      "trial": 2,
+      "category": "ambiguous",
+      "primary": "missed_clarification",
+      "secondary": [],
+      "evidence": "Same trailing 12-month guess as trial 1 (median 822,500, 4,294 sales), clarification null, rather than asking for the period and measure."
+    }
+  ],
+  "counts": {
+    "claude_mcp": {
+      "wrong_filter": 1,
+      "wrong_column_or_join": 0,
+      "wrong_aggregation": 8,
+      "literal_case": 0,
+      "time_anchoring": 0,
+      "missed_clarification": 5,
+      "other": 1,
+      "total": 15
+    },
+    "cortex_analyst": {
+      "wrong_filter": 0,
+      "wrong_column_or_join": 0,
+      "wrong_aggregation": 0,
+      "literal_case": 0,
+      "time_anchoring": 0,
+      "missed_clarification": 9,
+      "other": 0,
+      "total": 9
+    },
+    "gpt_mcp": {
+      "wrong_filter": 0,
+      "wrong_column_or_join": 0,
+      "wrong_aggregation": 0,
+      "literal_case": 0,
+      "time_anchoring": 0,
+      "missed_clarification": 6,
+      "other": 0,
+      "total": 6
+    },
+    "all": {
+      "wrong_filter": 1,
+      "wrong_column_or_join": 0,
+      "wrong_aggregation": 8,
+      "literal_case": 0,
+      "time_anchoring": 0,
+      "missed_clarification": 20,
+      "other": 1,
+      "total": 30
+    }
+  }
+}
