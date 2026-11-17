@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "kind": "snowflake_metered_usage",
+  "read_at": "2026-11-17T09:56:00Z",
+  "source": "SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY and CORTEX_ANALYST_USAGE_HISTORY, hourly buckets in UTC, read as AA_ADMIN_USER with SYSADMIN",
+  "hours": {
+    "2026-11-17T07:00Z": {
+      "run": "smoke-20261117T070039Z-769d2c",
+      "cortex_credits": 0.804,
+      "cortex_requests": 12,
+      "warehouse_credits": 0.034974167
+    },
+    "2026-11-17T08:00Z": {
+      "run": "run-20261117T083854Z-c89eaa (baseline)",
+      "cortex_credits": 22.311,
+      "cortex_requests": 333,
+      "warehouse_credits": 0.313194458
+    },
+    "2026-11-17T09:00Z": {
+      "run": "demo-cache-20261117T095454Z-6269cd5d plus one live guard test ask (partial hour, still filling)",
+      "cortex_credits": 0.737,
+      "cortex_requests": 11,
+      "warehouse_credits": 0.000159723
+    }
+  },
+  "baseline_reconcile_credits": {
+    "snowflake": 0.313194458,
+    "clickhouse": 0.0
+  },
+  "notes": "The fix runs (08:56-09:41 UTC) asked only the MCP agents, so they used no Snowflake. ClickHouse Cloud is on a trial that does not bill in credits, so its side is recorded as 0.0 credits (its compute is not costed). The ledger's Cortex credits for the baseline (333 messages x 0.067 = 22.311) equal the metered value exactly. `agentic-analytics reconcile` takes WAREHOUSE credits only (it allocates them over records by warehouse time); Cortex message credits are counted separately from each record's cortex_messages, so the baseline's reconcile file is the 08:00 hour's warehouse credits (0.313) and the run's Snowflake total is 0.313 + 22.311 = 22.624, equal to the metered total."
+}

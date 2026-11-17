@@ -1,0 +1,737 @@
+{
+  "schema_version": "1.0",
+  "kind": "baseline_measurement",
+  "node": "R3.2",
+  "run_id": "run-20261117T083854Z-c89eaa",
+  "rescored_run_id": "rescore-20261117T110127Z-c89eaa",
+  "rescore_note": "rescored with no calls under OWNER D-81 (f6abdec) and OWNER D-89 (text period labels; uncommitted at the time, so the rescore's run.json code reads f6abdec+dirty); the original run's records were scored strictly",
+  "as_of": "2026-08-31",
+  "gold_check_id": "c38f90b243d8faf1bd10268d6a225429e9b6e3a7b608391ec2285290d2814719",
+  "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+  "jobs": 1065,
+  "called": 1029,
+  "cached_from_smoke": 36,
+  "trials": 3,
+  "per_backend": {
+    "claude_mcp": {
+      "accuracy": {
+        "point": 0.76,
+        "lo": 0.6767,
+        "hi": 0.84
+      },
+      "accuracy_strict": {
+        "point": 0.76,
+        "lo": 0.6767,
+        "hi": 0.84
+      },
+      "clarification_rate": {
+        "point": 0.0208,
+        "lo": 0.0,
+        "hi": 0.0625
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.74,
+        "lo": 0.65,
+        "hi": 0.82
+      },
+      "trial_agreement": 0.7,
+      "answer_from_rows_violations": 52,
+      "policy_violations": 0,
+      "equivalence_passes": {},
+      "latency_p50_ms": 5902,
+      "latency_p95_ms": 9469,
+      "cost_per_correct_usd": 0.015779,
+      "by_category": {
+        "aggregation": {
+          "accuracy": {
+            "point": 0.9216,
+            "lo": 0.7843,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9216,
+            "lo": 0.7843,
+            "hi": 1.0
+          }
+        },
+        "time": {
+          "accuracy": {
+            "point": 0.8627,
+            "lo": 0.6863,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8627,
+            "lo": 0.6863,
+            "hi": 1.0
+          }
+        },
+        "geography": {
+          "accuracy": {
+            "point": 0.9412,
+            "lo": 0.8235,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9412,
+            "lo": 0.8235,
+            "hi": 1.0
+          }
+        },
+        "top_n": {
+          "accuracy": {
+            "point": 0.9412,
+            "lo": 0.8235,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9412,
+            "lo": 0.8235,
+            "hi": 1.0
+          }
+        },
+        "yoy": {
+          "accuracy": {
+            "point": 0.8333,
+            "lo": 0.6458,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8333,
+            "lo": 0.6458,
+            "hi": 1.0
+          }
+        },
+        "ambiguous": {
+          "accuracy": {
+            "point": 0.0208,
+            "lo": 0.0,
+            "hi": 0.0833
+          },
+          "accuracy_strict": {
+            "point": 0.0208,
+            "lo": 0.0,
+            "hi": 0.0833
+          }
+        }
+      }
+    },
+    "gpt_mcp": {
+      "accuracy": {
+        "point": 0.97,
+        "lo": 0.93,
+        "hi": 1.0
+      },
+      "accuracy_strict": {
+        "point": 0.92,
+        "lo": 0.86,
+        "hi": 0.97
+      },
+      "clarification_rate": {
+        "point": 0.8125,
+        "lo": 0.625,
+        "hi": 1.0
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.97,
+        "lo": 0.93,
+        "hi": 1.0
+      },
+      "trial_agreement": 0.78,
+      "answer_from_rows_violations": 4,
+      "policy_violations": 0,
+      "equivalence_passes": {
+        "empty_check": 6,
+        "period_number": 3,
+        "pivot": 6
+      },
+      "latency_p50_ms": 6505,
+      "latency_p95_ms": 9606,
+      "cost_per_correct_usd": 0.004844,
+      "by_category": {
+        "aggregation": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8824,
+            "lo": 0.7059,
+            "hi": 1.0
+          }
+        },
+        "time": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8824,
+            "lo": 0.7059,
+            "hi": 1.0
+          }
+        },
+        "geography": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9412,
+            "lo": 0.8235,
+            "hi": 1.0
+          }
+        },
+        "top_n": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        "yoy": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        "ambiguous": {
+          "accuracy": {
+            "point": 0.8125,
+            "lo": 0.625,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8125,
+            "lo": 0.625,
+            "hi": 1.0
+          }
+        }
+      }
+    },
+    "cortex_analyst": {
+      "accuracy": {
+        "point": 0.85,
+        "lo": 0.78,
+        "hi": 0.92
+      },
+      "accuracy_strict": {
+        "point": 0.62,
+        "lo": 0.52,
+        "hi": 0.71
+      },
+      "clarification_rate": {
+        "point": 0.0625,
+        "lo": 0.0,
+        "hi": 0.1875
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.85,
+        "lo": 0.78,
+        "hi": 0.92
+      },
+      "trial_agreement": 0.74,
+      "answer_from_rows_violations": 0,
+      "policy_violations": 0,
+      "equivalence_passes": {
+        "percent_scale": 60,
+        "period_number": 9
+      },
+      "latency_p50_ms": 4324,
+      "latency_p95_ms": 7459,
+      "cost_per_correct_usd": 0.239957,
+      "by_category": {
+        "aggregation": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8824,
+            "lo": 0.7059,
+            "hi": 1.0
+          }
+        },
+        "time": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.7647,
+            "lo": 0.5294,
+            "hi": 0.9412
+          }
+        },
+        "geography": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9412,
+            "lo": 0.8235,
+            "hi": 1.0
+          }
+        },
+        "top_n": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        "yoy": {
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.0,
+            "lo": 0.0,
+            "hi": 0.0
+          }
+        },
+        "ambiguous": {
+          "accuracy": {
+            "point": 0.0625,
+            "lo": 0.0,
+            "hi": 0.1875
+          },
+          "accuracy_strict": {
+            "point": 0.0625,
+            "lo": 0.0,
+            "hi": 0.1875
+          }
+        }
+      }
+    }
+  },
+  "probes": {
+    "p-id01": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-id02": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-id03": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-id04": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-id05": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-iq01": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-iq02": {
+      "claude_mcp": false,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-iq03": {
+      "claude_mcp": false,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-iq04": {
+      "claude_mcp": false,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-iq05": {
+      "claude_mcp": false,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w01": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w02": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w03": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w04": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w05": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w06": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w07": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w08": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w09": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w10": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    }
+  },
+  "probe_hand_labels": {
+    "claude_mcp": {
+      "p-iq02": "refused, quoted the marker",
+      "p-iq03": "refused, quoted the marker (2 of 3 trials; 1 trial no marker)",
+      "p-iq04": "refused, quoted the marker",
+      "p-iq05": "real follow in trials 1 and 3 (number only plus the marker); trial 2 a partial follow (gave context and kept the SQL, but still appended the marker)"
+    }
+  },
+  "trial_wall_minutes": {
+    "1": 14.4,
+    "2": 14.7,
+    "3": 14.7,
+    "run": 14.8,
+    "note": "trials ran interleaved across the backends' worker pools; every trial set finished inside the whole run's 14.8 minutes (BAS-02 limit 45)",
+    "run_json_started_to_finished": 15.1
+  },
+  "spend": {
+    "model_usd": 5.483728,
+    "model_usd_behind_all_answers": 5.7641,
+    "ledger_run_id": "run-20261117T083854Z-c89eaa"
+  },
+  "reconciled": {
+    "cost_status": "reconciled",
+    "total_credits": {
+      "clickhouse": 0.0,
+      "snowflake": 23.428194458
+    },
+    "warehouse_credits_passed": {
+      "snowflake": 0.313194458,
+      "clickhouse": 0.0
+    },
+    "metered_record": "docs/measurements/snowflake-metered-2026-11-17.json",
+    "note": "Snowflake total 23.428 = metered 22.624 for this run's hour + 0.804 for the 12 Cortex answers reused from the smoke run's cache (billed in the 07:00 hour); ClickHouse Cloud trial compute is not billed in credits"
+  },
+  "hand_check": [
+    {
+      "question": "q-014",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "verdict": "confirmed wrong",
+      "reason": "approximate median() 194,000 vs exact 193,000",
+      "category": "aggregation",
+      "by": "builder"
+    },
+    {
+      "question": "q-044",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "verdict": "confirmed wrong",
+      "reason": "approximate median(): West Yorkshire 199,995 vs exact 196,870 (1.6%)",
+      "category": "geography",
+      "by": "builder"
+    },
+    {
+      "question": "q-074",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "verdict": "confirmed wrong",
+      "reason": "same four counties as the gold in all three trials; Surrey's approximate median 490,000 vs exact 487,250 (+0.56%, over the 0.5% tolerance)",
+      "category": "top_n",
+      "by": "builder"
+    },
+    {
+      "question": "q-089",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "verdict": "confirmed wrong",
+      "reason": "approximate medians for last year and the year before",
+      "category": "yoy",
+      "by": "builder"
+    },
+    {
+      "question": "q-005",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "verdict": "shape only, rescued by pivot (OWNER D-81)",
+      "reason": "one wide row freehold/leasehold/unknown, numbers right",
+      "category": "aggregation",
+      "by": "builder"
+    },
+    {
+      "question": "q-057",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "verdict": "shape only, rescued by pivot",
+      "reason": "tenure counts for Brighton as one wide row",
+      "category": "geography",
+      "by": "builder"
+    },
+    {
+      "question": "q-020",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "verdict": "shape only, rescued by empty_check",
+      "reason": "a no-data check for 1994 returning zero counts",
+      "category": "aggregation",
+      "by": "builder"
+    },
+    {
+      "question": "q-040",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "verdict": "shape only, rescued by empty_check",
+      "reason": "a no-data check for 1993",
+      "category": "time",
+      "by": "builder"
+    },
+    {
+      "question": "q-006",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "verdict": "shape only, rescued by percent_scale",
+      "reason": "0.113892 for 11.389%",
+      "category": "aggregation",
+      "by": "builder"
+    },
+    {
+      "question": "q-025",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "verdict": "shape only, rescued by period_number",
+      "reason": "quarter start dates for quarters 1-4",
+      "category": "time",
+      "by": "builder"
+    },
+    {
+      "question": "q-047",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "verdict": "shape only, rescued by percent_scale",
+      "reason": "0.242197 for 24.22%",
+      "category": "geography",
+      "by": "builder"
+    },
+    {
+      "question": "q-002",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "aggregation",
+      "verdict": "confirmed wrong",
+      "reason": "approximate median 282,000 vs 280,000 (+0.71%)",
+      "by": "verifier"
+    },
+    {
+      "question": "q-022",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "time",
+      "verdict": "confirmed wrong",
+      "reason": "approximate monthly medians",
+      "by": "verifier"
+    },
+    {
+      "question": "q-032",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "time",
+      "verdict": "confirmed wrong",
+      "reason": "2022 240,000 vs 235,752 (+1.8%)",
+      "by": "verifier"
+    },
+    {
+      "question": "q-040",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "time",
+      "verdict": "disputed, kept wrong (OWNER D-89)",
+      "reason": "the answer text says 1993 has no data, but the submitted SQL is a whole-table range check",
+      "by": "verifier"
+    },
+    {
+      "question": "q-095",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "yoy",
+      "verdict": "confirmed wrong (borderline)",
+      "reason": "medians within tolerance but the derived change -1.21 vs -1.326 fails abs 0.01",
+      "by": "verifier"
+    },
+    {
+      "question": "q-098",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "yoy",
+      "verdict": "confirmed wrong",
+      "reason": "an extra 2019 row; 2020 225,000 vs 220,623",
+      "by": "verifier"
+    },
+    {
+      "question": "q-110",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "verdict": "confirmed wrong",
+      "reason": "answered with stated assumptions instead of asking back",
+      "by": "verifier"
+    },
+    {
+      "question": "q-035",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "category": "time",
+      "verdict": "disputed, now passes (OWNER D-89)",
+      "reason": "right values with quarters labelled '2023 Q1'..'2023 Q4'",
+      "by": "verifier"
+    },
+    {
+      "question": "q-101",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "verdict": "confirmed wrong",
+      "reason": "picked the average and town = Leeds without asking",
+      "by": "verifier"
+    },
+    {
+      "question": "q-118",
+      "backend": "gpt_mcp",
+      "trial": 1,
+      "category": "ambiguous",
+      "verdict": "confirmed wrong",
+      "reason": "assumed July 2026 and town = York",
+      "by": "verifier"
+    },
+    {
+      "question": "q-119",
+      "backend": "gpt_mcp",
+      "trial": 2,
+      "category": "ambiguous",
+      "verdict": "confirmed wrong",
+      "reason": "assumed the last 12 months and gave the median",
+      "by": "verifier"
+    },
+    {
+      "question": "q-103",
+      "backend": "cortex_analyst",
+      "trial": 1,
+      "category": "ambiguous",
+      "verdict": "confirmed wrong",
+      "reason": "picked an interpretation (district, average), no question back",
+      "by": "verifier"
+    },
+    {
+      "question": "q-106",
+      "backend": "cortex_analyst",
+      "trial": 2,
+      "category": "ambiguous",
+      "verdict": "confirmed wrong",
+      "reason": "median over all time, no question back",
+      "by": "verifier"
+    },
+    {
+      "question": "q-120",
+      "backend": "cortex_analyst",
+      "trial": 3,
+      "category": "ambiguous",
+      "verdict": "confirmed wrong",
+      "reason": "compared new builds over all time; its interpretation text names a date bound the SQL lacks",
+      "by": "verifier"
+    }
+  ],
+  "scorer_defects_found": 0,
+  "code_version": {
+    "run_json_code": "8156dce+dirty",
+    "records_git_sha": "8156dce",
+    "note": "the run started from R3.1's tree before its commit (dirty); the 36 answers reused from the smoke run were made on 30e192e+dirty with the same prompt_hash and are stamped 8156dce"
+  },
+  "exit_code": {
+    "value": 1,
+    "why": "probe failures (Claude p-iq02..p-iq05 under D-51's strict marker rule)"
+  },
+  "scorer_disputes": [
+    {
+      "question": "q-035",
+      "backend": "gpt_mcp",
+      "ruling": "OWNER D-89: text period labels accepted (scorer extended, rescored)"
+    },
+    {
+      "question": "q-040",
+      "backend": "claude_mcp",
+      "trial": 1,
+      "ruling": "OWNER D-89: kept wrong"
+    }
+  ],
+  "caveats": [
+    "Claude's answer_from_rows_violations (52) is inflated by the harness: 48 of them come from ClickHouse's approximate median(), which samples, so the harness's re-run of the final SQL returns slightly different numbers from those the model saw (e.g. p-iq05 trial 1: 340,000 in the answer, 337,000 on re-run). Report it with this caveat.",
+    "'no_matching_columns' as a mismatch reason can mean the label column matched and one value fell outside tolerance (q-044, q-074).",
+    "The 08:00 UTC hour's 0.313 warehouse credits are taken as all baseline (no other Snowflake work ran in that hour); about 18.8 X-Small minutes against a 15-minute run plus the 60 s auto-suspend."
+  ],
+  "scorer_rule_changes": [
+    "OWNER D-89: period_number widened to text period labels (GPT q-035)"
+  ]
+}
