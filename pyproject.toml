@@ -12,8 +12,8 @@ dependencies = [
     "pyyaml>=6",
     "anthropic>=2.8",
     "openai>=3.51",
-    # D-24: exact pin until evalkit-harness v0.1.0 is on PyPI
-    "evalkit-harness @ git+https://github.com/biplob819/evalkit@06591f8de9b178078c971940a83019a6530fd119",
+    # D-2, D-97: exact pin on the PyPI release (tag v0.3.0, commit 4ddfef5)
+    "evalkit-harness==0.3.0",
     "mcp>=1.10",
     "sqlglot>=26",
     "clickhouse-connect>=0.8",

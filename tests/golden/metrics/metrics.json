@@ -1,0 +1,2259 @@
+{
+  "schema_version": "metrics-1",
+  "project": "agentic-analytics",
+  "run_id": "golden",
+  "created_at": "2026-11-15T12:00:00+00:00",
+  "simulated": false,
+  "provenance": {
+    "code_version": "0000000",
+    "snapshot": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
+    "config_hash": "67b124c104f52eed7f53828f9e01a299f13db13fde487cb06fc754fb690f4bcf",
+    "evalkit": "0.3.0"
+  },
+  "metrics": [
+    {
+      "name": "accuracy",
+      "unit": "rate",
+      "value": 0.611111111111111,
+      "n": 12,
+      "ci_low": 0.3611111111111111,
+      "ci_high": 0.8611111111111112,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "accuracy_strict",
+      "unit": "rate",
+      "value": 0.611111111111111,
+      "n": 12,
+      "ci_low": 0.3611111111111111,
+      "ci_high": 0.8611111111111112,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.3333333333333333,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.8333333333333333,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.3333333333333333,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.8333333333333333,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.3333333333333333,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.6666666666666666,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.3333333333333333,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.6666666666666666,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "clarification_rate",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "false_clarification_rate",
+      "unit": "rate",
+      "value": 0.1,
+      "n": 10,
+      "ci_low": 0.0,
+      "ci_high": 0.3,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "pass_all_trials",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 12,
+      "ci_low": 0.25,
+      "ci_high": 0.75,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "trial_agreement",
+      "unit": "rate",
+      "value": 0.75,
+      "n": 12,
+      "k": 9,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "answer_from_rows_violations",
+      "unit": "count",
+      "value": 3,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "policy_violations",
+      "unit": "count",
+      "value": 0,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "cost_per_correct",
+      "unit": "USD",
+      "value": 0.01187181818181818,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "latency_p50",
+      "unit": "ms",
+      "value": 1348,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "latency_p95",
+      "unit": "ms",
+      "value": 2677,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "step_efficiency.tool_calls_mean",
+      "unit": "ratio",
+      "value": 0.75,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "step_efficiency.min_tool_calls_mean",
+      "unit": "ratio",
+      "value": 0.8333333333333334,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "step_efficiency.excess_mean",
+      "unit": "ratio",
+      "value": 0.0,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "step_efficiency.at_minimum",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "tokens_in_per_case",
+      "unit": "count",
+      "value": 4035.5,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "tokens_out_per_case",
+      "unit": "count",
+      "value": 284.5833333333333,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "tokens_reasoning_per_case",
+      "unit": "count",
+      "value": 0.0,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "tokens_cached_per_case",
+      "unit": "count",
+      "value": 2017.3333333333333,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "cache_hit_share",
+      "unit": "rate",
+      "value": 0.49989674967992404,
+      "n": 145278,
+      "k": 72624,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "cost_per_case",
+      "unit": "USD",
+      "value": 0.007254999999999999,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "system_cost",
+      "unit": "USD",
+      "value": 0.26117999999999997,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "latency_p99",
+      "unit": "ms",
+      "value": 2677,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "error_rate",
+      "unit": "rate",
+      "value": 0.0,
+      "n": 36,
+      "k": 0,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "accuracy",
+      "unit": "rate",
+      "value": 0.6666666666666666,
+      "n": 12,
+      "ci_low": 0.4166666666666667,
+      "ci_high": 0.9166666666666666,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "accuracy_strict",
+      "unit": "rate",
+      "value": 0.6666666666666666,
+      "n": 12,
+      "ci_low": 0.4166666666666667,
+      "ci_high": 0.9166666666666666,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.6666666666666666,
+      "n": 2,
+      "ci_low": 0.16666666666666666,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.6666666666666666,
+      "n": 2,
+      "ci_low": 0.16666666666666666,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.3333333333333333,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.8333333333333333,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.3333333333333333,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.8333333333333333,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "clarification_rate",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "false_clarification_rate",
+      "unit": "rate",
+      "value": 0.1,
+      "n": 10,
+      "ci_low": 0.0,
+      "ci_high": 0.3,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "pass_all_trials",
+      "unit": "rate",
+      "value": 0.5833333333333334,
+      "n": 12,
+      "ci_low": 0.3333333333333333,
+      "ci_high": 0.8333333333333334,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "trial_agreement",
+      "unit": "rate",
+      "value": 0.8333333333333334,
+      "n": 12,
+      "k": 10,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "answer_from_rows_violations",
+      "unit": "count",
+      "value": 3,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "policy_violations",
+      "unit": "count",
+      "value": 0,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "cost_per_correct",
+      "unit": "USD",
+      "value": 0.011796000000000001,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "latency_p50",
+      "unit": "ms",
+      "value": 1347,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "latency_p95",
+      "unit": "ms",
+      "value": 2677,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "step_efficiency.tool_calls_mean",
+      "unit": "ratio",
+      "value": 0.75,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "step_efficiency.min_tool_calls_mean",
+      "unit": "ratio",
+      "value": 0.8333333333333334,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "step_efficiency.excess_mean",
+      "unit": "ratio",
+      "value": 0.0,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "step_efficiency.at_minimum",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "tokens_in_per_case",
+      "unit": "count",
+      "value": 3960.8333333333335,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "tokens_out_per_case",
+      "unit": "count",
+      "value": 288.75,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "tokens_reasoning_per_case",
+      "unit": "count",
+      "value": 0.0,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "tokens_cached_per_case",
+      "unit": "count",
+      "value": 1980.0,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "cache_hit_share",
+      "unit": "rate",
+      "value": 0.4998948032821376,
+      "n": 142590,
+      "k": 71280,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "cost_per_case",
+      "unit": "USD",
+      "value": 0.007864000000000001,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "system_cost",
+      "unit": "USD",
+      "value": 0.283104,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "latency_p99",
+      "unit": "ms",
+      "value": 2677,
+      "n": 36,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "error_rate",
+      "unit": "rate",
+      "value": 0.0,
+      "n": 36,
+      "k": 0,
+      "labels": {
+        "model": "claude_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-15"
+      }
+    },
+    {
+      "name": "accuracy",
+      "unit": "rate",
+      "value": 0.5833333333333334,
+      "n": 12,
+      "ci_low": 0.3055555555555555,
+      "ci_high": 0.8333333333333334,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "accuracy_strict",
+      "unit": "rate",
+      "value": 0.5833333333333334,
+      "n": 12,
+      "ci_low": 0.3055555555555555,
+      "ci_high": 0.8333333333333334,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.16666666666666666,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.6666666666666666,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.16666666666666666,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.6666666666666666,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.8333333333333333,
+      "n": 2,
+      "ci_low": 0.3333333333333333,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.8333333333333333,
+      "n": 2,
+      "ci_low": 0.3333333333333333,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "clarification_rate",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "false_clarification_rate",
+      "unit": "rate",
+      "value": 0.0,
+      "n": 10,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "pass_all_trials",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 12,
+      "ci_low": 0.25,
+      "ci_high": 0.75,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "trial_agreement",
+      "unit": "rate",
+      "value": 0.75,
+      "n": 12,
+      "k": 9,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "answer_from_rows_violations",
+      "unit": "count",
+      "value": 3,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "policy_violations",
+      "unit": "count",
+      "value": 0,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "errors",
+      "unit": "count",
+      "value": 3,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "kind": "answer.refusal"
+      }
+    },
+    {
+      "name": "cost_per_correct",
+      "unit": "USD",
+      "value": 0.013738714285714286,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "latency_p50",
+      "unit": "ms",
+      "value": 1701,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "latency_p95",
+      "unit": "ms",
+      "value": 2779,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "step_efficiency.tool_calls_mean",
+      "unit": "ratio",
+      "value": 0.8333333333333334,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "step_efficiency.min_tool_calls_mean",
+      "unit": "ratio",
+      "value": 0.8333333333333334,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "step_efficiency.excess_mean",
+      "unit": "ratio",
+      "value": 0.08333333333333333,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "step_efficiency.at_minimum",
+      "unit": "rate",
+      "value": 0.9166666666666666,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "tokens_in_per_case",
+      "unit": "count",
+      "value": 3784.1666666666665,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "tokens_out_per_case",
+      "unit": "count",
+      "value": 311.5,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "tokens_reasoning_per_case",
+      "unit": "count",
+      "value": 0.0,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "tokens_cached_per_case",
+      "unit": "count",
+      "value": 1891.6666666666667,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "cache_hit_share",
+      "unit": "rate",
+      "value": 0.4998898920942524,
+      "n": 136230,
+      "k": 68100,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "cost_per_case",
+      "unit": "USD",
+      "value": 0.00801425,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "system_cost",
+      "unit": "USD",
+      "value": 0.288513,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "latency_p99",
+      "unit": "ms",
+      "value": 2779,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "error_rate",
+      "unit": "rate",
+      "value": 0.08333333333333333,
+      "n": 36,
+      "k": 3,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "none",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "accuracy",
+      "unit": "rate",
+      "value": 0.7222222222222222,
+      "n": 12,
+      "ci_low": 0.47222222222222227,
+      "ci_high": 0.9166666666666666,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "accuracy_strict",
+      "unit": "rate",
+      "value": 0.7222222222222222,
+      "n": 12,
+      "ci_low": 0.47222222222222227,
+      "ci_high": 0.9166666666666666,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.8333333333333333,
+      "n": 2,
+      "ci_low": 0.3333333333333333,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.8333333333333333,
+      "n": 2,
+      "ci_low": 0.3333333333333333,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "clarification_rate",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "false_clarification_rate",
+      "unit": "rate",
+      "value": 0.0,
+      "n": 10,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "pass_all_trials",
+      "unit": "rate",
+      "value": 0.6666666666666666,
+      "n": 12,
+      "ci_low": 0.4166666666666667,
+      "ci_high": 0.9166666666666666,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "trial_agreement",
+      "unit": "rate",
+      "value": 0.8333333333333334,
+      "n": 12,
+      "k": 10,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "answer_from_rows_violations",
+      "unit": "count",
+      "value": 3,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "policy_violations",
+      "unit": "count",
+      "value": 0,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "errors",
+      "unit": "count",
+      "value": 3,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "kind": "answer.refusal"
+      }
+    },
+    {
+      "name": "cost_per_correct",
+      "unit": "USD",
+      "value": 0.010891384615384615,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "latency_p50",
+      "unit": "ms",
+      "value": 1701,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "latency_p95",
+      "unit": "ms",
+      "value": 2779,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "step_efficiency.tool_calls_mean",
+      "unit": "ratio",
+      "value": 0.8333333333333334,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "step_efficiency.min_tool_calls_mean",
+      "unit": "ratio",
+      "value": 0.8333333333333334,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "step_efficiency.excess_mean",
+      "unit": "ratio",
+      "value": 0.08333333333333333,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "step_efficiency.at_minimum",
+      "unit": "rate",
+      "value": 0.9166666666666666,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples"
+      }
+    },
+    {
+      "name": "tokens_in_per_case",
+      "unit": "count",
+      "value": 3940.75,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "tokens_out_per_case",
+      "unit": "count",
+      "value": 305.8333333333333,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "tokens_reasoning_per_case",
+      "unit": "count",
+      "value": 0.0,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "tokens_cached_per_case",
+      "unit": "count",
+      "value": 1970.0,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "cache_hit_share",
+      "unit": "rate",
+      "value": 0.49990484044915307,
+      "n": 141867,
+      "k": 70920,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "cost_per_case",
+      "unit": "USD",
+      "value": 0.007866,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "system_cost",
+      "unit": "USD",
+      "value": 0.283176,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "latency_p99",
+      "unit": "ms",
+      "value": 2779,
+      "n": 36,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "error_rate",
+      "unit": "rate",
+      "value": 0.08333333333333333,
+      "n": 36,
+      "k": 3,
+      "labels": {
+        "model": "gpt_mcp",
+        "fixes": "examples",
+        "mode": "live",
+        "price_date": "2026-11-14"
+      }
+    },
+    {
+      "name": "accuracy",
+      "unit": "rate",
+      "value": 0.75,
+      "n": 12,
+      "ci_low": 0.5,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "accuracy_strict",
+      "unit": "rate",
+      "value": 0.75,
+      "n": 12,
+      "ci_low": 0.5,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.5,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "aggregation"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "time"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "geography"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 0.0,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 0.0,
+      "n": 2,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "top_n"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "yoy"
+      }
+    },
+    {
+      "name": "accuracy_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "accuracy_strict_by_category",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "two-level percentile bootstrap over questions and trials, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "category": "ambiguous"
+      }
+    },
+    {
+      "name": "clarification_rate",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "ci_low": 1.0,
+      "ci_high": 1.0,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "false_clarification_rate",
+      "unit": "rate",
+      "value": 0.0,
+      "n": 10,
+      "ci_low": 0.0,
+      "ci_high": 0.0,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "pass_all_trials",
+      "unit": "rate",
+      "value": 0.75,
+      "n": 12,
+      "ci_low": 0.5,
+      "ci_high": 1.0,
+      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "trial_agreement",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 12,
+      "k": 12,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "answer_from_rows_violations",
+      "unit": "count",
+      "value": 0,
+      "n": 36,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "policy_violations",
+      "unit": "count",
+      "value": 0,
+      "n": 36,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "cost_per_correct",
+      "unit": "USD",
+      "value": 0.268,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "latency_p50",
+      "unit": "ms",
+      "value": 2400,
+      "n": 36,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "latency_p95",
+      "unit": "ms",
+      "value": 2400,
+      "n": 36,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none"
+      }
+    },
+    {
+      "name": "cost_per_case",
+      "unit": "USD",
+      "value": 0.20099999999999998,
+      "n": 36,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "mode": "live"
+      }
+    },
+    {
+      "name": "system_cost",
+      "unit": "USD",
+      "value": 7.236,
+      "n": 36,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "mode": "live"
+      }
+    },
+    {
+      "name": "latency_p99",
+      "unit": "ms",
+      "value": 2400,
+      "n": 36,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "mode": "live"
+      }
+    },
+    {
+      "name": "error_rate",
+      "unit": "rate",
+      "value": 0.0,
+      "n": 36,
+      "k": 0,
+      "labels": {
+        "model": "cortex_analyst",
+        "fixes": "none",
+        "mode": "live"
+      }
+    },
+    {
+      "name": "uplift",
+      "unit": "PP",
+      "value": 5.555555555555556,
+      "ci_low": -16.666666666666668,
+      "ci_high": 27.777777777777782,
+      "ci_method": "paired percentile bootstrap over shared questions, 2000 resamples, seed 7; Holm across fixes",
+      "labels": {
+        "model": "claude_mcp",
+        "fix": "examples"
+      }
+    },
+    {
+      "name": "uplift_p_value",
+      "unit": "ratio",
+      "value": 0.7056471764117941,
+      "labels": {
+        "model": "claude_mcp",
+        "fix": "examples"
+      }
+    },
+    {
+      "name": "uplift_separated",
+      "unit": "bool",
+      "value": false,
+      "labels": {
+        "model": "claude_mcp",
+        "fix": "examples"
+      }
+    },
+    {
+      "name": "uplift",
+      "unit": "PP",
+      "value": 13.888888888888891,
+      "ci_low": 0.0,
+      "ci_high": 36.111111111111114,
+      "ci_method": "paired percentile bootstrap over shared questions, 2000 resamples, seed 7; Holm across fixes",
+      "labels": {
+        "model": "gpt_mcp",
+        "fix": "examples"
+      }
+    },
+    {
+      "name": "uplift_p_value",
+      "unit": "ratio",
+      "value": 0.21989005497251374,
+      "labels": {
+        "model": "gpt_mcp",
+        "fix": "examples"
+      }
+    },
+    {
+      "name": "uplift_separated",
+      "unit": "bool",
+      "value": false,
+      "labels": {
+        "model": "gpt_mcp",
+        "fix": "examples"
+      }
+    },
+    {
+      "name": "probes_passed",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "k": 2,
+      "labels": {
+        "model": "claude_mcp"
+      }
+    },
+    {
+      "name": "probes_passed",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "k": 2,
+      "labels": {
+        "model": "gpt_mcp"
+      }
+    },
+    {
+      "name": "probes_passed",
+      "unit": "rate",
+      "value": 1.0,
+      "n": 2,
+      "k": 2,
+      "labels": {
+        "model": "cortex_analyst"
+      }
+    },
+    {
+      "name": "total_cost_usd",
+      "unit": "USD",
+      "value": 9.683799,
+      "labels": {}
+    },
+    {
+      "name": "total_credits",
+      "unit": "CREDITS",
+      "value": 0.0,
+      "labels": {
+        "engine": "clickhouse"
+      }
+    },
+    {
+      "name": "total_credits",
+      "unit": "CREDITS",
+      "value": 2.814,
+      "labels": {
+        "engine": "snowflake"
+      }
+    }
+  ]
+}

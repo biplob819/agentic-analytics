@@ -930,6 +930,33 @@ def summarise(
     )
 
 
+def write_run_metrics(
+    run_dir: Path,
+    summary: RunSummary,
+    records: Sequence[Record],
+    questions: Mapping[str, Question],
+    manifest: Mapping[str, Any],
+    rates: Rates,
+    prices: Any,
+) -> None:
+    """M4.1 MON-05: `metrics/metrics.json` (EvalKit metrics-1) and `metrics/cases.jsonl` beside
+    summary.json."""
+    from agentic_analytics.monitoring.metrics import price_dates, write_metrics
+
+    models = (manifest.get("config") or {}).get("models") or {}
+    write_metrics(
+        run_dir,
+        summary,
+        records,
+        questions,
+        rates,
+        n_resamples=manifest["n_resamples"],
+        seed=manifest["seed"],
+        code_version=manifest.get("git_sha"),
+        price_dates=price_dates(models, prices),
+    )
+
+
 def run_benchmark(
     cfg: RunConfig,
     pack: Pack,
@@ -1451,6 +1478,8 @@ async def _execute(
     if benchmark:
         summary = summarise(records, qmap, manifest, aggregate_rates(rates))
         write_summary(run_dir / "summary.json", summary)
+        prices = options.prices if options.prices is not None else model_prices()
+        write_run_metrics(run_dir, summary, records, qmap, manifest, aggregate_rates(rates), prices)
         if options.render:
             from agentic_analytics.report import render_report
 
@@ -1569,6 +1598,9 @@ def reconcile_run(
     tmp.write_text("".join(r.model_dump_json() + "\n" for r in updated), encoding="utf-8")
     os.replace(tmp, run_dir / "records.jsonl")
     write_summary(run_dir / "summary.json", summary)
+    write_run_metrics(
+        run_dir, summary, updated, questions, manifest, aggregate_rates(rates), model_prices()
+    )
     manifest["reconciled_credits"] = credits
     _write_json(run_dir / "run.json", manifest)
     if render:

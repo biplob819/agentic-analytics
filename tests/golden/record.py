@@ -11,6 +11,8 @@ Writes, under `tests/golden/`:
 - `recording.json`: the recorded model turns, Cortex bodies and warehouse answers;
 - `run.yaml`: the run configuration;
 - `summary.json`: what `run_benchmark` produced from all of that;
+- `metrics/metrics.json` and `metrics/cases.jsonl`: the same run in EvalKit's metrics-1 format
+  with its per-case sidecar (M4.1 MON-05);
 - `scores.json`: each record's verdict and mismatch reason (`scores_digest`).
 
 The responses are recorded from the fakes for now (`tests/run/world.py`). When A2.1 and A2.2
@@ -141,6 +143,10 @@ def main() -> int:
             print(out.message, file=sys.stderr)
             return 1
         shutil.copyfile(out.run_dir / "summary.json", GOLDEN / "summary.json")
+        # M4.1 MON-05: the metrics-1 export and its per-case sidecar
+        (GOLDEN / "metrics").mkdir(exist_ok=True)
+        for name in ("metrics.json", "cases.jsonl"):
+            shutil.copyfile(out.run_dir / "metrics" / name, GOLDEN / "metrics" / name)
         (GOLDEN / "scores.json").write_text(scores_digest(out.run_dir), encoding="utf-8")
     print(f"wrote {GOLDEN}/summary.json ({out.jobs} asks)")
     return 0

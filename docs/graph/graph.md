@@ -70,7 +70,7 @@ Generated from Agentic Analytics Tech Spec §12.2 on 2026-11-15; edit here from 
 | --- | --- | --- | --- | --- | --- |
 | **B3.1** | Dashboard | M2.1, A2.3 | node_converge + verifier | Static dashboard: category × backend, uplift, cost, clarification, failure explorer | US1–US5 |
 | **B3.2** | README, deploy and write-up figures | B3.1, F3.2, M4.1 | node_converge + verifier | README headline, Cloudflare Pages deploy, decision log, data card, figures for the write-up | US6 |
-| **B3.3** | Open-source release v0.1.0 | B3.2, D4.2 | node_converge + verifier | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0, the hosted demo deployed with its live p95 (DEM-15, D-93) | US6, US7, US8 |
+| **B3.3** | Open-source release v0.1.0 | B3.2, D4.2 | node_converge + verifier | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0, the hosted demo deployed with its live p95 (DEM-15, D-93), run history and drift from EvalKit's ledger once v0.4.0 ships it (MON-07, OWNER D-98) | US6, US7, US8 |
 
 ## Wave 4 — demo and monitoring
 
@@ -78,4 +78,4 @@ Generated from Agentic Analytics Tech Spec §12.2 on 2026-11-15; edit here from 
 | --- | --- | --- | --- | --- | --- |
 | **D4.1** | `ask()` and guard | A2.3, R3.1 | node_converge + verifier | `ask()`, replay cache, live path behind EvalKit's guard, warm-up | US7 |
 | **D4.2** | Demo page | D4.1, B3.1 | node_converge + verifier | Streamlit app from this repo (D-57), packaged for deploy, with the p95 tool (the deployed live p95 is DEM-15 in B3.3, D-93) | US7 |
-| **M4.1** | Monitoring and EvalKit reuse | R3.2, B3.1 | node_converge + verifier | Scheduled smoke gated by `evalkit gate`, run history and drift through EvalKit's ledger and compare, metrics-summary export, `attack_outcome` probe scoring, step efficiency, upstreamed scorers with parity tests (OWNER D-74, D-75) | US1, US5 |
+| **M4.1** | Monitoring and EvalKit reuse | R3.2, B3.1 | node_converge + verifier | Scheduled smoke gated by `evalkit gate`, run pairs through `evalkit compare` (history and drift are MON-07 in B3.3, OWNER D-98), metrics-summary export, `attack_outcome` probe scoring, step efficiency, upstreamed scorers with parity tests (OWNER D-74, D-75) | US1, US5 |

@@ -129,7 +129,7 @@ def locked_demo_set(lock: dict) -> set[tuple[str, str]]:
 def requirement_problems(req_text: str, pyproject: dict, lock: dict) -> list[str]:
     """Why `req_text` is not exactly the locked resolution of the core dependencies + the `demo`
     extra (D-95): every package pinned `==` to its uv.lock version, nothing more, nothing less,
-    and the evalkit-harness git pin exactly as pyproject.toml has it (empty means in step)."""
+    and a direct-reference (git) pin exactly as pyproject.toml has it (empty means in step)."""
     project = pyproject["project"]
     wanted = {_name(r): r for r in [*project["dependencies"],
                                     *project["optional-dependencies"]["demo"]]}  # fmt: skip
@@ -146,7 +146,7 @@ def requirement_problems(req_text: str, pyproject: dict, lock: dict) -> list[str
         name = _name(ln)
         names.add(name)
         spec = wanted.get(name, "")
-        if "@" in spec:  # a direct reference (the evalkit-harness git pin, D-24)
+        if "@" in spec:  # a direct reference (a git pin, as EvalKit's was before D-97)
             if ln != spec:
                 problems.append(f"{name} must be listed exactly as in pyproject.toml")
             entry = (name, next(iter(versions.get(name, {""}))))
@@ -189,8 +189,8 @@ def test_demo_requirements_pin_the_core_and_demo_extra_to_uv_lock():
             "snowflake-connector-python", "clickhouse-connect", "mcp", "evalkit-harness",
             "pandas", "numpy", "narwhals"} <= listed  # fmt: skip
     assert len(listed) > 50  # the whole resolved set, not only the direct dependencies
-    todo = [ln for ln in text.splitlines() if "TODO" in ln]
-    assert len(todo) == 1 and "PyPI" in todo[0]  # only the switch to the PyPI release
+    assert "TODO" not in text and "git+" not in text  # EvalKit from PyPI (D-97)
+    assert "evalkit-harness==0.3.0" in text.splitlines()
 
 
 def test_demo_requirements_are_what_uv_export_prints():
@@ -219,7 +219,10 @@ def test_demo_requirements_are_what_uv_export_prints():
         (lambda t: t.replace("sqlglot==30.31.0", "sqlglot==30.30.0"), "sqlglot==30.30.0 but"),
         (lambda t: t.replace("pyjwt==2.15.1", "pyjwt>=2.9"), "pyjwt is not pinned with =="),
         (lambda t: t.replace("psycopg-binary==3.3.9", "#"), "psycopg-binary==3.3.9 missing"),
-        (lambda t: t.replace("6530fd119", "6530fd118"), "evalkit-harness must be listed exactly"),
+        (
+            lambda t: t.replace("evalkit-harness==0.3.0", "evalkit-harness==0.2.0"),
+            "evalkit-harness==0.2.0 but",
+        ),
         (lambda t: t + "rich==13.9.4\n", "rich is not in the locked core + demo set"),
         (lambda t: t + "mcp==2.3.0\n", "a package is listed twice"),
     ],

@@ -1,5 +1,12 @@
 """Answer-from-rows numeric check (SCR-04, Tech Spec §6.1, B1, B7, EK L-35).
 
+Since M4.1 MON-06 (OWNER D-75) the check itself runs from EvalKit: `unsupported_numbers` calls
+`evalkit.scorers.unsupported_numbers` (B5.13 AFR-01, ported from this module). EvalKit adds
+two rules this module never had, neither of which moved a recorded verdict: a number written
+with a minus needs a negative cell, and an ``x`` multiple may be derived as the ratio of two
+named rows' cells. This module keeps the number reader (`extract_numbers`), which the injection
+check reads markers with (`policy`) and which EvalKit does not make public.
+
 Every number written in an answer must be backed by the executed result. A number is supported
 when one of these holds:
 
@@ -45,14 +52,13 @@ without a scale word (``one``, ``two``) are prose and are not checked.
 
 from __future__ import annotations
 
-import bisect
-import math
 import re
 from collections.abc import Iterable
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Literal
 
 from evalkit.schemas import ResultSet
+from evalkit.scorers import unsupported_numbers as evalkit_unsupported_numbers
 
 REL_TOL = 0.005  # 0.5% relative (Tech Spec §6.1)
 YEAR_RANGE: tuple[int, int] = (1995, 2026)
@@ -155,9 +161,6 @@ _MONTH_DAY = re.compile(
     rf"(\b{_MONTHS}\.?\s+)(\d{{1,2}}(?:st|nd|rd|th)?)(?![\d]|[.,]\d)", re.IGNORECASE
 )
 _ABBR_YEAR = re.compile(r"(?<![\w])'\d{2}(?![\d])")
-
-_FRACTION_NAMES = re.compile(r"share|ratio|fraction|proportion|(?:^|_)rate(?:$|_)", re.I)
-_PERCENT_NAMES = re.compile(r"pct|percent", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -409,112 +412,6 @@ def extract_numbers(text: str) -> list[Number]:
     return out
 
 
-@dataclass
-class _Cells:
-    every: list[float] = field(default_factory=list)  # all numeric cells (absolute values)
-    percent_units: list[float] = field(default_factory=list)  # cells read as percent units
-    fractions: list[float] = field(default_factory=list)  # cells read as fractions (<= 1)
-    # numbers written inside text cells and column names ("FLAT 12", "SALES 5000")
-    in_text: list[float] = field(default_factory=list)
-
-
-def _cell_number(cell: object) -> float | None:
-    if isinstance(cell, bool) or cell is None:
-        return None
-    v: float | None = None
-    if isinstance(cell, int | float):
-        v = float(cell)
-    elif isinstance(cell, str) and re.fullmatch(r"\s*-?\d[\d,]*(?:\.\d+)?\s*", cell):
-        try:
-            v = float(cell.replace(",", ""))
-        except ValueError:
-            return None
-    return abs(v) if v is not None and math.isfinite(v) else None
-
-
-def _cells(rs: ResultSet | None) -> _Cells:
-    out = _Cells()
-    if rs is None:
-        return out
-    fraction_col = [bool(_FRACTION_NAMES.search(c)) for c in rs.columns]
-    percent_col = [bool(_PERCENT_NAMES.search(c)) for c in rs.columns]
-    texts: set[str] = set(rs.columns)
-    for row in rs.rows:
-        for j, cell in enumerate(row):
-            v = _cell_number(cell)
-            if v is None:
-                if isinstance(cell, str):
-                    texts.add(cell)
-                continue
-            out.every.append(v)
-            if v <= 1 and (fraction_col[j] or percent_col[j]):
-                out.fractions.append(v)
-                if percent_col[j] and not fraction_col[j]:
-                    out.percent_units.append(v)
-            else:
-                out.percent_units.append(v)
-    for text in texts:
-        for n in extract_numbers(text):
-            out.in_text.extend(_values(n))
-    for vals in (out.every, out.percent_units, out.fractions, out.in_text):
-        vals.sort()
-    return out
-
-
-def _in_text(n: Number, cells: _Cells) -> bool:
-    """The number is written, token for token, inside a text cell or a column name."""
-    for x in _values(n):
-        eps = 1e-9 * max(1.0, x)
-        i = bisect.bisect_left(cells.in_text, x - eps)
-        if i < len(cells.in_text) and cells.in_text[i] <= x + eps:
-            return True
-    return False
-
-
-def _near(x: float, half: float, cells: list[float]) -> bool:
-    eps = 1e-9 * max(1.0, x)
-    w = max(half, REL_TOL * x / (1 - REL_TOL)) + eps
-    lo, hi = bisect.bisect_left(cells, x - w), bisect.bisect_right(cells, x + w)
-    for v in cells[lo:hi]:
-        d = abs(v - x)
-        if d <= half + eps or d <= REL_TOL * max(v, x) + eps:
-            return True
-    return False
-
-
-def _matches_cells(n: Number, cells: _Cells) -> bool:
-    for x, half, kind in n.candidates:
-        if kind == "num" and _near(x, half, cells.every):
-            return True
-        if kind == "pct" and (
-            _near(x, half, cells.percent_units) or _near(x / 100, half / 100, cells.fractions)
-        ):
-            return True
-    return False
-
-
-def _values(n: Number) -> set[float]:
-    out: set[float] = set()
-    for x, _, kind in n.candidates:
-        out.add(x)
-        if kind == "pct":
-            out.add(x / 100)
-    return out
-
-
-def _same_value(a: Number, b: Number) -> bool:
-    return any(
-        math.isclose(x, y, rel_tol=1e-9, abs_tol=1e-12) for x in _values(a) for y in _values(b)
-    )
-
-
-def _in_years(n: Number, year_range: tuple[int, int]) -> bool:
-    lo, hi = year_range
-    if n.decade:
-        return n.value <= hi and n.value + 9 >= lo
-    return n.year_like and lo <= n.value <= hi
-
-
 def unsupported_numbers(
     answer_text: str,
     executed: ResultSet | None,
@@ -525,22 +422,18 @@ def unsupported_numbers(
 ) -> tuple[str, ...]:
     """The numbers in `answer_text` that no rule above supports, as written, first-seen order.
 
+    Runs EvalKit's `scorers.unsupported_numbers` (B5.13 AFR-01, ported from this module's
+    original check; M4.1 MON-06, OWNER D-75) with this pack's data range as `year_range` and
+    EvalKit's 0.5% relative tolerance. It scored all 5,010 recorded answers of the baseline
+    and fix runs exactly as the local check did (docs/measurements/evalkit-parity-2026-11-17.json).
     `executed` is None when nothing executed successfully; then only the question, years,
     top-N and a row count of zero can support a number.
     """
-    cells = _cells(executed)
-    n_rows = len(executed.rows) if executed is not None else 0
-    asked = extract_numbers(question_text)
-    left: list[str] = []
-    for n in extract_numbers(answer_text):
-        if _in_years(n, year_range):
-            continue
-        if n.plain_int and (n.value == top_n or n.value == n_rows):
-            continue
-        if any(_same_value(n, q) for q in asked):
-            continue
-        if _matches_cells(n, cells) or _in_text(n, cells):
-            continue
-        if n.text not in left:
-            left.append(n.text)
-    return tuple(left)
+    return evalkit_unsupported_numbers(
+        answer_text,
+        executed,
+        question_text,
+        top_n=top_n,
+        year_range=year_range,
+        rel_tol=REL_TOL,
+    )

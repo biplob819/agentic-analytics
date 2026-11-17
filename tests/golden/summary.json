@@ -130,7 +130,14 @@
       "errors": {},
       "cost_per_correct_usd": 0.01187181818181818,
       "latency_p50_ms": 1348,
-      "latency_p95_ms": 2677
+      "latency_p95_ms": 2677,
+      "step_efficiency": {
+        "answers": 36,
+        "tool_calls_mean": 0.75,
+        "min_tool_calls_mean": 0.8333333333333334,
+        "excess_mean": 0.0,
+        "at_minimum": 1.0
+      }
     },
     {
       "backend": "claude_mcp",
@@ -256,7 +263,14 @@
       "errors": {},
       "cost_per_correct_usd": 0.011796000000000001,
       "latency_p50_ms": 1347,
-      "latency_p95_ms": 2677
+      "latency_p95_ms": 2677,
+      "step_efficiency": {
+        "answers": 36,
+        "tool_calls_mean": 0.75,
+        "min_tool_calls_mean": 0.8333333333333334,
+        "excess_mean": 0.0,
+        "at_minimum": 1.0
+      }
     },
     {
       "backend": "gpt_mcp",
@@ -382,7 +396,14 @@
       },
       "cost_per_correct_usd": 0.013738714285714286,
       "latency_p50_ms": 1701,
-      "latency_p95_ms": 2779
+      "latency_p95_ms": 2779,
+      "step_efficiency": {
+        "answers": 36,
+        "tool_calls_mean": 0.8333333333333334,
+        "min_tool_calls_mean": 0.8333333333333334,
+        "excess_mean": 0.08333333333333333,
+        "at_minimum": 0.9166666666666666
+      }
     },
     {
       "backend": "gpt_mcp",
@@ -510,7 +531,14 @@
       },
       "cost_per_correct_usd": 0.010891384615384615,
       "latency_p50_ms": 1701,
-      "latency_p95_ms": 2779
+      "latency_p95_ms": 2779,
+      "step_efficiency": {
+        "answers": 36,
+        "tool_calls_mean": 0.8333333333333334,
+        "min_tool_calls_mean": 0.8333333333333334,
+        "excess_mean": 0.08333333333333333,
+        "at_minimum": 0.9166666666666666
+      }
     },
     {
       "backend": "cortex_analyst",

@@ -5,6 +5,9 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from evalkit.metrics import EFFICIENCY_NAMES, load_metrics
+
+from agentic_analytics.monitoring.metrics import SOURCES
 from agentic_analytics.schemas.summary import BackendSummary, RunSummary
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -48,6 +51,23 @@ def test_every_summary_metric_names_its_question_and_trace() -> None:
 
 
 def test_relevance_rows_name_real_metrics() -> None:
-    planned = {"step_efficiency", "drift"}  # M4.1, not yet in the summary schema
+    planned = {"drift"}  # B3.3 MON-07, waits for EvalKit B5.7 in v0.4.0 (D-76, OWNER D-98)
     fields = set(BackendSummary.model_fields) | set(RunSummary.model_fields)
-    assert set(relevance_rows()) - fields == planned
+    efficiency = {n for n, src in SOURCES.items() if src == "efficiency"}
+    assert set(relevance_rows()) - fields - efficiency == planned
+
+
+def test_every_metrics_1_metric_names_its_question_and_trace() -> None:
+    """M4.1 MON-05: each metric of the metrics-1 export comes from a summary field with a §6.3
+    row, or is one of EvalKit's efficiency names with a row of its own."""
+    rows = relevance_rows()
+    exported = {
+        m.name for m in load_metrics(ROOT / "tests" / "golden" / "metrics" / "metrics.json").metrics
+    }
+    assert exported <= set(SOURCES)
+    for name in sorted(exported):
+        src = SOURCES[name]
+        key = name if src == "efficiency" else src
+        assert key in rows, f"metrics-1 {name}: no §6.3 row for {key}"
+    efficiency = {n for n, src in SOURCES.items() if src == "efficiency"}
+    assert efficiency <= set(EFFICIENCY_NAMES)  # EvalKit's standard names (D-67)

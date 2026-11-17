@@ -1,0 +1,104 @@
+name: monitor
+
+# M4.1 MON-01 (OWNER D-74, OWNER D-75, NFR1): the scheduled smoke run. It runs
+# `agentic-analytics smoke` (12 questions x 3 backends, one trial) under a $2 model-spend cap,
+# from the `monitoring` environment's secrets (read-only warehouse credentials and the two model
+# keys; never an admin credential), and fails when `evalkit gate` finds a backend's accuracy
+# below its floor in monitoring/gates.yaml.
+#
+# THE SCHEDULE IS DISABLED. Every scheduled run spends money (up to $2 of model calls plus
+# Snowflake trial credits), and the owner must approve recurring spend before it starts
+# (OWNER D-74); it stays off until the release (OWNER D-103). Until then this runs only when
+# started by hand (workflow_dispatch). To enable it at the release, by a new owner decision:
+# uncomment the `schedule:` block below, add `schedule` to SECRET_TRIGGERS in
+# tests/harness/test_records.py, change the schedule check in
+# tests/monitoring/test_monitor_workflow.py, and log the decision in docs/decisions.md. Both
+# tests fail while the schedule is live without those changes.
+#
+# Never on pull requests (a PR could change what runs with the secrets) and never in forks
+# (the job runs only in the upstream repository).
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "17 6 * * 1"   # weekly, Monday 06:17 UTC (off until the release, OWNER D-103)
+
+permissions:
+  contents: read
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  smoke:
+    if: github.repository == 'biplob819/agentic-analytics'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: monitoring
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked
+      # the ledger's length before the run, so the Spend line step reports only what this run
+      # appends, never an older committed line
+      - name: Ledger length before the run
+        shell: bash
+        run: wc -l < docs/measurements/spend-ledger.jsonl > "$RUNNER_TEMP/ledger-before"
+      - name: Smoke run under the $2 cap
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CLICKHOUSE_MCP_KEY_ID: ${{ secrets.CLICKHOUSE_MCP_KEY_ID }}
+          CLICKHOUSE_MCP_KEY_SECRET: ${{ secrets.CLICKHOUSE_MCP_KEY_SECRET }}
+          CLICKHOUSE_SERVICE_ID: ${{ secrets.CLICKHOUSE_SERVICE_ID }}
+          CLICKHOUSE_HOST: ${{ secrets.CLICKHOUSE_HOST }}
+          CLICKHOUSE_RO_USER: ${{ secrets.CLICKHOUSE_RO_USER }}
+          CLICKHOUSE_RO_PASSWORD: ${{ secrets.CLICKHOUSE_RO_PASSWORD }}
+          SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+          SNOWFLAKE_RO_USER: ${{ secrets.SNOWFLAKE_RO_USER }}
+          SNOWFLAKE_RO_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_RO_PRIVATE_KEY }}
+          SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+        run: uv run agentic-analytics smoke --max-cost 2
+      # `evalkit gate` (EvalKit B5.3) on the run's metrics-1 export (MON-05) and the accuracy
+      # floors in monitoring/gates.yaml; exit 1 below a floor, exit 2 when a backend is missing
+      # or the file cannot be read. `shell: bash` runs with -eo pipefail, so the gate's exit
+      # code fails the step through tee.
+      - name: evalkit gate
+        shell: bash
+        run: >-
+          uv run evalkit gate "results/$(cat results/latest)/metrics/metrics.json"
+          --config monitoring/gates.yaml --out gate.json
+          | tee -a "$GITHUB_STEP_SUMMARY"
+      # The spend-ledger line(s) this run appended: shown in the job summary and kept in the
+      # artifact. CI never commits the ledger back (the workflow can only read the repository).
+      - name: Spend line
+        if: always()
+        shell: bash
+        run: >-
+          tail -n "+$(( $(cat "$RUNNER_TEMP/ledger-before") + 1 ))"
+          docs/measurements/spend-ledger.jsonl
+          | tee spend-line.jsonl >> "$GITHUB_STEP_SUMMARY"
+      # The run's metrics-1 export (a folder `evalkit compare` reads), the gate verdict and the
+      # spend line, so two CI runs can be compared after downloading their artifacts:
+      #   evalkit compare monitor-<old>/metrics monitor-<new>/metrics
+      - name: Collect the artifact
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p monitor-artifact
+          if [ -f results/latest ]; then
+            cp -R "results/$(cat results/latest)/metrics" monitor-artifact/metrics
+          fi
+          for f in gate.json spend-line.jsonl; do
+            if [ -f "$f" ]; then cp "$f" monitor-artifact/; fi
+          done
+      - name: Upload the artifact
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: monitor-${{ github.run_id }}
+          path: monitor-artifact/
+          if-no-files-found: warn
+          retention-days: 90

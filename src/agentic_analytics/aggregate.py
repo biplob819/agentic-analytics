@@ -11,6 +11,8 @@ whole summary is reproducible from its inputs and seed.
   over questions only (EK L-36): trials are never resampled before an any() or all().
 - Float totals use `math.fsum` (EK L-27); money inputs are checked finite and non-negative
   (EK L-12).
+- Step efficiency (M4.1 MON-04) is per MCP configuration, from the recorded steps of its
+  benchmark answers (probes excluded); `monitoring.efficiency` documents the minimum.
 """
 
 from __future__ import annotations
@@ -28,6 +30,7 @@ from typing import Literal
 
 from evalkit.stats import Resamples, holm, interval, interval_from, paired, percentile_ms
 
+from agentic_analytics.monitoring.efficiency import step_efficiency
 from agentic_analytics.schemas import (
     ENGINE_OF,
     FIX_NAMES,
@@ -515,6 +518,7 @@ def backend_summary(
         cost_per_correct_usd=cost_per_correct(flat, rates),
         latency_p50_ms=percentile_ms(lat, 0.5),
         latency_p95_ms=percentile_ms(lat, 0.95),
+        step_efficiency=step_efficiency(flat, questions),
     )
 
 

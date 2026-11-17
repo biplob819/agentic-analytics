@@ -23,6 +23,7 @@ from agentic_analytics.schemas.summary import (
     CategoryAccuracy,
     FixUplift,
     RunSummary,
+    StepEfficiency,
 )
 
 __all__ = [
@@ -54,6 +55,7 @@ __all__ = [
     "RunConfig",
     "RunSummary",
     "Scores",
+    "StepEfficiency",
     "Tolerance",
     "load_run_config",
 ]

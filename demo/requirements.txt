@@ -4,8 +4,6 @@
 # (D-95: the host installs exactly what the tests ran), regenerated with
 #   uv export --no-hashes --no-annotate --no-header --extra demo --no-dev --frozen --no-emit-project
 # below these comments; tests/demo/test_deploy.py keeps it in step with pyproject.toml and uv.lock.
-# TODO(D-24/D-47): switch to evalkit-harness==0.1.0 once the PyPI release is out (handled
-# separately); until then the same exact git pin as pyproject.toml.
 altair==6.3.0
 annotated-types==0.8.0
 anthropic==2.8.0
@@ -19,7 +17,7 @@ click==8.5.1
 clickhouse-connect==1.12.0
 cryptography==50.0.2
 docstring-parser==0.18.0
-evalkit-harness @ git+https://github.com/biplob819/evalkit@06591f8de9b178078c971940a83019a6530fd119
+evalkit-harness==0.3.0
 h11==0.16.0
 httpcore2==2.16.0 ; sys_platform != 'emscripten'
 httpx2==2.16.0

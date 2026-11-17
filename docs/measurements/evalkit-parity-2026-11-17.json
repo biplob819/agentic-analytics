@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0",
+  "kind": "evalkit_parity",
+  "node": "M4.1",
+  "date": "2026-11-17",
+  "command": "uv run python -m agentic_analytics.monitoring.parity --run smoke-20261117T070039Z-769d2c --run rescore-20261117T122213Z-c89eaa --run rescore-20261117T122217Z-6ccebe",
+  "evalkit": "0.3.0",
+  "evalkit_commit": "4ddfef50d55db653aaf57048af06f2ba606e1573",
+  "note": "Offline, no calls: EvalKit v0.3.0's unsupported_numbers (answer from rows), clarification_rates and attack_outcome on every stored record of the first live smoke, the latest baseline rescore and the fix-run rescore (the 5,010 records of D-92 plus the smoke's 36), against the scores and summaries stored with them. Every answer-from-rows list and verdict, every configuration's clarification and false-clarification point rate, and every probe verdict is identical.",
+  "year_range": [
+    1995,
+    2026
+  ],
+  "identical": true,
+  "runs": [
+    {
+      "run_id": "smoke-20261117T070039Z-769d2c",
+      "kind": "smoke",
+      "records": 36,
+      "records_sha256": "f59d553ae6693d66efacd3ef9afb76cfe44b067d1a4dcdf2e59126997aeaa70a",
+      "answer_from_rows": {
+        "records": 36,
+        "executed": 35,
+        "differing": 0,
+        "verdicts_differing": 0,
+        "differences": []
+      },
+      "clarification": {
+        "configurations": 3,
+        "differing": 0,
+        "differences": []
+      },
+      "probes": {
+        "records": 0,
+        "disagreements": 0,
+        "outcomes": {},
+        "differences": []
+      }
+    },
+    {
+      "run_id": "rescore-20261117T122213Z-c89eaa",
+      "kind": "rescore",
+      "records": 1065,
+      "records_sha256": "45752e51852439603dd88d1b590811753e4b36d616bc81ee605e3763e301bf98",
+      "answer_from_rows": {
+        "records": 1065,
+        "executed": 929,
+        "differing": 0,
+        "verdicts_differing": 0,
+        "differences": []
+      },
+      "clarification": {
+        "configurations": 3,
+        "differing": 0,
+        "differences": []
+      },
+      "probes": {
+        "records": 165,
+        "disagreements": 0,
+        "outcomes": {
+          "blocked": 154,
+          "succeeded": 11
+        },
+        "differences": []
+      }
+    },
+    {
+      "run_id": "rescore-20261117T122217Z-6ccebe",
+      "kind": "rescore",
+      "records": 3945,
+      "records_sha256": "fe904b34f541793b1ddc4e2cce25127201598e73210421d3970a680cf549ea45",
+      "answer_from_rows": {
+        "records": 3945,
+        "executed": 3335,
+        "differing": 0,
+        "verdicts_differing": 0,
+        "differences": []
+      },
+      "clarification": {
+        "configurations": 11,
+        "differing": 0,
+        "differences": []
+      },
+      "probes": {
+        "records": 645,
+        "disagreements": 0,
+        "outcomes": {
+          "blocked": 580,
+          "succeeded": 65
+        },
+        "differences": []
+      }
+    }
+  ]
+}

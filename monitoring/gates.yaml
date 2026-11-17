@@ -1,0 +1,30 @@
+# M4.1 MON-01 (OWNER D-74, OWNER D-75): the scheduled smoke run's gates, checked by
+#   evalkit gate results/<run>/metrics/metrics.json --config monitoring/gates.yaml
+# (EvalKit B5.3) in .github/workflows/monitor.yml, on the run's metrics-1 export (MON-05).
+#
+# Accuracy floors for the smoke run (12 questions, one trial, no fixes). One answer moves smoke
+# accuracy by about 8 points, so each floor sits well under the first live smoke (D-78: Claude
+# 8/12, GPT 11/12, Cortex 8/12) and catches a broken backend or a large regression, not drift
+# (drift is EvalKit's ledger, B5.7). Gated on the point estimate. Change a floor only with a
+# decisions.md line.
+#
+# One gate per backend, so a backend missing from the run is an input error (exit 2, a gate
+# matching nothing is never a silent pass), and one gate over every no-fix configuration, so
+# a backend added later is gated too.
+gates:
+  - metric: accuracy
+    labels: {model: claude_mcp, fixes: "none"}
+    op: ">="
+    value: 0.5
+  - metric: accuracy
+    labels: {model: gpt_mcp, fixes: "none"}
+    op: ">="
+    value: 0.5
+  - metric: accuracy
+    labels: {model: cortex_analyst, fixes: "none"}
+    op: ">="
+    value: 0.5
+  - metric: accuracy
+    labels: {model: "*", fixes: "none"}
+    op: ">="
+    value: 0.5
