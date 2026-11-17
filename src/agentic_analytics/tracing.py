@@ -297,7 +297,9 @@ class Redactor:
         if s.lstrip()[:1] in ("{", "["):
             try:
                 parsed = json.loads(s)
-            except (ValueError, RecursionError):
+            except RecursionError:  # Python 3.11's parser gives up here; 3.12 parses deeper
+                return REDACTED  # too deep to check: fail closed
+            except ValueError:
                 parsed = None
             if isinstance(parsed, dict | list):
                 try:
