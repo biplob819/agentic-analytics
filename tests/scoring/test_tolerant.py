@@ -392,3 +392,68 @@ def test_a_strict_pass_is_never_relabelled_as_an_equivalence():
     exact = ex(("new_build_pct",), ((11.389191233977966,),))
     s = score(q(PCT_TEXT, tolerance=PCT), exact, PCT_GOLD)
     assert s.correct is True and s.correct_strict is True and s.equivalences == ()
+
+
+# -- OWNER D-89: text period labels ------------------------------------------------------------
+
+Q035 = "What was the average (mean) price paid in each quarter of 2023?"
+Q035_TOL = Tolerance(rel=0.005, abs=1e-9, columns=("avg_price",))
+Q035_GOLD = rs(
+    ("quarter", "avg_price"),
+    (
+        (1, 402525.04774426745),
+        (2, 414916.01938011934),
+        (3, 410081.28997829),
+        (4, 400829.5861065616),
+    ),
+)
+Q035_VALUES = (402525.05, 414916.02, 410081.29, 400829.59)
+
+
+def _quarters(labels):
+    return ex(("quarter", "mean_price_gbp"), list(zip(labels, Q035_VALUES, strict=True)))
+
+
+def test_gpts_text_quarter_labels_match_quarter_numbers():
+    """The real case: GPT-6.1 Sol, q-035, every trial of the baseline."""
+    qq = q(Q035, category="time", tolerance=Q035_TOL)
+    for labels in (
+        ("2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4"),
+        ("Q1 2023", "Q2 2023", "Q3 2023", "Q4 2023"),
+        ("2023-Q1", "2023-q2", "2023-Q3", "2023-Q4"),
+        ("Q1", "Q2", "Q3", "Q4"),
+    ):
+        assert tolerant_match(_quarters(labels), Q035_GOLD, qq) == ("period_number",), labels
+
+
+def test_text_quarter_labels_stay_wrong_when_they_should():
+    qq = q(Q035, category="time", tolerance=Q035_TOL)
+    two_years = ("2022 Q4", "2023 Q1", "2023 Q2", "2023 Q3")
+    assert tolerant_match(_quarters(two_years), Q035_GOLD, qq) == ()
+    swapped = ("2023 Q2", "2023 Q1", "2023 Q3", "2023 Q4")
+    assert tolerant_match(_quarters(swapped), Q035_GOLD, qq) == ()
+    assert tolerant_match(_quarters(("Q1", "Q2", "Q3", "Q5")), Q035_GOLD, qq) == ()
+    assert tolerant_match(_quarters(("first", "second", "third", "fourth")), Q035_GOLD, qq) == ()
+    unnamed = q("What was the average price paid in each period of 2023?", tolerance=Q035_TOL)
+    assert (
+        tolerant_match(_quarters(("2023 Q1", "2023 Q2", "2023 Q3", "2023 Q4")), Q035_GOLD, unnamed)
+        == ()
+    )
+
+
+def test_text_month_labels_match_month_numbers_and_quarter_labels_never_do():
+    for labels in (("2016-03", "2016-04"), ("March 2016", "April 2016"), ("Mar 2016", "Apr 2016")):
+        run = ex(("month", "sales"), list(zip(labels, (70, 80), strict=True)))
+        assert tolerant_match(run, MONTHS, q(MONTH_Q, category="time")) == ("period_number",), (
+            labels
+        )
+    # gold months 1 and 4 are what Q1 and Q2 would map to: only the guard keeps them apart
+    jan_apr = rs(("month", "sales"), ((1, 70), (4, 80)))
+    quarterly = ex(("month", "sales"), (("Q1 2016", 70), ("Q2 2016", 80)))
+    assert tolerant_match(quarterly, jan_apr, q(MONTH_Q, category="time")) == ()
+    as_months = ex(("month", "sales"), (("Jan 2016", 70), ("Apr 2016", 80)))
+    assert tolerant_match(as_months, jan_apr, q(MONTH_Q, category="time")) == ("period_number",)
+    two_years = ex(("month", "sales"), (("March 2016", 70), ("April 2017", 80)))
+    assert tolerant_match(two_years, MONTHS, q(MONTH_Q, category="time")) == ()
+    not_months = ex(("month", "sales"), (("Marchy 2016", 70), ("Aprilish 2016", 80)))
+    assert tolerant_match(not_months, MONTHS, q(MONTH_Q, category="time")) == ()

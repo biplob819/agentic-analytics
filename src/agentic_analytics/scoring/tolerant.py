@@ -27,7 +27,10 @@ Only answer-expected questions are eligible; clarify-expected questions and prob
    number (1-12) when the question names months and the gold has a column of month numbers,
    or the quarter number (1-4) when every date is a quarter start, the question names quarters
    and the gold has a column of quarter numbers. Dates over two or more years never convert:
-   their month numbers would merge different periods.
+   their month numbers would merge different periods. Text period labels count too (OWNER
+   D-89): quarter labels (``2023 Q1``, ``Q1 2023``, ``2023-Q1``, ``Q1``) become quarter numbers
+   and month labels (``2023-03``, ``March 2023``, ``Mar 2023``) month numbers, under the same
+   conditions; a quarter label never becomes a month number.
 
 percent_scale and period_number act on columns and may apply together (a monthly percentage
 change returned as month dates and fractions); pivot and empty_check reshape the whole result
@@ -207,17 +210,72 @@ def empty_check(predicted: ResultSet, gold: ResultSet, question: Question) -> Re
 # 4. period_number
 
 
-def _period_starts(values: Sequence[Any]) -> list[tuple[int, int] | None] | None:
-    """(year, month) per cell when every non-null cell is a month start, else None."""
-    out: list[tuple[int, int] | None] = []
+_QUARTER_LABEL = (
+    re.compile(r"(\d{4})[\s-]*Q([1-4])", re.IGNORECASE),
+    re.compile(r"Q([1-4])[\s-]*(\d{4})", re.IGNORECASE),
+    re.compile(r"Q([1-4])", re.IGNORECASE),
+)
+_MONTH_NAMES = {
+    m: i
+    for i, names in enumerate(
+        (
+            ("january", "jan"), ("february", "feb"), ("march", "mar"), ("april", "apr"),
+            ("may",), ("june", "jun"), ("july", "jul"), ("august", "aug"),
+            ("september", "sep", "sept"), ("october", "oct"), ("november", "nov"),
+            ("december", "dec"),
+        ),
+        start=1,
+    )
+    for m in names
+}  # fmt: skip
+_MONTH_LABEL = (
+    re.compile(r"(\d{4})-(\d{2})"),
+    re.compile(r"([A-Za-z]+)\.?\s+(\d{4})"),
+    re.compile(r"(\d{4})\s+([A-Za-z]+)"),
+)
+
+
+def _period_cell(v: Any) -> tuple[int | None, int, bool] | None:
+    """(year or None, first month of the period, is a quarter label) for one period cell."""
+    if not isinstance(v, str):
+        return None
+    text = v.strip()
+    m = _PERIOD_START.fullmatch(text)
+    if m is not None:
+        month = int(m.group(2))
+        return (int(m.group(1)), month, False) if 1 <= month <= 12 else None
+    q = _QUARTER_LABEL[0].fullmatch(text)
+    if q is not None:
+        return int(q.group(1)), 3 * int(q.group(2)) - 2, True
+    q = _QUARTER_LABEL[1].fullmatch(text)
+    if q is not None:
+        return int(q.group(2)), 3 * int(q.group(1)) - 2, True
+    q = _QUARTER_LABEL[2].fullmatch(text)
+    if q is not None:
+        return None, 3 * int(q.group(1)) - 2, True
+    m = _MONTH_LABEL[0].fullmatch(text)
+    if m is not None:
+        month = int(m.group(2))
+        return (int(m.group(1)), month, False) if 1 <= month <= 12 else None
+    for pat, year_at, name_at in ((_MONTH_LABEL[1], 2, 1), (_MONTH_LABEL[2], 1, 2)):
+        m = pat.fullmatch(text)
+        if m is not None and m.group(name_at).casefold() in _MONTH_NAMES:
+            return int(m.group(year_at)), _MONTH_NAMES[m.group(name_at).casefold()], False
+    return None
+
+
+def _period_starts(values: Sequence[Any]) -> list[tuple[int | None, int, bool] | None] | None:
+    """(year, first month, quarter label?) per cell when every non-null cell is a period start
+    (a month-start date or a text period label, OWNER D-89), else None."""
+    out: list[tuple[int | None, int, bool] | None] = []
     for v in values:
         if v is None:
             out.append(None)
             continue
-        m = _PERIOD_START.fullmatch(v) if isinstance(v, str) else None
-        if m is None or not 1 <= int(m.group(2)) <= 12:
+        cell = _period_cell(v)
+        if cell is None:
             return None
-        out.append((int(m.group(1)), int(m.group(2))))
+        out.append(cell)
     return out if any(p is not None for p in out) else None
 
 
@@ -236,15 +294,17 @@ def period_columns(
     """The month-number and quarter-number readings of the predicted date columns that apply."""
     if not gold.rows:
         return []
-    dates: dict[int, list[tuple[int, int] | None]] = {}
+    dates: dict[int, list[tuple[int | None, int, bool] | None]] = {}
     for i in range(len(predicted.columns)):
         starts = _period_starts(_column(predicted, i))
-        if starts is not None and len({p[0] for p in starts if p is not None}) == 1:
+        # one calendar year: the cells' stated years (a bare "Q1" states none) are a single year
+        if starts is not None and len({p[0] for p in starts if p is not None and p[0]}) <= 1:
             dates[i] = starts
     if not dates:
         return []
     out: list[dict[int, list[Any]]] = []
-    if _NAMES_MONTHS.search(question.text) and _has_numbers(gold, 12):
+    no_quarter_labels = not any(p is not None and p[2] for s in dates.values() for p in s)
+    if _NAMES_MONTHS.search(question.text) and _has_numbers(gold, 12) and no_quarter_labels:
         out.append({i: [None if p is None else p[1] for p in s] for i, s in dates.items()})
     quarter_starts = all(p is None or p[1] in QUARTER_STARTS for s in dates.values() for p in s)
     if quarter_starts and _NAMES_QUARTERS.search(question.text) and _has_numbers(gold, 4):
