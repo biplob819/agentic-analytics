@@ -53,9 +53,20 @@ _NOT_PERCENT = re.compile(
     r"\bnot\s+(?:as\s+|in\s+)?(?:a\s+)?(?:%|per\s?cent(?:age)?s?\b)", re.IGNORECASE
 )
 _PERCENT_TOKENS = frozenset({"pct", "percent", "percentage"})
+_NEGATION = re.compile(
+    r"\b(?:not|no|never|without|avoid|avoiding|rather\s+than|instead\s+of|don'?t|doesn'?t)\b",
+    re.IGNORECASE,
+)
+_CLAUSE = re.compile(r"[,;:.?!()]")
+_PERCENTAGE_POINTS = re.compile(r"\bpercentage[\s-]points?\b", re.IGNORECASE)
+_FISCAL = re.compile(r"\bFY\s?\d{2,4}\b", re.IGNORECASE)
+_NOT_A_PERIOD = frozenset(
+    {"day", "week", "count", "n", "num", "number", "total", "sum", "avg", "average"}
+)
+_NOT_A_COUNT = frozenset({"total", "grand", "year", "q", "quarter", "month", "day", "id", "rank"})
 _TOKEN = re.compile(r"[a-z]+|\d+", re.ASCII)
 _COUNT_UNSAFE = frozenset({"avg", "average", "mean", "median", "price", "amount", "value", "sum"})
-_TOTAL_NAMES = frozenset({"total", "sum", "all", "overall", "grand_total", "count"})
+_TOTAL_NAMES = frozenset({"total", "sum", "all", "overall", "grand_total", "count", "n"})
 _ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}(?:[T ][\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?", re.ASCII)
 _YEAR = re.compile(r"\b(19\d{2}|20\d{2})\b", re.ASCII)
 _NAMES_MONTHS = re.compile(r"\bmonths?\b", re.IGNORECASE)
@@ -66,8 +77,8 @@ _PERIOD_START = re.compile(
 _PLAIN_NUMBER = re.compile(r"\s*[-+]?\d+(?:\.\d+)?\s*", re.ASCII)
 _SEPARATORS = re.compile(r"[\s_-]+")
 QUARTER_STARTS = frozenset({1, 4, 7, 10})
-_MONTH_COLUMN = frozenset({"month", "mon", "mm"})
-_QUARTER_COLUMN = frozenset({"quarter", "qtr", "q"})
+_MONTH_COLUMN = frozenset({"month"})
+_QUARTER_COLUMN = frozenset({"quarter", "qtr"})
 
 Variant = tuple[tuple[Equivalence, ...], ResultSet]
 
@@ -130,19 +141,37 @@ def _is_percent_name(name: str) -> bool:
     """A percent column by name: a pct/percent/percentage token, or a percentage-point change
     (``change_points``). "percentile" and ``loyalty_points`` are not (D-91)."""
     t = _tokens(name)
+    if any(len(x) == 2 and x.isdigit() for x in t) or re.search(r"(?:^|_)p\d{2}$", name.casefold()):
+        return False  # EvalKit B5.15: pct95 / p99 are percentiles; a 4-digit year suffix is not
     return bool(t & _PERCENT_TOKENS) or {"points", "change"} <= t
+
+
+def _asks_percent(text: str) -> bool:
+    """The question asks for a percentage: a clause names one and holds no negation word
+    ("not counting refunds, what percentage" asks; "do not give a percentage" does not)."""
+    return any(
+        _ASKS_PERCENT.search(clause) and not _NEGATION.search(clause)
+        for clause in _CLAUSE.split(text)
+    )
 
 
 def _gold_percent_columns(gold: ResultSet, question: Question) -> list[int]:
     tol = question.tolerance
-    asks = _ASKS_PERCENT.search(question.text) and not _NOT_PERCENT.search(question.text)
+    asks = _asks_percent(question.text) and not _NOT_PERCENT.search(question.text)
     if tol.abs < PERCENT_ABS or not asks:
         return []
+    points_ok = bool(_PERCENTAGE_POINTS.search(question.text))
     covered = None if tol.columns is None else {c.casefold() for c in tol.columns}
     return [
         j
         for j, name in enumerate(gold.columns)
-        if (covered is None or name.casefold() in covered) and _is_percent_name(name)
+        if (covered is None or name.casefold() in covered)
+        and _is_percent_name(name)
+        and (
+            points_ok
+            or not {"points", "change"} <= _tokens(name)
+            or _tokens(name) & _PERCENT_TOKENS
+        )
     ]
 
 
@@ -200,7 +229,11 @@ def pivot(predicted: ResultSet, gold: ResultSet) -> ResultSet | None:
         if key in labels:
             pair = (labels[key], cell) if label_col == 0 else (cell, labels[key])
             long.append(pair)
-        elif key in _TOTAL_NAMES or not (_is_num(cell) and cell == 0):
+        elif (
+            key in _TOTAL_NAMES
+            or (key == "unknown" and any(_label_key(x)[:1].isdigit() for x in labels))
+            or not (_is_num(cell) and cell == 0)
+        ):
             return None  # an extra label must be one the gold omitted, so zero; never a total
     return ResultSet(columns=gold.columns, rows=tuple(long))
 
@@ -229,7 +262,11 @@ def empty_check(predicted: ResultSet, gold: ResultSet, question: Question) -> Re
     for name, cell in zip(predicted.columns, row, strict=True):
         if _numeric(cell) is not None:
             # D-91: a zero count, not a zero measure (avg_price = 0.0)
-            if (_is_num(cell) and not float(cell).is_integer()) or _tokens(name) & _COUNT_UNSAFE:
+            # a measure anywhere in the name, or a column that IS a year/quarter/total/id
+            # (its leading word), is not a zero count; "sales_in_requested_year" is one
+            lead = _TOKEN.findall(name.casefold())[:1]
+            unsafe = _tokens(name) & _COUNT_UNSAFE or set(lead) & _NOT_A_COUNT
+            if (_is_num(cell) and not float(cell).is_integer()) or unsafe:
                 return None
         elif isinstance(cell, str) and not _ISO_DATE.fullmatch(cell.strip()):
             return None  # D-91: only the dates of a no-data check, never an error message
@@ -311,7 +348,8 @@ def _period_starts(values: Sequence[Any]) -> list[tuple[int | None, int, bool] |
 def _has_numbers(gold: ResultSet, top: int, names: frozenset[str]) -> bool:
     """A gold period column (named month or quarter, D-91) whose cells are integers in 1..top."""
     for j in range(len(gold.columns)):
-        if not _tokens(gold.columns[j]) & names:
+        t = _tokens(gold.columns[j])
+        if not t & names or t & _NOT_A_PERIOD:
             continue
         cells = _column(gold, j)
         if cells and all(_is_num(v) and float(v).is_integer() and 1 <= v <= top for v in cells):
@@ -332,6 +370,8 @@ def period_columns(
         if starts is not None and len({p[0] for p in starts if p is not None and p[0]}) <= 1:
             dates[i] = starts
     # D-91: when the question names years, the dates' stated year must be one of them
+    if _FISCAL.search(question.text):
+        return []  # fiscal periods are not calendar months or quarters (EvalKit B5.15)
     named_years = {int(y) for y in _YEAR.findall(question.text)}
     if named_years:
         dates = {

@@ -531,3 +531,77 @@ def test_pivot_rejects_a_zero_total_column():
     assert tolerant_match(run, gold, q(text)) == ()
     ok = ex(("freehold", "leasehold", "unknown"), ((5, 3, 0),))
     assert tolerant_match(ok, gold, q(text)) == ("pivot",)
+
+
+# -- D-92: EvalKit B5.15's stricter refusals, adopted so the switch changes no verdict --------
+
+
+def test_evalkit_stricter_percent_rules():
+    tol = Tolerance(rel=0.005, abs=0.01)
+    pts = rs(("change_points",), ((1.5,),))
+    run = ex(("change_points",), ((0.015,),))
+    assert tolerant_match(run, pts, q("What was the percentage change?", tolerance=tol)) == ()
+    assert tolerant_match(
+        run, pts, q("By how many percentage points did it change?", tolerance=tol)
+    ) == ("percent_scale",)
+    for text in (
+        "Give the new-build share as a fraction rather than a percentage.",
+        "Do not express it as a percentage: what share were new builds?",
+        "Without converting to a percentage, what share were new builds?",
+    ):
+        assert (
+            tolerant_match(ex(("new_build_pct",), ((0.113892,),)), PCT_GOLD, q(text, tolerance=PCT))
+            == ()
+        ), text
+    other_clause = "Not counting refunds, what percentage of 2023 sales were new builds?"
+    assert tolerant_match(
+        ex(("new_build_pct",), ((0.113892,),)), PCT_GOLD, q(other_clause, tolerance=PCT)
+    ) == ("percent_scale",)
+    for name in ("latency_pct95", "p99"):
+        assert (
+            tolerant_match(
+                ex((name,), ((0.0123,),)),
+                rs((name,), ((1.23,),)),
+                q("What percentage?", tolerance=tol),
+            )
+            == ()
+        ), name
+    year_pct = rs(("pct2023",), ((11.39,),))
+    assert tolerant_match(
+        ex(("pct2023",), ((0.1139,),)), year_pct, q("What percentage in 2023?", tolerance=tol)
+    ) == ("percent_scale",)
+
+
+def test_evalkit_stricter_period_rules():
+    run = ex(("month", "sales"), (("2024-03-01", 70),))
+    for col in ("week_of_month", "day_of_month", "month_count", "mon", "mm"):
+        gold = rs((col, "sales"), ((3, 70),))
+        assert tolerant_match(run, gold, q("Sales by month of 2024?", category="time")) == (), col
+    fy = ex(("month", "sales"), (("2023-03-01", 70),))
+    assert (
+        tolerant_match(
+            fy, rs(("month", "sales"), ((3, 70),)), q("Sales by month of FY2024?", category="time")
+        )
+        == ()
+    )
+
+
+def test_evalkit_stricter_empty_and_pivot_rules():
+    empty = rs(("month", "median_price"), ())
+    qq = q("What was the median price in each month of 1993?", category="time", expects_empty=True)
+    for col in ("grand_total", "year", "q"):
+        assert tolerant_match(ex(("earliest", col), (("1995-01-01", 0),)), empty, qq) == (), col
+    ok = ex(("earliest_sale_date", "sales_in_requested_year"), (("1995-01-01", 0),))
+    assert tolerant_match(ok, empty, qq) == ("empty_check",)
+    gold = rs(("duration", "sales"), (("freehold", 5), ("leasehold", 3)))
+    assert (
+        tolerant_match(
+            ex(("freehold", "leasehold", "n"), ((5, 3, 0),)), gold, q("Sales by tenure?")
+        )
+        == ()
+    )
+    years = rs(("year", "sales"), (("2022", 5), ("2023", 3)))
+    assert (
+        tolerant_match(ex(("2022", "2023", "unknown"), ((5, 3, 0),)), years, q("Sales by year?"))
+        == ()
+    )
