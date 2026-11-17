@@ -282,3 +282,43 @@ def test_truncated_query_with_trailing_comment_still_gets_an_exact_count() -> No
     assert client.calls[1][1] == (
         "SELECT count(*) AS n FROM (\nSELECT number AS i FROM numbers(77)\n) AS aa_counted"
     )
+
+
+# Q2.2 live: clickhouse-connect returns no column names for a result with no rows, and the
+# executor crashed building a ResultSet with no columns (the empty-result gold q-020, q-040).
+
+
+def test_empty_result_takes_its_column_names_from_describe() -> None:
+    described = ch_result(["name", "type"], [("type", "Enum8('flat' = 4)"), ("sales", "UInt64")])
+    client = FakeCHClient([ch_result([], [], query_id="q-main"), described])
+    ex = make(client).execute(
+        "SELECT type, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 1994 "
+        "GROUP BY type; -- c"
+    )
+    assert ex.error is None and ex.result is not None
+    assert ex.result.columns == ("type", "sales") and ex.result.rows == ()
+    assert ex.rows_total == 0 and ex.truncated is False and ex.query_id == "q-main"
+    kind, sql, settings = client.calls[1]
+    assert kind == "query" and settings is not None and settings["readonly"] == 1
+    assert sql == (
+        "DESCRIBE TABLE (\nSELECT type, count() AS sales FROM uk.uk_price_paid "
+        "WHERE toYear(date) = 1994 GROUP BY type\n)"
+    )
+
+
+def test_empty_result_whose_describe_fails_is_a_sql_error() -> None:
+    client = FakeCHClient([ch_result([], [], query_id="q-main"), DatabaseError("boom", code=62)])
+    ex = make(client).execute("SELECT 1 AS x WHERE 0")
+    assert ex.error == "sql_error" and ex.result is None and ex.query_id == "q-main"
+
+
+def test_empty_result_whose_describe_returns_nothing_is_a_sql_error() -> None:
+    client = FakeCHClient([ch_result([], []), ch_result(["name"], [])])
+    ex = make(client).execute("SELECT 1 AS x WHERE 0")
+    assert ex.error == "sql_error" and ex.result is None
+
+
+def test_a_non_empty_result_never_describes() -> None:
+    client = FakeCHClient([ch_result(["x"], [(1,)])])
+    make(client).execute("SELECT 1 AS x")
+    assert len(client.calls) == 1

@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 152,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:21.834877Z",
+  "question_id": "q-058",
+  "result": {
+    "columns": [
+      "COUNTY",
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "NORTHUMBERLAND",
+        195000
+      ],
+      [
+        "TYNE AND WEAR",
+        161000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "cdbcc06ef5e4f8b862e0638bc5b8c32fee4703308fa05e11c3d2a56067c6bfa5"
+}

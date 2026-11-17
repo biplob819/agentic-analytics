@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 295,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:41.001219Z",
+  "question_id": "q-076",
+  "result": {
+    "columns": [
+      "district",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "ELMBRIDGE",
+        626000.0
+      ],
+      [
+        "MOLE VALLEY",
+        562500.0
+      ],
+      [
+        "WAVERLEY",
+        535000.0
+      ],
+      [
+        "EPSOM AND EWELL",
+        525000.0
+      ],
+      [
+        "GUILDFORD",
+        493250.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "6f2d442d03031a99a29410c2388f20e6c6579f03141e7381bd7356c0e4650b41"
+}

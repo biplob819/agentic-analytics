@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 147,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:48.460478Z",
+  "question_id": "q-019",
+  "result": {
+    "columns": [
+      "FREEHOLD_PCT"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        97.25910833565759
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "436a647aafbb837df5840c0bada6ff840144e0da38d5b501816403bf803bc03c"
+}

@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 160,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:59.774245Z",
+  "question_id": "q-097",
+  "result": {
+    "columns": [
+      "TOTAL_2021",
+      "TOTAL_2022",
+      "PCT_CHANGE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        499538305905,
+        446829857594,
+        -10.551432730570989
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "fb5d0a9c302e5fb6bc2bf60205e6ef715f321aa660d8801ceca22b1a1afbf804"
+}

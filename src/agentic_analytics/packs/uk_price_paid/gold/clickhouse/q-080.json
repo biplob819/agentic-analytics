@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 309,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:45.621392Z",
+  "question_id": "q-080",
+  "result": {
+    "columns": [
+      "district",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "KENSINGTON AND CHELSEA",
+        995000.0
+      ],
+      [
+        "CITY OF WESTMINSTER",
+        850000.0
+      ],
+      [
+        "CITY OF LONDON",
+        802625.0
+      ],
+      [
+        "CAMDEN",
+        700000.0
+      ],
+      [
+        "HAMMERSMITH AND FULHAM",
+        666583.5
+      ],
+      [
+        "ISLINGTON",
+        590000.0
+      ],
+      [
+        "HOUNSLOW",
+        571150.0
+      ],
+      [
+        "RICHMOND UPON THAMES",
+        555000.0
+      ],
+      [
+        "WANDSWORTH",
+        550000.0
+      ],
+      [
+        "HACKNEY",
+        530000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "d30623cc8f805bf126f078a81d582a35958f5da5a9031627fa930cafade685ae"
+}

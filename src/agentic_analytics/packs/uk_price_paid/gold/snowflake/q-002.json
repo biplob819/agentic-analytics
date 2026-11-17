@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 246,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:34.479404Z",
+  "question_id": "q-002",
+  "result": {
+    "columns": [
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        280000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "9df4529ce4693a4b2955c96d0cffc361435ef8cc51a5accd7df732c014d82236"
+}

@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 320,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:34.169213Z",
+  "question_id": "q-070",
+  "result": {
+    "columns": [
+      "town",
+      "new_build_sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        6387
+      ],
+      [
+        "MANCHESTER",
+        1940
+      ],
+      [
+        "LIVERPOOL",
+        1313
+      ],
+      [
+        "NOTTINGHAM",
+        1251
+      ],
+      [
+        "LEEDS",
+        1242
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "7241c1205b0f56fd7ae0de2b50fbb55bce8ad14fbdc552847e444b3b76f7862d"
+}

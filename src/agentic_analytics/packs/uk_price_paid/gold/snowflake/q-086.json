@@ -1,0 +1,50 @@
+{
+  "elapsed_ms": 148,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:51.016571Z",
+  "question_id": "q-086",
+  "result": {
+    "columns": [
+      "TOWN",
+      "SALES_2023",
+      "SALES_2024",
+      "PCT_CHANGE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "BIRMINGHAM",
+        12081,
+        12953,
+        7.217945534310074
+      ],
+      [
+        "BRISTOL",
+        13357,
+        14109,
+        5.630006738039979
+      ],
+      [
+        "LEEDS",
+        9785,
+        10781,
+        10.178845171180377
+      ],
+      [
+        "LONDON",
+        59855,
+        66833,
+        11.65817392030741
+      ],
+      [
+        "MANCHESTER",
+        14473,
+        15746,
+        8.795688523457473
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "9a7b4c0e372ca7d7b93fe510eb7a57d1eafe63da226b1716320add8d245ab849"
+}

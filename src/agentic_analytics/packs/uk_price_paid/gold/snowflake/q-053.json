@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 153,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:17.885815Z",
+  "question_id": "q-053",
+  "result": {
+    "columns": [
+      "SALES"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        228
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "637d8aa42b244ff9e7b23b9fbbf2984f9166f982d939b9aa470f26d104ff81df"
+}

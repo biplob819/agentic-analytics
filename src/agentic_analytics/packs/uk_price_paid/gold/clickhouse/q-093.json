@@ -1,0 +1,50 @@
+{
+  "elapsed_ms": 336,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:56.404129Z",
+  "question_id": "q-093",
+  "result": {
+    "columns": [
+      "type",
+      "sales_2020",
+      "sales_2021",
+      "pct_change"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "detached",
+        222275,
+        314357,
+        41.427061072995166
+      ],
+      [
+        "flat",
+        146361,
+        216800,
+        48.12689172662116
+      ],
+      [
+        "other",
+        56319,
+        70486,
+        25.154921074592945
+      ],
+      [
+        "semi-detached",
+        238231,
+        335622,
+        40.880909705286044
+      ],
+      [
+        "terraced",
+        235008,
+        344906,
+        46.7635144335512
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "7f90500684a405dae1b870024cca5e6c7c0b5b332f24c0e7a54fdd079886196f"
+}

@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 158,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:36.989240Z",
+  "question_id": "q-005",
+  "result": {
+    "columns": [
+      "DURATION",
+      "SALES"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "freehold",
+        651962
+      ],
+      [
+        "leasehold",
+        209820
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "cd10edcd536721c55f180c0f9bb7d6dcc650a40c6c414f26b970d877d339234c"
+}

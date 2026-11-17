@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 153,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:55.729960Z",
+  "question_id": "q-092",
+  "result": {
+    "columns": [
+      "AVG_2007",
+      "AVG_2008",
+      "PCT_CHANGE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        219391.439443,
+        217147.432993,
+        -1.0228322744484428
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "2c7adbfa02a3f0a8af95adfccf51f8949b2e9891dda7811bf1ab10c243b877b5"
+}

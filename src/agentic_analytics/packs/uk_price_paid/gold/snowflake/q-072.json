@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 159,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:36.541805Z",
+  "question_id": "q-072",
+  "result": {
+    "columns": [
+      "TOWN",
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "COBHAM",
+        1600000
+      ],
+      [
+        "LONDON",
+        1500000
+      ],
+      [
+        "WEYBRIDGE",
+        1350000
+      ],
+      [
+        "ESHER",
+        1315000
+      ],
+      [
+        "BEACONSFIELD",
+        1300000
+      ],
+      [
+        "HARPENDEN",
+        1300000
+      ],
+      [
+        "BARNET",
+        1250000
+      ],
+      [
+        "GERRARDS CROSS",
+        1193500
+      ],
+      [
+        "ASCOT",
+        1175000
+      ],
+      [
+        "TADWORTH",
+        1097500
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "975f9af61a049d76d4b43bf0e1dc3abec6a2d026b97e6a6a2b6588b9eb65f621"
+}

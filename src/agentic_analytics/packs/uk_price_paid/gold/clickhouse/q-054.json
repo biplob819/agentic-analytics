@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 488,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:18.666136Z",
+  "question_id": "q-054",
+  "result": {
+    "columns": [
+      "type",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "detached",
+        436995.0
+      ],
+      [
+        "flat",
+        159475.0
+      ],
+      [
+        "other",
+        350000.0
+      ],
+      [
+        "semi-detached",
+        296000.0
+      ],
+      [
+        "terraced",
+        250000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "f403f6c69ae92b6fb4f4c811e609568c2375163f6191450acaea7129eb701767"
+}

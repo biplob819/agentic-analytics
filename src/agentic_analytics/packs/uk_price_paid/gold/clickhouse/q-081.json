@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 334,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:46.697552Z",
+  "question_id": "q-081",
+  "result": {
+    "columns": [
+      "median_2023",
+      "median_2024",
+      "pct_change"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        275000.0,
+        280000.0,
+        1.8181818181818181
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "fe8746ed7540b9cc67657b6c338614b5f81176135f1444ad422ee937d0b9a393"
+}

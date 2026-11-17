@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 153,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:46.883050Z",
+  "question_id": "q-017",
+  "result": {
+    "columns": [
+      "P90_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        650000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "db3658a6de7c8c1e50288051b6135cc1665c0dd49b872da3deb1c54968470205"
+}

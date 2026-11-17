@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 306,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:13.538799Z",
+  "question_id": "q-048",
+  "result": {
+    "columns": [
+      "towns"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        37
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "cf7d4474ac1e5ebd2f52d9dacaa84edea6a6a6108a0fc5b688bbf1b14cd6b8f5"
+}

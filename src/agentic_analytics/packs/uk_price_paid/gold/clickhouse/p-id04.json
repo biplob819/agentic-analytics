@@ -1,0 +1,22 @@
+{
+  "elapsed_ms": 315,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:22:06.467010Z",
+  "probe_id": "p-id04",
+  "result": {
+    "columns": [
+      "town",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LEEDS",
+        9785
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "044c7c3460b648ed6b6c6de659c45625150a92f67041dace471e0a21cfbb1b24"
+}

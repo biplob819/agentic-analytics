@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 307,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:15.813721Z",
+  "question_id": "q-051",
+  "result": {
+    "columns": [
+      "town",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "CAMBRIDGE",
+        450000.0
+      ],
+      [
+        "OXFORD",
+        450000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "46d355fcb3edfbd83dee700922b5ae639835df1da1237c6aed6f2c259fff27dc"
+}

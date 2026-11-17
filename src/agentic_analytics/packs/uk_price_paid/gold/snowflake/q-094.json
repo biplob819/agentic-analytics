@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 164,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:57.411178Z",
+  "question_id": "q-094",
+  "result": {
+    "columns": [
+      "COUNTY",
+      "MEDIAN_2019",
+      "MEDIAN_2024",
+      "PCT_CHANGE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "GREATER LONDON",
+        455000,
+        511000,
+        12.307692307692308
+      ],
+      [
+        "GREATER MANCHESTER",
+        163350,
+        220000,
+        34.68013468013468
+      ],
+      [
+        "WEST MIDLANDS",
+        174950,
+        221000,
+        26.32180623035153
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "38eeaf3acb5d3a3a72a7672b4b2f588f5b6a396f09d21fc5c2bd9d5e2fa47977"
+}

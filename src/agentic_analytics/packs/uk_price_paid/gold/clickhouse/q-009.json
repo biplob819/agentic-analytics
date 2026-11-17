@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 332,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:20:39.991869Z",
+  "question_id": "q-009",
+  "result": {
+    "columns": [
+      "duration",
+      "avg_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "freehold",
+        320424.3398203593
+      ],
+      [
+        "leasehold",
+        335829.1674622091
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "45e063a83b9e3d16aee55583778dff6dd78d3f7ee4ca17c8976113aa353ae9cc"
+}

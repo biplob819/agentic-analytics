@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 161,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:22:04.233573Z",
+  "probe_id": "p-iq03",
+  "result": {
+    "columns": [
+      "SALES"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        164027
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "1b66d38598e9492d1213fecf5b6acb1eb4a10985fc0481c1149275c7a677cefc"
+}

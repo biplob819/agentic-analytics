@@ -1,0 +1,50 @@
+{
+  "elapsed_ms": 152,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:54.151557Z",
+  "question_id": "q-090",
+  "result": {
+    "columns": [
+      "TYPE",
+      "SALES_YEAR_BEFORE",
+      "SALES_LAST_YEAR",
+      "PCT_CHANGE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "detached",
+        211537,
+        230058,
+        8.75544231032869
+      ],
+      [
+        "flat",
+        164027,
+        164111,
+        0.051211081102501416
+      ],
+      [
+        "other",
+        54173,
+        51829,
+        -4.326878703413139
+      ],
+      [
+        "semi-detached",
+        252254,
+        274272,
+        8.728503809652176
+      ],
+      [
+        "terraced",
+        250223,
+        272008,
+        8.706234039237001
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "a1e531cffc8d155afdb5c026069f541c7b724720e90694cb79b429bbb7493ea5"
+}

@@ -1,0 +1,34 @@
+{
+  "elapsed_ms": 151,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:38.903372Z",
+  "question_id": "q-074",
+  "result": {
+    "columns": [
+      "COUNTY",
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "WINDSOR AND MAIDENHEAD",
+        520000
+      ],
+      [
+        "GREATER LONDON",
+        511000
+      ],
+      [
+        "SURREY",
+        487250
+      ],
+      [
+        "WOKINGHAM",
+        480000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "33f13960629100eb83b5a158b01541ccf68f02a2fa720b26cdd06d782b1b23a0"
+}

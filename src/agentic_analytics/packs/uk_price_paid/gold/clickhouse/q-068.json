@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 334,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:31.961206Z",
+  "question_id": "q-068",
+  "result": {
+    "columns": [
+      "postcode1",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "W1K",
+        3400000.0
+      ],
+      [
+        "SW1X",
+        2600000.0
+      ],
+      [
+        "SW1W",
+        1840000.0
+      ],
+      [
+        "W8",
+        1695000.0
+      ],
+      [
+        "W1H",
+        1607500.0
+      ],
+      [
+        "SW7",
+        1500000.0
+      ],
+      [
+        "W1U",
+        1425000.0
+      ],
+      [
+        "SW3",
+        1400000.0
+      ],
+      [
+        "W1T",
+        1300000.0
+      ],
+      [
+        "W11",
+        1175000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "1ee6dbce68a82ceece8e1a7090c19ac546e04327d71d5f3c21e908688a33e4f8"
+}

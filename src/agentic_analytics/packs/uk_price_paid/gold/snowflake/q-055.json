@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 149,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:19.577334Z",
+  "question_id": "q-055",
+  "result": {
+    "columns": [
+      "LEASEHOLD_PCT"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        4.856273913470028
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "eaaca0816c489ea60ed58fb79bf251a340801bb0e79c47fa34dfe847aedec7dd"
+}

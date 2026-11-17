@@ -1,0 +1,22 @@
+{
+  "elapsed_ms": 151,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:39.337211Z",
+  "question_id": "q-008",
+  "result": {
+    "columns": [
+      "NEW_BUILD_MEDIAN_PRICE",
+      "EXISTING_MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        334000,
+        275000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "a0a5c0ea398122a440402ec41315f7f8222af118fce77883362804168e7c1599"
+}

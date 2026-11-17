@@ -101,6 +101,11 @@ def count_sql(sql: str, engine: Engine) -> str:
     The body ends at the last real token, so trailing semicolons and comments (`SELECT 1; -- c`)
     are dropped; the newlines keep any comment left inside the body inert.
     """
+    return f"SELECT count(*) AS n FROM (\n{query_body(sql, engine)}\n) AS aa_counted"
+
+
+def query_body(sql: str, engine: Engine) -> str:
+    """`sql` up to its last real token: trailing semicolons and comments dropped, for wrapping."""
     import sqlglot
     from sqlglot.tokenizer_core import TokenType
 
@@ -114,7 +119,7 @@ def count_sql(sql: str, engine: Engine) -> str:
     except Exception:  # the guard already parsed it; keep the plain strip as a fallback
         while body.endswith(";"):
             body = body[:-1].rstrip()
-    return f"SELECT count(*) AS n FROM (\n{body}\n) AS aa_counted"
+    return body
 
 
 def recorded_sql(sql: str) -> str:
@@ -192,5 +197,6 @@ __all__ = [
     "WarehouseConfigError",
     "count_sql",
     "make_result",
+    "query_body",
     "to_json_value",
 ]

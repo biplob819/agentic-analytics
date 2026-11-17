@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 149,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:25.266697Z",
+  "question_id": "q-062",
+  "result": {
+    "columns": [
+      "TOWN",
+      "SALES"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        59855
+      ],
+      [
+        "MANCHESTER",
+        14473
+      ],
+      [
+        "BRISTOL",
+        13357
+      ],
+      [
+        "BIRMINGHAM",
+        12081
+      ],
+      [
+        "NOTTINGHAM",
+        11665
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "aa97362eb86305ffbf291b27a97d314ff834a6396c90d005b40dcf45e7340e5d"
+}

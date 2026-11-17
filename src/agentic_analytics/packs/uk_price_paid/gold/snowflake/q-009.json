@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 155,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:40.146599Z",
+  "question_id": "q-009",
+  "result": {
+    "columns": [
+      "DURATION",
+      "AVG_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "freehold",
+        320424.33982
+      ],
+      [
+        "leasehold",
+        335829.167462
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "f2829d5727e8ebe541b64486e07764a80503a85d7cf3db4eac3f7dfbe3b2c2b4"
+}

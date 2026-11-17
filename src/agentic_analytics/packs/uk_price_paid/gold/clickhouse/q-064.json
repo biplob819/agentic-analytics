@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 330,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:27.468200Z",
+  "question_id": "q-064",
+  "result": {
+    "columns": [
+      "town",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "PETERLEE",
+        65000.0
+      ],
+      [
+        "FERRYHILL",
+        71499.0
+      ],
+      [
+        "STANLEY",
+        87000.0
+      ],
+      [
+        "BISHOP AUCKLAND",
+        105000.0
+      ],
+      [
+        "NELSON",
+        105000.0
+      ],
+      [
+        "HARTLEPOOL",
+        115000.0
+      ],
+      [
+        "SEAHAM",
+        115000.0
+      ],
+      [
+        "BURNLEY",
+        116250.0
+      ],
+      [
+        "ASHINGTON",
+        119000.0
+      ],
+      [
+        "BOOTLE",
+        120000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "19aac0f4d3ea134f66e7ee0740940f0c3c1953ebdc1170dc7bcd118f835d254e"
+}

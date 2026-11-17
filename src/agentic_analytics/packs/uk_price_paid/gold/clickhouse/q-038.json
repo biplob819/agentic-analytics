@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 347,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:04.405301Z",
+  "question_id": "q-038",
+  "result": {
+    "columns": [
+      "year",
+      "total_value"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        2019,
+        359717805107
+      ],
+      [
+        2020,
+        337223687293
+      ],
+      [
+        2021,
+        499538305905
+      ],
+      [
+        2022,
+        446829857594
+      ],
+      [
+        2023,
+        350703359572
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "6e1c2b173980261fe3fd71945ccab3bb719ac23f7b3a1d152a275cf31eabfc00"
+}

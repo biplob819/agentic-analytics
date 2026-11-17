@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 325,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:28.612789Z",
+  "question_id": "q-065",
+  "result": {
+    "columns": [
+      "county",
+      "total_value"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "GREATER LONDON",
+        105441360403
+      ],
+      [
+        "SURREY",
+        16472938516
+      ],
+      [
+        "GREATER MANCHESTER",
+        14156422044
+      ],
+      [
+        "WEST MIDLANDS",
+        13721450446
+      ],
+      [
+        "KENT",
+        13607434310
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "c313b3fe59870ffb8bbacab56f3eb0d633061521a46691bd9fe19736444014a9"
+}

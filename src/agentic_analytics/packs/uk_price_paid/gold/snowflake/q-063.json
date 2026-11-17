@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 156,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:26.471827Z",
+  "question_id": "q-063",
+  "result": {
+    "columns": [
+      "DISTRICT",
+      "AVG_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "CITY OF LONDON",
+        3499719.069971
+      ],
+      [
+        "CITY OF WESTMINSTER",
+        2983767.564699
+      ],
+      [
+        "KENSINGTON AND CHELSEA",
+        2270453.382141
+      ],
+      [
+        "CAMDEN",
+        1477447.864609
+      ],
+      [
+        "HAMMERSMITH AND FULHAM",
+        1122063.265844
+      ],
+      [
+        "ISLINGTON",
+        999565.964481
+      ],
+      [
+        "ELMBRIDGE",
+        969267.541684
+      ],
+      [
+        "RICHMOND UPON THAMES",
+        935073.648396
+      ],
+      [
+        "TOWER HAMLETS",
+        880632.389301
+      ],
+      [
+        "WANDSWORTH",
+        880119.254337
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "a40e12c0c81e4a6aee26a7e979cc0ad371c31f19c30162fe802d8924fdf7f308"
+}

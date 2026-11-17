@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 171,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:43.321785Z",
+  "question_id": "q-078",
+  "result": {
+    "columns": [
+      "TOWN",
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        750000
+      ],
+      [
+        "ST ALBANS",
+        563000
+      ],
+      [
+        "HARROW",
+        530000
+      ],
+      [
+        "SUTTON",
+        520000
+      ],
+      [
+        "ILFORD",
+        508750
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "6797df09dac656bccde04410289c53426a3d0645dfbbc29f21964a54a2e70bdf"
+}

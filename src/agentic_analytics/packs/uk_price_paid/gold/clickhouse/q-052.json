@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 310,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:16.579361Z",
+  "question_id": "q-052",
+  "result": {
+    "columns": [
+      "district",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "BRADFORD",
+        8122
+      ],
+      [
+        "CALDERDALE",
+        3415
+      ],
+      [
+        "KIRKLEES",
+        6632
+      ],
+      [
+        "LEEDS",
+        12756
+      ],
+      [
+        "WAKEFIELD",
+        5606
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "de3dd2eaf3bd49e2cb2a7cf100860c26a62063045d28914af7aedc6dde960cdf"
+}

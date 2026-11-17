@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 313,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:15.055107Z",
+  "question_id": "q-050",
+  "result": {
+    "columns": [
+      "town",
+      "avg_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LIVERPOOL",
+        152627.52684806165
+      ],
+      [
+        "MANCHESTER",
+        213907.20281210056
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "43cf10c134929dbc920623022d2ff3abbc4f860e4923e8bcba746b069cb2a008"
+}

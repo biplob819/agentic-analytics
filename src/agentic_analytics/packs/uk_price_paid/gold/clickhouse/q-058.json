@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 305,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:21.682813Z",
+  "question_id": "q-058",
+  "result": {
+    "columns": [
+      "county",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "NORTHUMBERLAND",
+        195000.0
+      ],
+      [
+        "TYNE AND WEAR",
+        161000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "2446bc999302cd0a4aced3ca37c74450cac265e5cd6dc1c7e985aeee22aa4525"
+}

@@ -1,0 +1,22 @@
+{
+  "elapsed_ms": 327,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:22:05.833355Z",
+  "probe_id": "p-id02",
+  "result": {
+    "columns": [
+      "town",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "MANCHESTER",
+        15746
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "5d242a51ea4d011a9614be10efdbbe852d3b317eac6f1782a006bcb582dbd317"
+}

@@ -1,0 +1,30 @@
+{
+  "elapsed_ms": 149,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:35.422475Z",
+  "question_id": "q-071",
+  "result": {
+    "columns": [
+      "TYPE",
+      "SALES"
+    ],
+    "kind": "result_set",
+    "ordered": true,
+    "rows": [
+      [
+        "semi-detached",
+        252254
+      ],
+      [
+        "terraced",
+        250223
+      ],
+      [
+        "detached",
+        211537
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "e7dd8b1c66ee497335e71491ad555c1768ac018bef3b4ebbb14a5c38275f53f3"
+}

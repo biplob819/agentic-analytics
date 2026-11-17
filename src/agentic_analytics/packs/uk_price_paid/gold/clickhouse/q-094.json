@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 359,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:57.247544Z",
+  "question_id": "q-094",
+  "result": {
+    "columns": [
+      "county",
+      "median_2019",
+      "median_2024",
+      "pct_change"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "GREATER LONDON",
+        455000.0,
+        511000.0,
+        12.307692307692308
+      ],
+      [
+        "GREATER MANCHESTER",
+        163350.0,
+        220000.0,
+        34.68013468013468
+      ],
+      [
+        "WEST MIDLANDS",
+        174950.0,
+        221000.0,
+        26.32180623035153
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "baf9814b00d25ff3028d37538327e7c0974bb8820539f78d18a6779045ac6071"
+}

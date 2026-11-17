@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 306,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:22:01.555363Z",
+  "question_id": "q-099",
+  "result": {
+    "columns": [
+      "sales_q1_2023",
+      "sales_q1_2024",
+      "pct_change"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        209156,
+        192539,
+        -7.944787622635736
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "716814c31aa8a785c2fc7884ea48d1e1769bae17c5bf917e939dfeab569fd851"
+}

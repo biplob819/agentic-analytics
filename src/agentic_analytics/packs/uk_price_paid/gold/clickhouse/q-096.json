@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 319,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:58.824982Z",
+  "question_id": "q-096",
+  "result": {
+    "columns": [
+      "new_builds_2023",
+      "new_builds_2024",
+      "change_count",
+      "pct_change"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        98150,
+        89505,
+        -8645,
+        -8.80794701986755
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "3efb9d29b96f23ef04df6a8c1c09861204236905fd49a6512d243825d4cc0d82"
+}

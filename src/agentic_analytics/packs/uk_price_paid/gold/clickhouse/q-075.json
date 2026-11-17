@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 328,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:39.892214Z",
+  "question_id": "q-075",
+  "result": {
+    "columns": [
+      "town",
+      "sales_over_1m"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        13214
+      ],
+      [
+        "BRISTOL",
+        379
+      ],
+      [
+        "READING",
+        251
+      ],
+      [
+        "CAMBRIDGE",
+        248
+      ],
+      [
+        "RICHMOND",
+        229
+      ],
+      [
+        "ST ALBANS",
+        229
+      ],
+      [
+        "SEVENOAKS",
+        223
+      ],
+      [
+        "CHELTENHAM",
+        219
+      ],
+      [
+        "MANCHESTER",
+        219
+      ],
+      [
+        "BATH",
+        217
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "c3009d67326614e5caf37892e7c59e89090691f71ee376634070fc337e47da9d"
+}

@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 339,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:36.383026Z",
+  "question_id": "q-072",
+  "result": {
+    "columns": [
+      "town",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "COBHAM",
+        1600000.0
+      ],
+      [
+        "LONDON",
+        1500000.0
+      ],
+      [
+        "WEYBRIDGE",
+        1350000.0
+      ],
+      [
+        "ESHER",
+        1315000.0
+      ],
+      [
+        "BEACONSFIELD",
+        1300000.0
+      ],
+      [
+        "HARPENDEN",
+        1300000.0
+      ],
+      [
+        "BARNET",
+        1250000.0
+      ],
+      [
+        "GERRARDS CROSS",
+        1193500.0
+      ],
+      [
+        "ASCOT",
+        1175000.0
+      ],
+      [
+        "TADWORTH",
+        1097500.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "88278d600b2c5ec925f26e92a30e5dea444549b05db35dd52a9572b6e54fa083"
+}

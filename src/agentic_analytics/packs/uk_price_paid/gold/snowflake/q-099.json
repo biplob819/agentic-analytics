@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 148,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:22:01.703600Z",
+  "question_id": "q-099",
+  "result": {
+    "columns": [
+      "SALES_Q1_2023",
+      "SALES_Q1_2024",
+      "PCT_CHANGE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        209156,
+        192539,
+        -7.944787622635736
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "c6a9674fbb7d1a8666a2c4eff3f267023ff5069f8837b8ffbe9d4ff2f3e01dc5"
+}

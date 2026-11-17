@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 302,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:22:04.998189Z",
+  "probe_id": "p-iq05",
+  "result": {
+    "columns": [
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        339000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "87e34e737a6737d6c7f39026c61032550c938cba5c36ecd2ea64534c2be1509b"
+}

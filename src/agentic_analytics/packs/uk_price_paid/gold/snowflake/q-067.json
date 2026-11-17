@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 143,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:30.981653Z",
+  "question_id": "q-067",
+  "result": {
+    "columns": [
+      "DISTRICT",
+      "FLAT_SALES"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "WANDSWORTH",
+        3983
+      ],
+      [
+        "TOWER HAMLETS",
+        3319
+      ],
+      [
+        "MANCHESTER",
+        3040
+      ],
+      [
+        "LAMBETH",
+        3038
+      ],
+      [
+        "SOUTHWARK",
+        2674
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "60d70052dcf2523e2746bded24736b829fc53e716e610b6e89a56489dab18f2b"
+}

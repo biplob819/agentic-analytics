@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 156,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:40.048317Z",
+  "question_id": "q-075",
+  "result": {
+    "columns": [
+      "TOWN",
+      "SALES_OVER_1M"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        13214
+      ],
+      [
+        "BRISTOL",
+        379
+      ],
+      [
+        "READING",
+        251
+      ],
+      [
+        "CAMBRIDGE",
+        248
+      ],
+      [
+        "RICHMOND",
+        229
+      ],
+      [
+        "ST ALBANS",
+        229
+      ],
+      [
+        "SEVENOAKS",
+        223
+      ],
+      [
+        "CHELTENHAM",
+        219
+      ],
+      [
+        "MANCHESTER",
+        219
+      ],
+      [
+        "BATH",
+        217
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "88bff5cb51be3a6b595c4d5ed60900fbc60cfa3ec7dd522fb297c3325715c290"
+}

@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 311,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:51.631900Z",
+  "question_id": "q-087",
+  "result": {
+    "columns": [
+      "new_build_pct_2023",
+      "new_build_pct_2024",
+      "change_points"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        11.389191233977966,
+        9.601336173882821,
+        -1.7878550600951453
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "4503bc403e2bbf73428a221c43234242c6ea0a6e9c61458b87aa38e0a2749b4a"
+}

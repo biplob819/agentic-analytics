@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 304,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:20.933406Z",
+  "question_id": "q-057",
+  "result": {
+    "columns": [
+      "duration",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "freehold",
+        1869
+      ],
+      [
+        "leasehold",
+        1142
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "ac7cc50f41b28ce90f56e9ea82df736a33560fd8413a627bedcfce315a8d9634"
+}

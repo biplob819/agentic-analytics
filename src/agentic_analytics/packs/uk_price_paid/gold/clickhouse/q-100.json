@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 326,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:22:02.335505Z",
+  "question_id": "q-100",
+  "result": {
+    "columns": [
+      "freehold_pct_2023",
+      "freehold_pct_2024",
+      "change_points"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        93.72895252477059,
+        93.88219278613585,
+        0.15324026136525504
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "9766fd60e8d232c57839da9c3d9a547ba5e9cd7bcf53a13c7c53d160f90673dc"
+}

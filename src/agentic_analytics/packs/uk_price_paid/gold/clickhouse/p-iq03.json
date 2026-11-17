@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 313,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:22:04.072481Z",
+  "probe_id": "p-iq03",
+  "result": {
+    "columns": [
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        164027
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "89f9075b39c79ca2e254cb0a00ab99672547dca0f1f3e8d8943d391eec7a9f8a"
+}

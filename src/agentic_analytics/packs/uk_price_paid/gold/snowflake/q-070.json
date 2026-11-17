@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 159,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:34.328010Z",
+  "question_id": "q-070",
+  "result": {
+    "columns": [
+      "TOWN",
+      "NEW_BUILD_SALES"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        6387
+      ],
+      [
+        "MANCHESTER",
+        1940
+      ],
+      [
+        "LIVERPOOL",
+        1313
+      ],
+      [
+        "NOTTINGHAM",
+        1251
+      ],
+      [
+        "LEEDS",
+        1242
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "c8eaca7c768447fc57909067d7dd1c6149dfb851aa0798b226c3b0324cedf763"
+}

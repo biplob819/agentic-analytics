@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 150,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:04.555379Z",
+  "question_id": "q-038",
+  "result": {
+    "columns": [
+      "YEAR",
+      "TOTAL_VALUE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        2019,
+        359717805107
+      ],
+      [
+        2020,
+        337223687293
+      ],
+      [
+        2021,
+        499538305905
+      ],
+      [
+        2022,
+        446829857594
+      ],
+      [
+        2023,
+        350703359572
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "92ca743898f1d418e9ffcbf312e30d9a678ec44f95c58189a36e28e1fb51ba7b"
+}

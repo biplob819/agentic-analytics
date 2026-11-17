@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 312,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:33.097419Z",
+  "question_id": "q-069",
+  "result": {
+    "columns": [
+      "town",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "ALTRINCHAM",
+        435000.0
+      ],
+      [
+        "SALE",
+        373030.0
+      ],
+      [
+        "CHEADLE",
+        350000.0
+      ],
+      [
+        "STOCKPORT",
+        266000.0
+      ],
+      [
+        "MANCHESTER",
+        239000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "2b635f00f10e0bef49d52a35a97bbb53ed73634dc9ceedb818a7ec336bc1f298"
+}

@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 338,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:43.150873Z",
+  "question_id": "q-078",
+  "result": {
+    "columns": [
+      "town",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        750000.0
+      ],
+      [
+        "ST ALBANS",
+        563000.0
+      ],
+      [
+        "HARROW",
+        530000.0
+      ],
+      [
+        "SUTTON",
+        520000.0
+      ],
+      [
+        "ILFORD",
+        508750.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "90a3f81e22d0ec338871912c61c27bc0769e348ee4dde6b91d5179d598e351fc"
+}

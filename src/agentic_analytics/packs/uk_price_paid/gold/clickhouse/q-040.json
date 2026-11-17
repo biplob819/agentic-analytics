@@ -1,0 +1,17 @@
+{
+  "elapsed_ms": 577,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:06.271662Z",
+  "question_id": "q-040",
+  "result": {
+    "columns": [
+      "month",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": []
+  },
+  "schema_version": "1.0",
+  "sql_hash": "3e935816f2e3d628f3783a270e40c1f144b7b9fa57965a887981ce070034efd4"
+}

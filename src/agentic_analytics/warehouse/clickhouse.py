@@ -4,9 +4,13 @@ Every statement passes `check_sql` first. Queries run with `readonly=1`, `max_ex
 and `max_result_rows=row_cap + 1` with `result_overflow_mode='break'`, so the server stops after
 just over the cap; the client keeps `row_cap` rows and reports `truncated`. When rows were cut, a
 second guarded query (`SELECT count(*) FROM (<sql>)`) gives the exact `rows_total`; if that count
-fails, `rows_total` is the lower bound `row_cap + 1`. `elapsed_ms` is wall-clock time for the whole
-call, count included. The executor generates the `query_id` and sends it, so the id is recorded
-even when the query fails; it is `None` only when nothing was sent (guard refusal, no connection).
+fails, `rows_total` is the lower bound `row_cap + 1`. clickhouse-connect reports no column names
+for a result with no rows, so an empty result takes its names from `DESCRIBE TABLE (<sql>)`, which
+analyses the query without running it; if that fails the execution is a `sql_error` (Q2.2 live:
+an empty gold result crashed on a ResultSet with no columns). `elapsed_ms` is wall-clock time for
+the whole call, count included. The executor generates the `query_id` and sends it, so the id is
+recorded even when the query fails; it is `None` only when nothing was sent (guard refusal, no
+connection).
 Warehouse errors come back as `Execution(error=...)`; bad credentials raise `WarehouseConfigError`.
 """
 
@@ -32,6 +36,7 @@ from agentic_analytics.warehouse._common import (
     check_row_cap,
     count_sql,
     failed,
+    query_body,
     succeeded,
 )
 from agentic_analytics.warehouse.guard import check_sql
@@ -166,6 +171,10 @@ class ClickHouseExecutor:
                 raise WarehouseConfigError("ClickHouse rejected the credentials") from e
             log.info("ClickHouse query %s failed: %s", query_id, e)
             return failed("clickhouse", sql, classify(e), timer, query_id)
+        if not columns:
+            columns = self._describe(client, sql)
+            if not columns:
+                return failed("clickhouse", sql, "sql_error", timer, query_id)
         total = self._count(client, sql, row_cap) if len(rows) > row_cap else None
         return succeeded(
             "clickhouse",
@@ -177,6 +186,23 @@ class ClickHouseExecutor:
             timer=timer,
             query_id=query_id,
         )
+
+    def _describe(self, client: Any, sql: str) -> tuple[str, ...]:
+        """The result column names of a guarded query, without running it (empty results).
+
+        The wrapper does not go through `check_sql` (the guard refuses DESCRIBE): it is safe
+        because the inner SQL already passed the guard, the wrapper is fixed text, `query_body`
+        drops trailing comments so the closing `\n)` cannot be commented out, and the call sends
+        the same read-only settings as every query (`readonly=1`).
+        """
+        try:
+            res = client.query(
+                describe_sql(sql), settings=self.settings(ROW_CAP, self._new_query_id())
+            )
+            return tuple(str(r[0]) for r in res.result_rows)
+        except Exception as e:
+            log.info("DESCRIBE of an empty result failed (%s)", e)
+            return ()
 
     def _count(self, client: Any, sql: str, row_cap: int) -> int | None:
         wrapped = count_sql(sql, "clickhouse")
@@ -191,4 +217,9 @@ class ClickHouseExecutor:
             return None
 
 
-__all__ = ["ClickHouseExecutor", "classify"]
+def describe_sql(sql: str) -> str:
+    """`DESCRIBE TABLE (<sql>)`: the result's column names and types, the query not run."""
+    return f"DESCRIBE TABLE (\n{query_body(sql, 'clickhouse')}\n)"
+
+
+__all__ = ["ClickHouseExecutor", "classify", "describe_sql"]

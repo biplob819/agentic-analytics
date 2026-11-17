@@ -11,6 +11,7 @@ import json
 import os
 import sys
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 from agentic_analytics import __version__
@@ -47,6 +48,22 @@ def build_parser() -> argparse.ArgumentParser:
         if name == "pack":
             p.add_argument("action", nargs="?", choices=["check"], default=None)
             p.add_argument("--pack", default="uk_price_paid", help="pack name or directory")
+        elif name == "gold":
+            p.add_argument("--pack", default="uk_price_paid", help="pack name or directory")
+            p.add_argument("--only", default=None, help="check one new question; writes nothing")
+            p.add_argument(
+                "--verify",
+                action="store_true",
+                help="only validate the existing gold check against the files; run no SQL",
+            )
+            p.add_argument("--config", default="run.yaml", help="run.yaml holding as_of")
+            p.add_argument("--as-of", default=None, help="as-of date YYYY-MM-DD (else run.yaml)")
+            p.add_argument("--seed", type=int, default=None, help="selection seed (default fixed)")
+            p.add_argument(
+                "--measurements",
+                default="docs/measurements",
+                help="snapshot records (default: docs/measurements)",
+            )
         elif name == "load":
             from agentic_analytics.load.cli import add_load_args
 
@@ -129,6 +146,119 @@ def cmd_pack(ns: argparse.Namespace) -> int:
     return EXIT_OK if report.ok else EXIT_FAILED
 
 
+def _verify_gold(ns: argparse.Namespace) -> int:
+    """`gold --verify`: validate the pack's inputs and its existing gold check; run no SQL."""
+    from agentic_analytics.packs import PackError, load_pack
+    from agentic_analytics.questions import BankError, load_questions
+    from agentic_analytics.run.gold import PreconditionError, load_gold_check, require_gold
+
+    try:
+        pack = load_pack(ns.pack)
+        bank = load_questions(pack)
+        check = load_gold_check(pack)
+    except (PackError, BankError, PreconditionError) as exc:
+        return _error(ns.json, str(exc))
+    if check is None:
+        return _error(ns.json, f"{pack.ref} has no gold check: run `{PROG} gold`", EXIT_FAILED)
+    try:
+        require_gold(pack, bank, check.engines, check.snapshot_sha256)
+    except PreconditionError as exc:
+        return _error(ns.json, f"gold check not clean: {exc}", EXIT_FAILED)
+    msg = f"{pack.ref}: gold check {check.gold_check_id[:12]} is clean ({check.mode})"
+    payload = {"ok": True, "gold_check_id": check.gold_check_id, "mode": check.mode}
+    _emit(ns.json, payload, msg)
+    return EXIT_OK
+
+
+def _gold_as_of(ns: argparse.Namespace) -> Any:
+    from datetime import date
+
+    from agentic_analytics.run.config import RunConfigError
+    from agentic_analytics.schemas import load_run_config
+
+    if ns.as_of:
+        try:
+            return date.fromisoformat(ns.as_of)
+        except ValueError as exc:
+            raise RunConfigError(f"--as-of takes YYYY-MM-DD, got {ns.as_of!r}") from exc
+    if not Path(ns.config).is_file():
+        raise RunConfigError(
+            f"no {ns.config} for the as-of date: pass --as-of or run `{PROG} init`"
+        )
+    return load_run_config(ns.config).as_of
+
+
+def cmd_gold(ns: argparse.Namespace) -> int:
+    """Q2.2: run the gold check (GLD-01..06), or check one question with `--only`."""
+    if ns.verify:
+        return _verify_gold(ns)
+    from agentic_analytics.env import load_dotenv
+    from agentic_analytics.gold import check as gold
+    from agentic_analytics.packs import PackError, load_pack
+    from agentic_analytics.questions import BankError, load_questions
+    from agentic_analytics.run.config import RunConfigError
+    from agentic_analytics.run.gold import PreconditionError, current_snapshot
+    from agentic_analytics.schemas import ConfigError
+    from agentic_analytics.warehouse import WarehouseConfigError
+
+    load_dotenv()
+    try:
+        pack = load_pack(ns.pack)
+        bank = load_questions(pack)
+        executors = gold.configured_executors(os.environ)
+        if not executors:
+            raise RunConfigError("no engine is configured: set the variables in .env.example")
+        as_of = _gold_as_of(ns)
+    except (PackError, BankError, RunConfigError, ConfigError) as exc:
+        return _error(ns.json, str(exc))
+    try:
+        snapshot = current_snapshot(Path(ns.measurements))
+    except PreconditionError as exc:
+        return _error(ns.json, f"refusing to start: {exc}", EXIT_FAILED)
+
+    def say(text: str) -> None:
+        if not ns.json:
+            print(text)
+
+    seed = gold.SELECTION_SEED if ns.seed is None else ns.seed
+    try:
+        outcome = gold.run_gold_check(
+            pack,
+            bank,
+            executors,
+            as_of=as_of,
+            snapshot_sha256=snapshot,
+            seed=seed,
+            only=ns.only,
+            say=say,
+        )
+    except (gold.GoldConfigError, WarehouseConfigError) as exc:
+        return _error(ns.json, str(exc))
+    except Exception as exc:  # a runtime failure: exit 2 without a traceback
+        return _error(ns.json, f"runtime error: {type(exc).__name__}: {str(exc)[:300]}")
+    failures = list(outcome.failures)
+    payload: dict[str, Any] = {"ok": not failures, "failures": failures, "only": ns.only}
+    if outcome.check is not None:
+        c = outcome.check
+        payload |= {
+            "gold_check_id": c.gold_check_id,
+            "mode": c.mode,
+            "status": c.status,
+            "questions": len(c.questions),
+            "written": [str(p) for p in outcome.written],
+        }
+        msg = (
+            f"{pack.ref}: gold check {c.status} ({c.mode}), {len(c.questions)} questions "
+            f"selected, gold_check_id {c.gold_check_id[:12]}"
+        )
+    else:
+        msg = f"{ns.only}: {'ok' if not failures else 'FAILED'}"
+    if failures:
+        msg += f"; {len(failures)} failures:\n  " + "\n  ".join(failures[:50])
+    _emit(ns.json, payload, msg, err=bool(failures))
+    return outcome.exit_code
+
+
 def cmd_setup(ns: argparse.Namespace) -> int:
     """N1.7 (OWNER D-55). Output goes through the setup command's own secret box, which knows
     every secret it has seen; the printed Snowflake SQL holds public keys only."""
@@ -149,6 +279,7 @@ BUILT: dict[str, Callable[[argparse.Namespace], int]] = {
     "doctor": lambda ns: cmd_doctor(ns.json),
     "load": cmd_load,
     "pack": cmd_pack,
+    "gold": cmd_gold,
     "setup": cmd_setup,
 }
 

@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 151,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:33.248568Z",
+  "question_id": "q-069",
+  "result": {
+    "columns": [
+      "TOWN",
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "ALTRINCHAM",
+        435000
+      ],
+      [
+        "SALE",
+        373030
+      ],
+      [
+        "CHEADLE",
+        350000
+      ],
+      [
+        "STOCKPORT",
+        266000
+      ],
+      [
+        "MANCHESTER",
+        239000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "5bac4a85cd81d045febc933e16547c8b6f376ad036c2480885cce2c08b400f5a"
+}

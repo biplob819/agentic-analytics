@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 155,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:22:03.759162Z",
+  "probe_id": "p-iq02",
+  "result": {
+    "columns": [
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        239125
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "0c3ca1927f08339e5fc3985aa607653cde067b3605ea1b101a9f41596bd633f6"
+}

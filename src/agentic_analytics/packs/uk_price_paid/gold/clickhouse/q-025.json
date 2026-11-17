@@ -1,0 +1,34 @@
+{
+  "elapsed_ms": 306,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:20:53.906721Z",
+  "question_id": "q-025",
+  "result": {
+    "columns": [
+      "quarter",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        1,
+        248421
+      ],
+      [
+        2,
+        259454
+      ],
+      [
+        3,
+        287727
+      ],
+      [
+        4,
+        281804
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "dcbb4a3eebe133cd8cf8850a9a692679048773560ced61e3c2cb8fff2b7f5cb2"
+}

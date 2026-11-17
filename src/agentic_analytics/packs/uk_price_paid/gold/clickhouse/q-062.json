@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 311,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:25.117757Z",
+  "question_id": "q-062",
+  "result": {
+    "columns": [
+      "town",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        59855
+      ],
+      [
+        "MANCHESTER",
+        14473
+      ],
+      [
+        "BRISTOL",
+        13357
+      ],
+      [
+        "BIRMINGHAM",
+        12081
+      ],
+      [
+        "NOTTINGHAM",
+        11665
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "6835b9f9fc2e415ec5a687ae8295230fdee7945b7669f7b5362410f8703821b8"
+}

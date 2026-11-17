@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 317,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:22:06.784080Z",
+  "probe_id": "p-id05",
+  "result": {
+    "columns": [
+      "type",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "detached",
+        2203
+      ],
+      [
+        "flat",
+        3369
+      ],
+      [
+        "other",
+        783
+      ],
+      [
+        "semi-detached",
+        3396
+      ],
+      [
+        "terraced",
+        4358
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "aa2bf47cef596c13c392f3edb77d5813a5e7296f569b7c746f3b92529a51a5a7"
+}

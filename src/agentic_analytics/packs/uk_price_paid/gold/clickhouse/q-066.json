@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 316,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:29.731555Z",
+  "question_id": "q-066",
+  "result": {
+    "columns": [
+      "town",
+      "new_build_pct"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "BICESTER",
+        33.45132743362832
+      ],
+      [
+        "SALFORD",
+        32.176234979973295
+      ],
+      [
+        "LICHFIELD",
+        32.08292201382034
+      ],
+      [
+        "STRATFORD-UPON-AVON",
+        31.175934366453966
+      ],
+      [
+        "ELY",
+        28.810853950518755
+      ],
+      [
+        "WELLINGBOROUGH",
+        27.909738717339668
+      ],
+      [
+        "BISHOP'S STORTFORD",
+        27.906976744186046
+      ],
+      [
+        "ABINGDON",
+        27.272727272727273
+      ],
+      [
+        "WORKSOP",
+        27.119883040935672
+      ],
+      [
+        "BRENTWOOD",
+        26.873580620741862
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "c5c90ce655b51399d1032eb42e51361041a4bf4f0dfb4e9da1d8adad0fc4747d"
+}

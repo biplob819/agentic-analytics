@@ -1,0 +1,22 @@
+{
+  "elapsed_ms": 162,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:23.345940Z",
+  "question_id": "q-060",
+  "result": {
+    "columns": [
+      "FLAT_MEDIAN_PRICE",
+      "HOUSE_MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        995000,
+        3150000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "ac6dcc88684f992acef482c09339b6b3441782ed10493da02eb5eb7c1afa0d91"
+}

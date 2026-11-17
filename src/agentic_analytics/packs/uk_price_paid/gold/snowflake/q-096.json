@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 148,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:58.972718Z",
+  "question_id": "q-096",
+  "result": {
+    "columns": [
+      "NEW_BUILDS_2023",
+      "NEW_BUILDS_2024",
+      "CHANGE_COUNT",
+      "PCT_CHANGE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        98150,
+        89505,
+        -8645,
+        -8.80794701986755
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "6ccbf1a5f6ecfad1cbf3e74eb110ee8a92de8d568e428848998b5f75e73d7591"
+}

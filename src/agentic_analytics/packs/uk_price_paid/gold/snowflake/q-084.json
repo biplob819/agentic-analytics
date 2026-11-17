@@ -1,0 +1,50 @@
+{
+  "elapsed_ms": 159,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:49.314593Z",
+  "question_id": "q-084",
+  "result": {
+    "columns": [
+      "TYPE",
+      "MEDIAN_2023",
+      "MEDIAN_2024",
+      "PCT_CHANGE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "detached",
+        417000,
+        410000,
+        -1.6786570743405276
+      ],
+      [
+        "flat",
+        231000,
+        237500,
+        2.813852813852814
+      ],
+      [
+        "other",
+        294000,
+        300000,
+        2.0408163265306123
+      ],
+      [
+        "semi-detached",
+        260000,
+        262500,
+        0.9615384615384616
+      ],
+      [
+        "terraced",
+        215000,
+        220000,
+        2.3255813953488373
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "c7930b1639e26ade96dc130cdd1287ea4535bbdf30bcd949ffd686874ab5b075"
+}

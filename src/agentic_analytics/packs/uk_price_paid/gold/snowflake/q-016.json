@@ -1,0 +1,22 @@
+{
+  "elapsed_ms": 152,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:46.101803Z",
+  "question_id": "q-016",
+  "result": {
+    "columns": [
+      "MIN_PRICE",
+      "MAX_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        1,
+        180000000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "a3ec76a22ba3d7434adf3d1f435074821f19f801a7eec99e148e9f2adf36d1af"
+}

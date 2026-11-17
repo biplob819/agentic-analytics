@@ -1,0 +1,22 @@
+{
+  "elapsed_ms": 319,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:22:05.506308Z",
+  "probe_id": "p-id01",
+  "result": {
+    "columns": [
+      "town",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        66833
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "bd53618637c999a34f02be249efd90c70e50015fbd5b88f3a93d0cf98d2761af"
+}

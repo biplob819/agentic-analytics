@@ -1,0 +1,30 @@
+{
+  "elapsed_ms": 317,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:09.773150Z",
+  "question_id": "q-044",
+  "result": {
+    "columns": [
+      "county",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "GREATER LONDON",
+        511000.0
+      ],
+      [
+        "GREATER MANCHESTER",
+        220000.0
+      ],
+      [
+        "WEST YORKSHIRE",
+        196870.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "5cb0bb121d00531edd9f14ec99bba51955691e29557a6f0c5d8fa6c166787c16"
+}

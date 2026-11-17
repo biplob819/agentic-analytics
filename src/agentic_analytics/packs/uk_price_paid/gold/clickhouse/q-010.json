@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 389,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:20:40.889133Z",
+  "question_id": "q-010",
+  "result": {
+    "columns": [
+      "postcode_districts"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        2300
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "61d1e594eae1d750c79d50def003a4a3e79591d0c68f230f9258d19a29ac1885"
+}

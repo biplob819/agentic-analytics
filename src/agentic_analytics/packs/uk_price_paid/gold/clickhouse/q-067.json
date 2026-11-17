@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 325,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:30.838317Z",
+  "question_id": "q-067",
+  "result": {
+    "columns": [
+      "district",
+      "flat_sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "WANDSWORTH",
+        3983
+      ],
+      [
+        "TOWER HAMLETS",
+        3319
+      ],
+      [
+        "MANCHESTER",
+        3040
+      ],
+      [
+        "LAMBETH",
+        3038
+      ],
+      [
+        "SOUTHWARK",
+        2674
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "58978d8cff4dbe02e24de1a0f7d1d09ec75dce2301f1debb2d69bc3d583ee9ea"
+}

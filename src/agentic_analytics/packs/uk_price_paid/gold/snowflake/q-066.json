@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 147,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:29.878120Z",
+  "question_id": "q-066",
+  "result": {
+    "columns": [
+      "TOWN",
+      "NEW_BUILD_PCT"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "BICESTER",
+        33.45132743362832
+      ],
+      [
+        "SALFORD",
+        32.176234979973295
+      ],
+      [
+        "LICHFIELD",
+        32.08292201382034
+      ],
+      [
+        "STRATFORD-UPON-AVON",
+        31.175934366453966
+      ],
+      [
+        "ELY",
+        28.810853950518755
+      ],
+      [
+        "WELLINGBOROUGH",
+        27.909738717339668
+      ],
+      [
+        "BISHOP'S STORTFORD",
+        27.906976744186046
+      ],
+      [
+        "ABINGDON",
+        27.272727272727273
+      ],
+      [
+        "WORKSOP",
+        27.119883040935672
+      ],
+      [
+        "BRENTWOOD",
+        26.873580620741862
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "cf767d248e7df7b677d8c409cdab0952881315d29b230bd19c2da7fba2b094e3"
+}

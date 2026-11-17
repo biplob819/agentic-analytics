@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 154,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:22:02.490026Z",
+  "question_id": "q-100",
+  "result": {
+    "columns": [
+      "FREEHOLD_PCT_2023",
+      "FREEHOLD_PCT_2024",
+      "CHANGE_POINTS"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        93.72895252477059,
+        93.88219278613585,
+        0.15324026136525504
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "69cf30d2b00f830218c42ed545de8ffe65b540124fb96fd296b84ec114ec0a54"
+}

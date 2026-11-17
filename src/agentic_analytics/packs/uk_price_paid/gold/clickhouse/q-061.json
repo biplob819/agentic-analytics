@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 332,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:23.976830Z",
+  "question_id": "q-061",
+  "result": {
+    "columns": [
+      "town",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "ASCOT",
+        699950.0
+      ],
+      [
+        "PINNER",
+        687500.0
+      ],
+      [
+        "LEATHERHEAD",
+        655000.0
+      ],
+      [
+        "TWICKENHAM",
+        625000.0
+      ],
+      [
+        "RICKMANSWORTH",
+        622492.5
+      ],
+      [
+        "KINGSTON UPON THAMES",
+        581500.0
+      ],
+      [
+        "RUISLIP",
+        570000.0
+      ],
+      [
+        "BARNET",
+        565500.0
+      ],
+      [
+        "LONDON",
+        565000.0
+      ],
+      [
+        "ST ALBANS",
+        565000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "8a0bda2fe957d4c95dda2f08646b3ecc80bde47de83abcc2c4c7e2dacc9a5b4a"
+}

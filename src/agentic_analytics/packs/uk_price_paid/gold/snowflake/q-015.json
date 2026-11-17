@@ -1,0 +1,44 @@
+{
+  "elapsed_ms": 150,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:45.315918Z",
+  "question_id": "q-015",
+  "result": {
+    "columns": [
+      "TYPE",
+      "SALES",
+      "TOTAL_VALUE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "detached",
+        314357,
+        150601367125
+      ],
+      [
+        "flat",
+        216800,
+        68370336180
+      ],
+      [
+        "other",
+        70486,
+        85685620041
+      ],
+      [
+        "semi-detached",
+        335622,
+        99214367796
+      ],
+      [
+        "terraced",
+        344906,
+        95666614763
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "1b0309a2ec6474413ec5d35df57f5fbb6455329deae0d8dd2b89415025b1521f"
+}

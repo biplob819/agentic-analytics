@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 321,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:55.576790Z",
+  "question_id": "q-092",
+  "result": {
+    "columns": [
+      "avg_2007",
+      "avg_2008",
+      "pct_change"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        219391.4394426143,
+        217147.4329930863,
+        -1.022832274235098
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "3235f2477874596682a7072b3696484fb2347da489b32255dfa8bfe98c1d8a39"
+}

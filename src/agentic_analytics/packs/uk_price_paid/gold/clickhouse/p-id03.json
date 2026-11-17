@@ -1,0 +1,22 @@
+{
+  "elapsed_ms": 319,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:22:06.151980Z",
+  "probe_id": "p-id03",
+  "result": {
+    "columns": [
+      "town",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "BIRMINGHAM",
+        12953
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "6ba6d740927ecb2276d646d47948904c7ee1f2dee74675b6929ef39386e99876"
+}

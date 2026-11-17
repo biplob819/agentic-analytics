@@ -1,0 +1,122 @@
+{
+  "elapsed_ms": 313,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:10.556897Z",
+  "question_id": "q-045",
+  "result": {
+    "columns": [
+      "district",
+      "median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "BARNET",
+        405500.0
+      ],
+      [
+        "BRENT",
+        435000.0
+      ],
+      [
+        "BROMLEY",
+        349750.0
+      ],
+      [
+        "CAMDEN",
+        700000.0
+      ],
+      [
+        "CITY OF LONDON",
+        802625.0
+      ],
+      [
+        "CITY OF WESTMINSTER",
+        850000.0
+      ],
+      [
+        "CROYDON",
+        290000.0
+      ],
+      [
+        "EALING",
+        439903.5
+      ],
+      [
+        "ENFIELD",
+        321912.5
+      ],
+      [
+        "GREENWICH",
+        424348.0
+      ],
+      [
+        "HACKNEY",
+        530000.0
+      ],
+      [
+        "HAMMERSMITH AND FULHAM",
+        666583.5
+      ],
+      [
+        "HARINGEY",
+        445000.0
+      ],
+      [
+        "HOUNSLOW",
+        571150.0
+      ],
+      [
+        "ISLINGTON",
+        590000.0
+      ],
+      [
+        "KENSINGTON AND CHELSEA",
+        995000.0
+      ],
+      [
+        "LAMBETH",
+        470000.0
+      ],
+      [
+        "LEWISHAM",
+        366000.0
+      ],
+      [
+        "MERTON",
+        430000.0
+      ],
+      [
+        "NEWHAM",
+        409500.0
+      ],
+      [
+        "REDBRIDGE",
+        381250.0
+      ],
+      [
+        "RICHMOND UPON THAMES",
+        555000.0
+      ],
+      [
+        "SOUTHWARK",
+        480000.0
+      ],
+      [
+        "TOWER HAMLETS",
+        480000.0
+      ],
+      [
+        "WALTHAM FOREST",
+        384500.0
+      ],
+      [
+        "WANDSWORTH",
+        550000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "11755bfa75769ddc2eebdddac7f1c54875cf355fd7c013c1346a4ae5cb8329f1"
+}

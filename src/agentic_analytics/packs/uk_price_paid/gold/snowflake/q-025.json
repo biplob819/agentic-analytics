@@ -1,0 +1,34 @@
+{
+  "elapsed_ms": 176,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:54.082415Z",
+  "question_id": "q-025",
+  "result": {
+    "columns": [
+      "QUARTER",
+      "SALES"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        1,
+        248421
+      ],
+      [
+        2,
+        259454
+      ],
+      [
+        3,
+        287727
+      ],
+      [
+        4,
+        281804
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "051e7dc4a45dcc1817e1ce99d2b1808c78df6ab486fe323858c3a1eb06636804"
+}

@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 158,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:58.206804Z",
+  "question_id": "q-095",
+  "result": {
+    "columns": [
+      "MEDIAN_2023",
+      "MEDIAN_2024",
+      "PCT_CHANGE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        415000,
+        409497.5,
+        -1.3259036144578313
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "b71dc8abe32f88a43bcf91f88a471ee17a7c6445f9cf6d954e0a5cbf41052ffe"
+}

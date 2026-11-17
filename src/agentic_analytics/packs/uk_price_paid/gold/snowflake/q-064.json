@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 154,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:27.621850Z",
+  "question_id": "q-064",
+  "result": {
+    "columns": [
+      "TOWN",
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "PETERLEE",
+        65000
+      ],
+      [
+        "FERRYHILL",
+        71499
+      ],
+      [
+        "STANLEY",
+        87000
+      ],
+      [
+        "BISHOP AUCKLAND",
+        105000
+      ],
+      [
+        "NELSON",
+        105000
+      ],
+      [
+        "HARTLEPOOL",
+        115000
+      ],
+      [
+        "SEAHAM",
+        115000
+      ],
+      [
+        "BURNLEY",
+        116250
+      ],
+      [
+        "ASHINGTON",
+        119000
+      ],
+      [
+        "BOOTLE",
+        120000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "ad8dcd89080609d2095a5961aa1f672d4e6bdf725fe0f4013727875c6f2f4883"
+}

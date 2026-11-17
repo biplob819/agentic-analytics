@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 313,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:20:57.050217Z",
+  "question_id": "q-029",
+  "result": {
+    "columns": [
+      "month",
+      "sales"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        3,
+        143406
+      ],
+      [
+        4,
+        59896
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "d4c7d30969a096a41d0ef0cf4d0967dd482dcc66c20d9198c2211143bbf13fea"
+}

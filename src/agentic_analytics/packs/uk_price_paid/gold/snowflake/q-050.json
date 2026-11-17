@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 157,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:15.212246Z",
+  "question_id": "q-050",
+  "result": {
+    "columns": [
+      "TOWN",
+      "AVG_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LIVERPOOL",
+        152627.526848
+      ],
+      [
+        "MANCHESTER",
+        213907.202812
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "91b1be91fd3807c8a774638d24f1367487a61b73cf9b053b454413254cf3f188"
+}

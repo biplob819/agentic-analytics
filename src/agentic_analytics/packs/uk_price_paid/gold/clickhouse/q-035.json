@@ -1,0 +1,34 @@
+{
+  "elapsed_ms": 318,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:01.994795Z",
+  "question_id": "q-035",
+  "result": {
+    "columns": [
+      "quarter",
+      "avg_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        1,
+        402525.04774426745
+      ],
+      [
+        2,
+        414916.01938011934
+      ],
+      [
+        3,
+        410081.28997829
+      ],
+      [
+        4,
+        400829.5861065616
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "e4f3c279bf7b3f1bd6183811f6237329015f1901100c884c6ada35d9daa7bd6d"
+}

@@ -1,0 +1,58 @@
+{
+  "elapsed_ms": 156,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:37.734808Z",
+  "question_id": "q-073",
+  "result": {
+    "columns": [
+      "TOWN",
+      "AVG_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "LONDON",
+        712064.253037
+      ],
+      [
+        "TEDDINGTON",
+        603635.863415
+      ],
+      [
+        "RICHMOND",
+        576501.705263
+      ],
+      [
+        "KINGSTON UPON THAMES",
+        552618.130354
+      ],
+      [
+        "BRENTFORD",
+        518316.410256
+      ],
+      [
+        "TWICKENHAM",
+        494339.242075
+      ],
+      [
+        "BARNET",
+        414969.434457
+      ],
+      [
+        "WEMBLEY",
+        401151.376417
+      ],
+      [
+        "HOVE",
+        384845.466667
+      ],
+      [
+        "SURBITON",
+        382786.449857
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "ce16a56726058eb647c5ff9a51d8bc1a0e9dc178c9071daf70aa05abbbf5a47e"
+}

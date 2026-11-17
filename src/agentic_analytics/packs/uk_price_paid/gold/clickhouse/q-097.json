@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 323,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:59.613899Z",
+  "question_id": "q-097",
+  "result": {
+    "columns": [
+      "total_2021",
+      "total_2022",
+      "pct_change"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        499538305905,
+        446829857594,
+        -10.551432730570989
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "1d1703003aa8fe7d7d5098cb20c5d7cd0d789f590e96f215278a523be6010912"
+}

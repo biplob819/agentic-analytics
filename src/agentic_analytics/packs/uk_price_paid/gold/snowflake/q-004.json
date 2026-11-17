@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 228,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:36.200375Z",
+  "question_id": "q-004",
+  "result": {
+    "columns": [
+      "TYPE",
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "detached",
+        410000
+      ],
+      [
+        "flat",
+        237500
+      ],
+      [
+        "other",
+        300000
+      ],
+      [
+        "semi-detached",
+        262500
+      ],
+      [
+        "terraced",
+        220000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "b1918d561aa10a195d3162728c03dfa71f9a96a11b45050bd387d209629635ba"
+}

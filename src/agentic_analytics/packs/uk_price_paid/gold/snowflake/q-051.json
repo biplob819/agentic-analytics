@@ -1,0 +1,26 @@
+{
+  "elapsed_ms": 157,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:15.970790Z",
+  "question_id": "q-051",
+  "result": {
+    "columns": [
+      "TOWN",
+      "MEDIAN_PRICE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "CAMBRIDGE",
+        450000
+      ],
+      [
+        "OXFORD",
+        450000
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "edd5f1930ec53a687a7bf48a5c12110be9de05fc565cb45922ad001c0c716602"
+}

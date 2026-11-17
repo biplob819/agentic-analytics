@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 153,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:28.765726Z",
+  "question_id": "q-065",
+  "result": {
+    "columns": [
+      "COUNTY",
+      "TOTAL_VALUE"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "GREATER LONDON",
+        105441360403
+      ],
+      [
+        "SURREY",
+        16472938516
+      ],
+      [
+        "GREATER MANCHESTER",
+        14156422044
+      ],
+      [
+        "WEST MIDLANDS",
+        13721450446
+      ],
+      [
+        "KENT",
+        13607434310
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "b29b33a8a502a13326c50f93dafc8247c45e71b6135aed3147c267e404c0de42"
+}

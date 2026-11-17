@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 160,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:20:41.049035Z",
+  "question_id": "q-010",
+  "result": {
+    "columns": [
+      "POSTCODE_DISTRICTS"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        2300
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "c8a0626f57c81ff999277f3213940b77356681c7b42387cafd319c6645e33ffd"
+}

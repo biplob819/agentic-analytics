@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 150,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:51.782157Z",
+  "question_id": "q-087",
+  "result": {
+    "columns": [
+      "NEW_BUILD_PCT_2023",
+      "NEW_BUILD_PCT_2024",
+      "CHANGE_POINTS"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        11.389191233977966,
+        9.601336173882821,
+        -1.7878550600951453
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "f993efd2b086d8876941bf76f5af0a89c95b4a0a6bc17d2a8e9b6903b01a0f60"
+}

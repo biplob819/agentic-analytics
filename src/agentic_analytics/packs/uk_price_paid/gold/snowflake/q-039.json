@@ -1,0 +1,30 @@
+{
+  "elapsed_ms": 153,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:05.386585Z",
+  "question_id": "q-039",
+  "result": {
+    "columns": [
+      "YEAR",
+      "SALES"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        2023,
+        861782
+      ],
+      [
+        2024,
+        932214
+      ],
+      [
+        2025,
+        992278
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "4d30d23ec1402d3e0bbcb6245fc71289543d254490deb08019d16d6107933fd6"
+}

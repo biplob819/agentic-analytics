@@ -1,0 +1,44 @@
+{
+  "elapsed_ms": 324,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:20:45.165908Z",
+  "question_id": "q-015",
+  "result": {
+    "columns": [
+      "type",
+      "sales",
+      "total_value"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "detached",
+        314357,
+        150601367125
+      ],
+      [
+        "flat",
+        216800,
+        68370336180
+      ],
+      [
+        "other",
+        70486,
+        85685620041
+      ],
+      [
+        "semi-detached",
+        335622,
+        99214367796
+      ],
+      [
+        "terraced",
+        344906,
+        95666614763
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "1a884eebeecee4f8cd039f5178b320f7e81b7e51bc961014158025d2b64e6cdd"
+}

@@ -1,0 +1,22 @@
+{
+  "elapsed_ms": 304,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:23.183596Z",
+  "question_id": "q-060",
+  "result": {
+    "columns": [
+      "flat_median_price",
+      "house_median_price"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        995000.0,
+        3150000.0
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "97acd556ac2207d34888e9d67769f1c7dc7a3e1738efc01f8ffc2d8fc4efcdef"
+}

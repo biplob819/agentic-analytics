@@ -1,0 +1,20 @@
+{
+  "elapsed_ms": 306,
+  "engine": "clickhouse",
+  "executed_at": "2026-11-17T05:21:19.428307Z",
+  "question_id": "q-055",
+  "result": {
+    "columns": [
+      "leasehold_pct"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        4.856273913470028
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "4da01b4549b330d9937cf9f18b2866e706e3f18a1ee6b1cbb75d7fddc8c79c66"
+}

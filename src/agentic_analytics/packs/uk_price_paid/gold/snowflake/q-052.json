@@ -1,0 +1,38 @@
+{
+  "elapsed_ms": 489,
+  "engine": "snowflake",
+  "executed_at": "2026-11-17T05:21:17.068754Z",
+  "question_id": "q-052",
+  "result": {
+    "columns": [
+      "DISTRICT",
+      "SALES"
+    ],
+    "kind": "result_set",
+    "ordered": false,
+    "rows": [
+      [
+        "BRADFORD",
+        8122
+      ],
+      [
+        "CALDERDALE",
+        3415
+      ],
+      [
+        "KIRKLEES",
+        6632
+      ],
+      [
+        "LEEDS",
+        12756
+      ],
+      [
+        "WAKEFIELD",
+        5606
+      ]
+    ]
+  },
+  "schema_version": "1.0",
+  "sql_hash": "f67741df8cd14aa077d3c50539ee9609cdf21c38514b63bff210dfae88259391"
+}
