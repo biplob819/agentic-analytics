@@ -1,0 +1,254 @@
+{
+  "answer": {
+    "backend": "gpt_mcp",
+    "chart": null,
+    "clarification": null,
+    "error": "step_budget",
+    "interpretation": null,
+    "model_snapshot": "example-agent-b",
+    "request_id": null,
+    "sql": null,
+    "suggestions": [],
+    "text": "",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 0,
+    "cost_usd": 0.041962,
+    "tokens": {
+      "cached": 9000,
+      "in": 17400,
+      "out": 260
+    }
+  },
+  "execution": null,
+  "kind": "trace",
+  "public": false,
+  "question": "What was the median price paid for a semi-detached house in MANCHESTER in 2017?",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": null,
+    "clarified": false,
+    "correct": false,
+    "false_clarification": false,
+    "injection_followed": null,
+    "mismatch_reason": null,
+    "over_budget": false,
+    "result_match": false,
+    "tool_calls": 5,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": null,
+      "end_offset_ms": 0,
+      "error": null,
+      "input": null,
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "derived_from_steps": true,
+        "first_step": 0
+      },
+      "model": "example-agent-b",
+      "name": "turn 0",
+      "output": null,
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 2900,
+      "tokens_out": 240
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 1752,
+      "error": null,
+      "input": {
+        "database": "uk"
+      },
+      "kind": "tool",
+      "latency_ms": 1752,
+      "metadata": {
+        "step_index": 0
+      },
+      "model": null,
+      "name": "tool list_tables",
+      "output": {
+        "rows_returned": null,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 4153,
+      "error": null,
+      "input": {
+        "query": "SELECT medianExact(price) AS median_price FROM uk.uk_price_paid WHERE town = 'MANCHESTER' AND type = 'S' AND toYear(date) = 2017"
+      },
+      "kind": "tool",
+      "latency_ms": 2401,
+      "metadata": {
+        "step_index": 1
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 1752,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 6114,
+      "error": null,
+      "input": {
+        "query": "SELECT medianExact(price) AS median_price FROM uk.uk_price_paid WHERE town = 'MANCHESTER' AND type = 'S' AND toYear(date) = 2017"
+      },
+      "kind": "tool",
+      "latency_ms": 1961,
+      "metadata": {
+        "step_index": 2
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 4153,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 7052,
+      "error": null,
+      "input": {
+        "query": "SELECT medianExact(price) AS median_price FROM uk.uk_price_paid WHERE town = 'MANCHESTER' AND type = 'S' AND toYear(date) = 2017"
+      },
+      "kind": "tool",
+      "latency_ms": 938,
+      "metadata": {
+        "step_index": 3
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 6114,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 7912,
+      "error": null,
+      "input": {
+        "query": "SELECT medianExact(price) AS median_price FROM uk.uk_price_paid WHERE town = 'MANCHESTER' AND type = 'S' AND toYear(date) = 2017"
+      },
+      "kind": "tool",
+      "latency_ms": 860,
+      "metadata": {
+        "step_index": 4
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 7052,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:01+00:00",
+  "steps": [
+    {
+      "arguments": {
+        "database": "uk"
+      },
+      "error": null,
+      "index": 0,
+      "latency_ms": 1752,
+      "rows_returned": null,
+      "tokens_in": 2900,
+      "tokens_out": 240,
+      "tool": "list_tables",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT medianExact(price) AS median_price FROM uk.uk_price_paid WHERE town = 'MANCHESTER' AND type = 'S' AND toYear(date) = 2017"
+      },
+      "error": null,
+      "index": 1,
+      "latency_ms": 2401,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT medianExact(price) AS median_price FROM uk.uk_price_paid WHERE town = 'MANCHESTER' AND type = 'S' AND toYear(date) = 2017"
+      },
+      "error": null,
+      "index": 2,
+      "latency_ms": 1961,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT medianExact(price) AS median_price FROM uk.uk_price_paid WHERE town = 'MANCHESTER' AND type = 'S' AND toYear(date) = 2017"
+      },
+      "error": null,
+      "index": 3,
+      "latency_ms": 938,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT medianExact(price) AS median_price FROM uk.uk_price_paid WHERE town = 'MANCHESTER' AND type = 'S' AND toYear(date) = 2017"
+      },
+      "error": null,
+      "index": 4,
+      "latency_ms": 860,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    }
+  ],
+  "trace_id": "c671842a347024c7b3562526d843e8f5",
+  "trace_key": {
+    "backend": "gpt_mcp",
+    "fixes": [],
+    "question_id": "q-002",
+    "run_id": "example-synthetic",
+    "trial": 1
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "answer": {
+    "backend": "cortex_analyst",
+    "chart": null,
+    "clarification": null,
+    "error": "step_budget",
+    "interpretation": "This is our interpretation of your question: List the 3 towns with the highest median price in 2016.",
+    "model_snapshot": "example-cortex",
+    "request_id": null,
+    "sql": null,
+    "suggestions": [],
+    "text": "",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 1,
+    "cost_usd": 0.0,
+    "tokens": {}
+  },
+  "execution": null,
+  "kind": "trace",
+  "public": false,
+  "question": "List the 3 towns with the highest median price in 2016.",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": null,
+    "clarified": false,
+    "correct": false,
+    "false_clarification": false,
+    "injection_followed": null,
+    "mismatch_reason": null,
+    "over_budget": false,
+    "result_match": false,
+    "tool_calls": 0,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": 0.0,
+      "end_offset_ms": 0,
+      "error": "step_budget",
+      "input": "List the 3 towns with the highest median price in 2016.",
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "cortex_messages": 1
+      },
+      "model": "example-cortex",
+      "name": "cortex_analyst",
+      "output": {
+        "interpretation": "This is our interpretation of your question: List the 3 towns with the highest median price in 2016.",
+        "sql": null,
+        "suggestions": []
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:01+00:00",
+  "steps": [],
+  "trace_id": "7892fc4ac262f6c52ea194fd8e61feb9",
+  "trace_key": {
+    "backend": "cortex_analyst",
+    "fixes": [],
+    "question_id": "q-031",
+    "run_id": "example-synthetic",
+    "trial": 1
+  }
+}

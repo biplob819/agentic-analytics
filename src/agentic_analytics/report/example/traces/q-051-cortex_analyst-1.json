@@ -1,0 +1,137 @@
+{
+  "answer": {
+    "backend": "cortex_analyst",
+    "chart": {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "data": {
+        "values": [
+          {
+            "value": 433350.0
+          }
+        ]
+      },
+      "encoding": {
+        "text": {
+          "field": "value",
+          "title": "value",
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+      },
+      "title": "What is the typical house price in LEEDS lately?",
+      "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+      }
+    },
+    "clarification": null,
+    "error": null,
+    "interpretation": "This is our interpretation of your question: What is the typical house price in LEEDS lately?",
+    "model_snapshot": "example-cortex",
+    "request_id": null,
+    "sql": "SELECT AVG(price) FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'LEEDS' AND date > '2025-09-30'",
+    "suggestions": [],
+    "text": "The figure is 433,350.",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 1,
+    "cost_usd": 0.0,
+    "tokens": {}
+  },
+  "execution": {
+    "columns": [
+      "value"
+    ],
+    "elapsed_ms": 250,
+    "engine": "snowflake",
+    "error": null,
+    "query_id": "sn-q-051-1",
+    "rows_sample": [
+      [
+        433350.0
+      ]
+    ],
+    "rows_total": 1,
+    "sql": "SELECT AVG(price) FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'LEEDS' AND date > '2025-09-30'",
+    "truncated": false
+  },
+  "kind": "trace",
+  "public": false,
+  "question": "What is the typical house price in LEEDS lately?",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": true,
+    "clarified": false,
+    "correct": false,
+    "false_clarification": false,
+    "injection_followed": null,
+    "mismatch_reason": null,
+    "over_budget": false,
+    "result_match": null,
+    "tool_calls": 0,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": 0.0,
+      "end_offset_ms": 0,
+      "error": null,
+      "input": "What is the typical house price in LEEDS lately?",
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "cortex_messages": 1
+      },
+      "model": "example-cortex",
+      "name": "cortex_analyst",
+      "output": {
+        "interpretation": "This is our interpretation of your question: What is the typical house price in LEEDS lately?",
+        "sql": "SELECT AVG(price) FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'LEEDS' AND date > '2025-09-30'",
+        "suggestions": []
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 250,
+      "error": null,
+      "input": "SELECT AVG(price) FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'LEEDS' AND date > '2025-09-30'",
+      "kind": "execution",
+      "latency_ms": 250,
+      "metadata": {
+        "engine": "snowflake"
+      },
+      "model": null,
+      "name": "execute",
+      "output": {
+        "query_id": "sn-q-051-1",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:01+00:00",
+  "steps": [],
+  "trace_id": "840c8402dc0c72c3d17ed50308bf89f0",
+  "trace_key": {
+    "backend": "cortex_analyst",
+    "fixes": [],
+    "question_id": "q-051",
+    "run_id": "example-synthetic",
+    "trial": 1
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "answer": {
+    "backend": "cortex_analyst",
+    "chart": {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "data": {
+        "values": [
+          {
+            "value": 235400.0
+          }
+        ]
+      },
+      "encoding": {
+        "text": {
+          "field": "value",
+          "title": "value",
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+      },
+      "title": "How many sales were registered in BIRMINGHAM in each month of 2019?",
+      "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+      }
+    },
+    "clarification": null,
+    "error": null,
+    "interpretation": "This is our interpretation of your question: How many sales were registered in BIRMINGHAM in each month of 2019?",
+    "model_snapshot": "example-cortex",
+    "request_id": null,
+    "sql": "SELECT DATE_TRUNC('month', date) AS month, COUNT(*) AS sales FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'BIRMINGHAM' AND YEAR(date) = 2019 GROUP BY month ORDER BY month AND price > 0",
+    "suggestions": [],
+    "text": "The figure is 235,400.",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 1,
+    "cost_usd": 0.0,
+    "tokens": {}
+  },
+  "execution": {
+    "columns": [
+      "value"
+    ],
+    "elapsed_ms": 93,
+    "engine": "snowflake",
+    "error": null,
+    "query_id": "sn-q-014-1",
+    "rows_sample": [
+      [
+        235400.0
+      ]
+    ],
+    "rows_total": 1,
+    "sql": "SELECT DATE_TRUNC('month', date) AS month, COUNT(*) AS sales FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'BIRMINGHAM' AND YEAR(date) = 2019 GROUP BY month ORDER BY month AND price > 0",
+    "truncated": false
+  },
+  "kind": "trace",
+  "public": false,
+  "question": "How many sales were registered in BIRMINGHAM in each month of 2019?",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": true,
+    "clarified": false,
+    "correct": false,
+    "false_clarification": false,
+    "injection_followed": null,
+    "mismatch_reason": "cell values differ: 1 of 1 rows outside tolerance (rel 1e-09)",
+    "over_budget": false,
+    "result_match": false,
+    "tool_calls": 0,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": 0.0,
+      "end_offset_ms": 0,
+      "error": null,
+      "input": "How many sales were registered in BIRMINGHAM in each month of 2019?",
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "cortex_messages": 1
+      },
+      "model": "example-cortex",
+      "name": "cortex_analyst",
+      "output": {
+        "interpretation": "This is our interpretation of your question: How many sales were registered in BIRMINGHAM in each month of 2019?",
+        "sql": "SELECT DATE_TRUNC('month', date) AS month, COUNT(*) AS sales FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'BIRMINGHAM' AND YEAR(date) = 2019 GROUP BY month ORDER BY month AND price > 0",
+        "suggestions": []
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 93,
+      "error": null,
+      "input": "SELECT DATE_TRUNC('month', date) AS month, COUNT(*) AS sales FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'BIRMINGHAM' AND YEAR(date) = 2019 GROUP BY month ORDER BY month AND price > 0",
+      "kind": "execution",
+      "latency_ms": 93,
+      "metadata": {
+        "engine": "snowflake"
+      },
+      "model": null,
+      "name": "execute",
+      "output": {
+        "query_id": "sn-q-014-1",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:01+00:00",
+  "steps": [],
+  "trace_id": "2135752b40d792df55ff118b59d86ccd",
+  "trace_key": {
+    "backend": "cortex_analyst",
+    "fixes": [],
+    "question_id": "q-014",
+    "run_id": "example-synthetic",
+    "trial": 1
+  }
+}

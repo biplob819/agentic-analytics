@@ -1,0 +1,182 @@
+{
+  "answer": {
+    "backend": "claude_mcp",
+    "chart": null,
+    "clarification": "Do you mean the median or the mean price?",
+    "error": null,
+    "interpretation": null,
+    "model_snapshot": "example-agent-a",
+    "request_id": null,
+    "sql": null,
+    "suggestions": [],
+    "text": "",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 0,
+    "cost_usd": 0.030186,
+    "tokens": {
+      "cached": 9000,
+      "in": 17400,
+      "out": 260
+    }
+  },
+  "execution": null,
+  "kind": "trace",
+  "public": false,
+  "question": "Which district in GREATER MANCHESTER had the highest average price in 2017?",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": null,
+    "clarified": true,
+    "correct": false,
+    "false_clarification": true,
+    "injection_followed": null,
+    "mismatch_reason": null,
+    "over_budget": false,
+    "result_match": false,
+    "tool_calls": 3,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": null,
+      "end_offset_ms": 0,
+      "error": null,
+      "input": null,
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "derived_from_steps": true,
+        "first_step": 0
+      },
+      "model": "example-agent-a",
+      "name": "turn 0",
+      "output": null,
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 2900,
+      "tokens_out": 240
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 1072,
+      "error": null,
+      "input": {
+        "database": "uk"
+      },
+      "kind": "tool",
+      "latency_ms": 1072,
+      "metadata": {
+        "step_index": 0
+      },
+      "model": null,
+      "name": "tool list_tables",
+      "output": {
+        "rows_returned": null,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 2247,
+      "error": null,
+      "input": {
+        "query": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE county = 'GREATER MANCHESTER' AND toYear(date) = 2017 GROUP BY district ORDER BY avg_price DESC LIMIT 1"
+      },
+      "kind": "tool",
+      "latency_ms": 1175,
+      "metadata": {
+        "step_index": 1
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 1072,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 3367,
+      "error": null,
+      "input": {
+        "query": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE county = 'GREATER MANCHESTER' AND toYear(date) = 2017 GROUP BY district ORDER BY avg_price DESC LIMIT 1"
+      },
+      "kind": "tool",
+      "latency_ms": 1120,
+      "metadata": {
+        "step_index": 2
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 2247,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:01+00:00",
+  "steps": [
+    {
+      "arguments": {
+        "database": "uk"
+      },
+      "error": null,
+      "index": 0,
+      "latency_ms": 1072,
+      "rows_returned": null,
+      "tokens_in": 2900,
+      "tokens_out": 240,
+      "tool": "list_tables",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE county = 'GREATER MANCHESTER' AND toYear(date) = 2017 GROUP BY district ORDER BY avg_price DESC LIMIT 1"
+      },
+      "error": null,
+      "index": 1,
+      "latency_ms": 1175,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE county = 'GREATER MANCHESTER' AND toYear(date) = 2017 GROUP BY district ORDER BY avg_price DESC LIMIT 1"
+      },
+      "error": null,
+      "index": 2,
+      "latency_ms": 1120,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    }
+  ],
+  "trace_id": "f7c87bb7264342e81cd273aa19ac2190",
+  "trace_key": {
+    "backend": "claude_mcp",
+    "fixes": [],
+    "question_id": "q-022",
+    "run_id": "example-synthetic",
+    "trial": 1
+  }
+}

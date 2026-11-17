@@ -1,0 +1,286 @@
+{
+  "answer": {
+    "backend": "claude_mcp",
+    "chart": null,
+    "clarification": null,
+    "error": null,
+    "interpretation": null,
+    "model_snapshot": "example-agent-a",
+    "request_id": null,
+    "sql": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019",
+    "suggestions": [],
+    "text": "I could not compute this.",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 0,
+    "cost_usd": 0.039716,
+    "tokens": {
+      "cached": 9000,
+      "in": 17400,
+      "out": 260
+    }
+  },
+  "execution": {
+    "columns": null,
+    "elapsed_ms": 76,
+    "engine": "clickhouse",
+    "error": "sql_error",
+    "query_id": null,
+    "rows_sample": null,
+    "rows_total": null,
+    "sql": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019",
+    "truncated": false
+  },
+  "kind": "trace",
+  "public": false,
+  "question": "What was the median price paid for a flat house in BIRMINGHAM in 2019?",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": null,
+    "clarified": false,
+    "correct": false,
+    "false_clarification": false,
+    "injection_followed": null,
+    "mismatch_reason": null,
+    "over_budget": false,
+    "result_match": false,
+    "tool_calls": 5,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": null,
+      "end_offset_ms": 0,
+      "error": null,
+      "input": null,
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "derived_from_steps": true,
+        "first_step": 0
+      },
+      "model": "example-agent-a",
+      "name": "turn 0",
+      "output": null,
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 2900,
+      "tokens_out": 240
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 2003,
+      "error": null,
+      "input": {
+        "database": "uk"
+      },
+      "kind": "tool",
+      "latency_ms": 2003,
+      "metadata": {
+        "step_index": 0
+      },
+      "model": null,
+      "name": "tool list_tables",
+      "output": {
+        "rows_returned": null,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 4995,
+      "error": null,
+      "input": {
+        "query": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019"
+      },
+      "kind": "tool",
+      "latency_ms": 2992,
+      "metadata": {
+        "step_index": 1
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 2003,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 7619,
+      "error": null,
+      "input": {
+        "query": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019"
+      },
+      "kind": "tool",
+      "latency_ms": 2624,
+      "metadata": {
+        "step_index": 2
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 4995,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 9112,
+      "error": null,
+      "input": {
+        "query": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019"
+      },
+      "kind": "tool",
+      "latency_ms": 1493,
+      "metadata": {
+        "step_index": 3
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 7619,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 11667,
+      "error": null,
+      "input": {
+        "query": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019"
+      },
+      "kind": "tool",
+      "latency_ms": 2555,
+      "metadata": {
+        "step_index": 4
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 9112,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 11743,
+      "error": "sql_error",
+      "input": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019",
+      "kind": "execution",
+      "latency_ms": 76,
+      "metadata": {
+        "engine": "clickhouse"
+      },
+      "model": null,
+      "name": "execute",
+      "output": {
+        "query_id": null,
+        "rows_total": null,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 11667,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:01+00:00",
+  "steps": [
+    {
+      "arguments": {
+        "database": "uk"
+      },
+      "error": null,
+      "index": 0,
+      "latency_ms": 2003,
+      "rows_returned": null,
+      "tokens_in": 2900,
+      "tokens_out": 240,
+      "tool": "list_tables",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019"
+      },
+      "error": null,
+      "index": 1,
+      "latency_ms": 2992,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019"
+      },
+      "error": null,
+      "index": 2,
+      "latency_ms": 2624,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019"
+      },
+      "error": null,
+      "index": 3,
+      "latency_ms": 1493,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT medianExact(prices) AS median_price FROM uk.uk_price_paid WHERE town = 'BIRMINGHAM' AND type = 'F' AND toYear(date) = 2019"
+      },
+      "error": null,
+      "index": 4,
+      "latency_ms": 2555,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    }
+  ],
+  "trace_id": "681f4fadc3596b713ae2c0cb98a7e3d8",
+  "trace_key": {
+    "backend": "claude_mcp",
+    "fixes": [],
+    "question_id": "q-004",
+    "run_id": "example-synthetic",
+    "trial": 1
+  }
+}

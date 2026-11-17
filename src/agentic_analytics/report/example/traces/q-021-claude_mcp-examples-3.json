@@ -1,0 +1,213 @@
+{
+  "answer": {
+    "backend": "claude_mcp",
+    "chart": {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "data": {
+        "values": [
+          {
+            "value": 272850.0
+          }
+        ]
+      },
+      "encoding": {
+        "text": {
+          "field": "value",
+          "title": "value",
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+      },
+      "title": "Which district in WEST YORKSHIRE had the highest average price in 2016?",
+      "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+      }
+    },
+    "clarification": null,
+    "error": null,
+    "interpretation": null,
+    "model_snapshot": "example-agent-a",
+    "request_id": null,
+    "sql": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE county = 'WEST YORKSHIRE' AND toYear(date) = 2016 GROUP BY district ORDER BY avg_price ASC LIMIT 1",
+    "suggestions": [],
+    "text": "The figure is 272,850.",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 0,
+    "cost_usd": 0.049711,
+    "tokens": {
+      "cached": 9000,
+      "in": 17400,
+      "out": 260
+    }
+  },
+  "execution": {
+    "columns": [
+      "value"
+    ],
+    "elapsed_ms": 291,
+    "engine": "clickhouse",
+    "error": null,
+    "query_id": "cl-q-021-3",
+    "rows_sample": [
+      [
+        272850.0
+      ]
+    ],
+    "rows_total": 1,
+    "sql": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE county = 'WEST YORKSHIRE' AND toYear(date) = 2016 GROUP BY district ORDER BY avg_price ASC LIMIT 1",
+    "truncated": false
+  },
+  "kind": "trace",
+  "public": false,
+  "question": "Which district in WEST YORKSHIRE had the highest average price in 2016?",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": true,
+    "clarified": false,
+    "correct": false,
+    "false_clarification": false,
+    "injection_followed": null,
+    "mismatch_reason": "cell values differ: 1 of 1 rows outside tolerance (rel 1e-09)",
+    "over_budget": false,
+    "result_match": false,
+    "tool_calls": 2,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": null,
+      "end_offset_ms": 0,
+      "error": null,
+      "input": null,
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "derived_from_steps": true,
+        "first_step": 0
+      },
+      "model": "example-agent-a",
+      "name": "turn 0",
+      "output": null,
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 2900,
+      "tokens_out": 240
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 1315,
+      "error": null,
+      "input": {
+        "database": "uk"
+      },
+      "kind": "tool",
+      "latency_ms": 1315,
+      "metadata": {
+        "step_index": 0
+      },
+      "model": null,
+      "name": "tool list_tables",
+      "output": {
+        "rows_returned": null,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 4234,
+      "error": null,
+      "input": {
+        "query": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE county = 'WEST YORKSHIRE' AND toYear(date) = 2016 GROUP BY district ORDER BY avg_price ASC LIMIT 1"
+      },
+      "kind": "tool",
+      "latency_ms": 2919,
+      "metadata": {
+        "step_index": 1
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 1315,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 4525,
+      "error": null,
+      "input": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE county = 'WEST YORKSHIRE' AND toYear(date) = 2016 GROUP BY district ORDER BY avg_price ASC LIMIT 1",
+      "kind": "execution",
+      "latency_ms": 291,
+      "metadata": {
+        "engine": "clickhouse"
+      },
+      "model": null,
+      "name": "execute",
+      "output": {
+        "query_id": "cl-q-021-3",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 4234,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:03+00:00",
+  "steps": [
+    {
+      "arguments": {
+        "database": "uk"
+      },
+      "error": null,
+      "index": 0,
+      "latency_ms": 1315,
+      "rows_returned": null,
+      "tokens_in": 2900,
+      "tokens_out": 240,
+      "tool": "list_tables",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE county = 'WEST YORKSHIRE' AND toYear(date) = 2016 GROUP BY district ORDER BY avg_price ASC LIMIT 1"
+      },
+      "error": null,
+      "index": 1,
+      "latency_ms": 2919,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    }
+  ],
+  "trace_id": "d568e2ec7cabcfb4cb1ccf28a7c72d6f",
+  "trace_key": {
+    "backend": "claude_mcp",
+    "fixes": [
+      "examples"
+    ],
+    "question_id": "q-021",
+    "run_id": "example-synthetic",
+    "trial": 3
+  }
+}

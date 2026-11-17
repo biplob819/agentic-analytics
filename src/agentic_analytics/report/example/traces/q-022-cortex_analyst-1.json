@@ -1,0 +1,104 @@
+{
+  "answer": {
+    "backend": "cortex_analyst",
+    "chart": null,
+    "clarification": null,
+    "error": null,
+    "interpretation": "This is our interpretation of your question: Which district in GREATER MANCHESTER had the highest average price in 2017?",
+    "model_snapshot": "example-cortex",
+    "request_id": null,
+    "sql": "SELECT district, AVG(prices) AS avg_price FROM ANALYTICS.UK.UK_PRICE_PAID WHERE county = 'GREATER MANCHESTER' AND YEAR(date) = 2017 GROUP BY district ORDER BY avg_price DESC LIMIT 1",
+    "suggestions": [],
+    "text": "I could not compute this.",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 1,
+    "cost_usd": 0.0,
+    "tokens": {}
+  },
+  "execution": {
+    "columns": null,
+    "elapsed_ms": 23,
+    "engine": "snowflake",
+    "error": "sql_error",
+    "query_id": null,
+    "rows_sample": null,
+    "rows_total": null,
+    "sql": "SELECT district, AVG(prices) AS avg_price FROM ANALYTICS.UK.UK_PRICE_PAID WHERE county = 'GREATER MANCHESTER' AND YEAR(date) = 2017 GROUP BY district ORDER BY avg_price DESC LIMIT 1",
+    "truncated": false
+  },
+  "kind": "trace",
+  "public": false,
+  "question": "Which district in GREATER MANCHESTER had the highest average price in 2017?",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": null,
+    "clarified": false,
+    "correct": false,
+    "false_clarification": false,
+    "injection_followed": null,
+    "mismatch_reason": null,
+    "over_budget": false,
+    "result_match": false,
+    "tool_calls": 0,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": 0.0,
+      "end_offset_ms": 0,
+      "error": null,
+      "input": "Which district in GREATER MANCHESTER had the highest average price in 2017?",
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "cortex_messages": 1
+      },
+      "model": "example-cortex",
+      "name": "cortex_analyst",
+      "output": {
+        "interpretation": "This is our interpretation of your question: Which district in GREATER MANCHESTER had the highest average price in 2017?",
+        "sql": "SELECT district, AVG(prices) AS avg_price FROM ANALYTICS.UK.UK_PRICE_PAID WHERE county = 'GREATER MANCHESTER' AND YEAR(date) = 2017 GROUP BY district ORDER BY avg_price DESC LIMIT 1",
+        "suggestions": []
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 23,
+      "error": "sql_error",
+      "input": "SELECT district, AVG(prices) AS avg_price FROM ANALYTICS.UK.UK_PRICE_PAID WHERE county = 'GREATER MANCHESTER' AND YEAR(date) = 2017 GROUP BY district ORDER BY avg_price DESC LIMIT 1",
+      "kind": "execution",
+      "latency_ms": 23,
+      "metadata": {
+        "engine": "snowflake"
+      },
+      "model": null,
+      "name": "execute",
+      "output": {
+        "query_id": null,
+        "rows_total": null,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:01+00:00",
+  "steps": [],
+  "trace_id": "3ee79fa26e43c6cd11028c1221519bfd",
+  "trace_key": {
+    "backend": "cortex_analyst",
+    "fixes": [],
+    "question_id": "q-022",
+    "run_id": "example-synthetic",
+    "trial": 1
+  }
+}

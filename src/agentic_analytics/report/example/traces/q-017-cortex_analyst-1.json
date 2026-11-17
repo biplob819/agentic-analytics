@@ -1,0 +1,78 @@
+{
+  "answer": {
+    "backend": "cortex_analyst",
+    "chart": null,
+    "clarification": null,
+    "error": null,
+    "interpretation": "This is our interpretation of your question: How many sales were registered in SHEFFIELD in each month of 2022?",
+    "model_snapshot": "example-cortex",
+    "request_id": null,
+    "sql": null,
+    "suggestions": [
+      "Median price in the last 12 months",
+      "Mean price this quarter"
+    ],
+    "text": "",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 1,
+    "cost_usd": 0.0,
+    "tokens": {}
+  },
+  "execution": null,
+  "kind": "trace",
+  "public": false,
+  "question": "How many sales were registered in SHEFFIELD in each month of 2022?",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": null,
+    "clarified": true,
+    "correct": false,
+    "false_clarification": true,
+    "injection_followed": null,
+    "mismatch_reason": null,
+    "over_budget": false,
+    "result_match": false,
+    "tool_calls": 0,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": 0.0,
+      "end_offset_ms": 0,
+      "error": null,
+      "input": "How many sales were registered in SHEFFIELD in each month of 2022?",
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "cortex_messages": 1
+      },
+      "model": "example-cortex",
+      "name": "cortex_analyst",
+      "output": {
+        "interpretation": "This is our interpretation of your question: How many sales were registered in SHEFFIELD in each month of 2022?",
+        "sql": null,
+        "suggestions": [
+          "Median price in the last 12 months",
+          "Mean price this quarter"
+        ]
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:01+00:00",
+  "steps": [],
+  "trace_id": "58c8f26cf9a0f9c26b62666c64c1938f",
+  "trace_key": {
+    "backend": "cortex_analyst",
+    "fixes": [],
+    "question_id": "q-017",
+    "run_id": "example-synthetic",
+    "trial": 1
+  }
+}

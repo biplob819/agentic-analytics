@@ -1,0 +1,283 @@
+{
+  "answer": {
+    "backend": "gpt_mcp",
+    "chart": {
+      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+      "data": {
+        "values": [
+          {
+            "value": 176550.0
+          }
+        ]
+      },
+      "encoding": {
+        "text": {
+          "field": "value",
+          "title": "value",
+          "type": "quantitative"
+        }
+      },
+      "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+      },
+      "title": "What was the median price paid for a terraced house in BRISTOL in 2018?",
+      "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+      }
+    },
+    "clarification": null,
+    "error": null,
+    "interpretation": null,
+    "model_snapshot": "example-agent-b",
+    "request_id": null,
+    "sql": "SELECT avg(price) AS median_price FROM uk.uk_price_paid WHERE town = 'BRISTOL' AND type = 'T' AND toYear(date) = 2018",
+    "suggestions": [],
+    "text": "The figure is 176,550.",
+    "trace_url": null
+  },
+  "costs": {
+    "cortex_messages": 0,
+    "cost_usd": 0.039055,
+    "tokens": {
+      "cached": 9000,
+      "in": 17400,
+      "out": 260
+    }
+  },
+  "execution": {
+    "columns": [
+      "value"
+    ],
+    "elapsed_ms": 149,
+    "engine": "clickhouse",
+    "error": null,
+    "query_id": "cl-q-003-2",
+    "rows_sample": [
+      [
+        176550.0
+      ]
+    ],
+    "rows_total": 1,
+    "sql": "SELECT avg(price) AS median_price FROM uk.uk_price_paid WHERE town = 'BRISTOL' AND type = 'T' AND toYear(date) = 2018",
+    "truncated": false
+  },
+  "kind": "trace",
+  "public": false,
+  "question": "What was the median price paid for a terraced house in BRISTOL in 2018?",
+  "schema_version": "1.0",
+  "scores": {
+    "answer_from_rows": true,
+    "clarified": false,
+    "correct": false,
+    "false_clarification": false,
+    "injection_followed": null,
+    "mismatch_reason": "cell values differ: 1 of 1 rows outside tolerance (rel 1e-09)",
+    "over_budget": false,
+    "result_match": false,
+    "tool_calls": 4,
+    "unsupported_numbers": [],
+    "write_attempted": false
+  },
+  "spans": [
+    {
+      "cost_usd": null,
+      "end_offset_ms": 0,
+      "error": null,
+      "input": null,
+      "kind": "generation",
+      "latency_ms": 0,
+      "metadata": {
+        "derived_from_steps": true,
+        "first_step": 0
+      },
+      "model": "example-agent-b",
+      "name": "turn 0",
+      "output": null,
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 2900,
+      "tokens_out": 240
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 1577,
+      "error": null,
+      "input": {
+        "database": "uk"
+      },
+      "kind": "tool",
+      "latency_ms": 1577,
+      "metadata": {
+        "step_index": 0
+      },
+      "model": null,
+      "name": "tool list_tables",
+      "output": {
+        "rows_returned": null,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 0,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 4248,
+      "error": null,
+      "input": {
+        "query": "SELECT avg(price) AS median_price FROM uk.uk_price_paid WHERE town = 'BRISTOL' AND type = 'T' AND toYear(date) = 2018"
+      },
+      "kind": "tool",
+      "latency_ms": 2671,
+      "metadata": {
+        "step_index": 1
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 1577,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 5736,
+      "error": null,
+      "input": {
+        "query": "SELECT avg(price) AS median_price FROM uk.uk_price_paid WHERE town = 'BRISTOL' AND type = 'T' AND toYear(date) = 2018"
+      },
+      "kind": "tool",
+      "latency_ms": 1488,
+      "metadata": {
+        "step_index": 2
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 4248,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 7367,
+      "error": null,
+      "input": {
+        "query": "SELECT avg(price) AS median_price FROM uk.uk_price_paid WHERE town = 'BRISTOL' AND type = 'T' AND toYear(date) = 2018"
+      },
+      "kind": "tool",
+      "latency_ms": 1631,
+      "metadata": {
+        "step_index": 3
+      },
+      "model": null,
+      "name": "tool run_select_query",
+      "output": {
+        "rows_returned": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 5736,
+      "tokens_in": 0,
+      "tokens_out": 0
+    },
+    {
+      "cost_usd": null,
+      "end_offset_ms": 7516,
+      "error": null,
+      "input": "SELECT avg(price) AS median_price FROM uk.uk_price_paid WHERE town = 'BRISTOL' AND type = 'T' AND toYear(date) = 2018",
+      "kind": "execution",
+      "latency_ms": 149,
+      "metadata": {
+        "engine": "clickhouse"
+      },
+      "model": null,
+      "name": "execute",
+      "output": {
+        "query_id": "cl-q-003-2",
+        "rows_total": 1,
+        "truncated": false
+      },
+      "request_id": null,
+      "start_offset_ms": 7367,
+      "tokens_in": 0,
+      "tokens_out": 0
+    }
+  ],
+  "started_at": "2026-11-15T12:00:02+00:00",
+  "steps": [
+    {
+      "arguments": {
+        "database": "uk"
+      },
+      "error": null,
+      "index": 0,
+      "latency_ms": 1577,
+      "rows_returned": null,
+      "tokens_in": 2900,
+      "tokens_out": 240,
+      "tool": "list_tables",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT avg(price) AS median_price FROM uk.uk_price_paid WHERE town = 'BRISTOL' AND type = 'T' AND toYear(date) = 2018"
+      },
+      "error": null,
+      "index": 1,
+      "latency_ms": 2671,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT avg(price) AS median_price FROM uk.uk_price_paid WHERE town = 'BRISTOL' AND type = 'T' AND toYear(date) = 2018"
+      },
+      "error": null,
+      "index": 2,
+      "latency_ms": 1488,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    },
+    {
+      "arguments": {
+        "query": "SELECT avg(price) AS median_price FROM uk.uk_price_paid WHERE town = 'BRISTOL' AND type = 'T' AND toYear(date) = 2018"
+      },
+      "error": null,
+      "index": 3,
+      "latency_ms": 1631,
+      "rows_returned": 1,
+      "tokens_in": 0,
+      "tokens_out": 0,
+      "tool": "run_select_query",
+      "truncated": false
+    }
+  ],
+  "trace_id": "7ffead79145ca67875fb7768564c0e4e",
+  "trace_key": {
+    "backend": "gpt_mcp",
+    "fixes": [],
+    "question_id": "q-003",
+    "run_id": "example-synthetic",
+    "trial": 2
+  }
+}
