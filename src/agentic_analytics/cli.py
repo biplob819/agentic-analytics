@@ -44,7 +44,10 @@ def build_parser() -> argparse.ArgumentParser:
         p = sub.add_parser(name, help=help_text)
         # SUPPRESS keeps a top-level --json from being reset by the subparser default
         p.add_argument("--json", action="store_true", default=argparse.SUPPRESS)
-        if name == "load":
+        if name == "pack":
+            p.add_argument("action", nargs="?", choices=["check"], default=None)
+            p.add_argument("--pack", default="uk_price_paid", help="pack name or directory")
+        elif name == "load":
             from agentic_analytics.load.cli import add_load_args
 
             add_load_args(p)
@@ -108,6 +111,24 @@ def cmd_load(ns: argparse.Namespace) -> int:
     return code
 
 
+def cmd_pack(ns: argparse.Namespace) -> int:
+    from agentic_analytics.packs import PackError, load_pack
+    from agentic_analytics.questions import check_pack
+
+    if ns.action != "check":
+        return _error(ns.json, "usage: agentic-analytics pack check [--pack PATH]")
+    try:  # a pack that cannot be found or read is a configuration error (§4: exit 2)
+        pack = load_pack(ns.pack)
+    except PackError as exc:
+        return _error(ns.json, f"cannot load pack {ns.pack!r}: {exc}")
+    report = check_pack(pack)
+    text = f"{report.pack}: {report.questions} questions, {report.probes} probes, " + (
+        "ok" if report.ok else f"{len(report.issues)} issues\n  " + "\n  ".join(report.issues)
+    )
+    _emit(ns.json, report.to_dict(), text)
+    return EXIT_OK if report.ok else EXIT_FAILED
+
+
 def cmd_setup(ns: argparse.Namespace) -> int:
     """N1.7 (OWNER D-55). Output goes through the setup command's own secret box, which knows
     every secret it has seen; the printed Snowflake SQL holds public keys only."""
@@ -127,6 +148,7 @@ def cmd_setup(ns: argparse.Namespace) -> int:
 BUILT: dict[str, Callable[[argparse.Namespace], int]] = {
     "doctor": lambda ns: cmd_doctor(ns.json),
     "load": cmd_load,
+    "pack": cmd_pack,
     "setup": cmd_setup,
 }
 

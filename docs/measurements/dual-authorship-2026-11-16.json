@@ -1,0 +1,2908 @@
+{
+ "schema_version": "1.0",
+ "kind": "dual_authorship",
+ "node": "Q2.1",
+ "criterion": "QST-04",
+ "ran_at": "2026-11-16T21:57:01Z",
+ "pack": "uk_price_paid@1.0",
+ "as_of": "2026-08-31",
+ "gold_check_id": "3972dd7fed4e8a9404bd95c166a5740d2c7fd4d1b8a0db07091cf2bb151562f3",
+ "second_author": {
+  "model": "gpt-6.1-sol",
+  "model_snapshot": [
+   "gpt-6.1-sol"
+  ],
+  "api": "OpenAI Responses API (D-54), N1.6 adapter, no tools, store=false",
+  "effort": "medium",
+  "calls": 100,
+  "refusals_or_no_sql": 0
+ },
+ "prompt": {
+  "system": "You write one ClickHouse SELECT statement that answers the user's question about the table below. Use exact functions only: quantileExactInclusive(p) for medians and percentiles, uniqExact for distinct counts, never median, quantile or uniq. Treat the as-of date as today. Reply with the SQL only, in one ```sql block, and nothing else.",
+  "user": "agentic_analytics.gold.dual.user_prompt: the pack's ClickHouse CREATE TABLE, the agents' as_of_line(2026-08-31), the question text; nothing else (no gold, id, category, tolerance or N1.4 semantic layer)"
+ },
+ "executor": "ClickHouse read-only executor (user aa_ro, role analytics_ro, readonly=1, row cap 200), gold bound to the as-of",
+ "comparison": "gold.check.cross_engine_mismatch (S2.1 match_result at the question's tolerance, plus equal column counts), as in gold.dual.compare_dual; each disagreement also scored with S2.1 match_result alone (allow_extra_columns), as an agent answer would be",
+ "answer_questions": 100,
+ "agree": 82,
+ "disagree": 18,
+ "disagree_on_substance": 0,
+ "triage_summary": {
+  "gold_wrong": [],
+  "second_author_wrong": [],
+  "ambiguous_flag_for_owner": [
+   "q-021",
+   "q-022",
+   "q-029",
+   "q-030",
+   "q-033",
+   "q-077"
+  ],
+  "extra_columns_only_agree_on_substance": [
+   "q-061",
+   "q-063",
+   "q-064",
+   "q-066",
+   "q-068",
+   "q-069",
+   "q-071",
+   "q-072",
+   "q-073",
+   "q-074",
+   "q-078",
+   "q-080"
+  ]
+ },
+ "gold_fixes": [],
+ "question_texts_changed": [],
+ "spend_usd": 0.1785,
+ "cost_estimate_usd": {
+  "input": "about 37k tokens total (100 x ~1.3k chars/3.5) at $2.00/M = $0.07",
+  "output_assumed": "2k (expected) to 4k (upper) output+reasoning tokens per call at $10.00/M = $2.00 to $4.00",
+  "estimate": 2.1,
+  "upper_bound": 4.1,
+  "limit": 5.0
+ },
+ "results": [
+  {
+   "id": "q-001",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT count() AS property_sales\nFROM uk.uk_price_paid\nWHERE date >= '2023-01-01'\n  AND date < '2024-01-01'",
+   "gpt_cost_usd": 0.001146
+  },
+  {
+   "id": "q-002",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT quantileExactInclusive(0.5)(price) AS median_price_paid\nFROM uk.uk_price_paid\nWHERE date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.001252
+  },
+  {
+   "id": "q-003",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT avg(price) AS average_price\nFROM uk.uk_price_paid\nWHERE type = 'detached'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.00125
+  },
+  {
+   "id": "q-004",
+   "category": "aggregation",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    type,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY type\nORDER BY type",
+   "gpt_cost_usd": 0.001432
+  },
+  {
+   "id": "q-005",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    duration AS tenure,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= toDate('2023-01-01')\n  AND date < toDate('2024-01-01')\nGROUP BY duration\nORDER BY duration",
+   "gpt_cost_usd": 0.001338
+  },
+  {
+   "id": "q-006",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    100.0 * countIf(is_new = 1) / nullIf(count(), 0) AS new_build_percentage\nFROM uk.uk_price_paid\nWHERE date >= '2023-01-01'\n  AND date < '2024-01-01'",
+   "gpt_cost_usd": 0.001364
+  },
+  {
+   "id": "q-007",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT sum(price) AS total_value_pounds\nFROM uk.uk_price_paid\nWHERE date >= toDate('2022-01-01')\n  AND date < toDate('2023-01-01')",
+   "gpt_cost_usd": 0.00123
+  },
+  {
+   "id": "q-008",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    quantileExactInclusiveIf(0.5)(price, is_new = 1) AS new_build_median_price,\n    quantileExactInclusiveIf(0.5)(price, is_new = 0) AS existing_median_price\nFROM uk.uk_price_paid\nWHERE date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.001642
+  },
+  {
+   "id": "q-009",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    duration,\n    avg(price) AS mean_price\nFROM uk.uk_price_paid\nWHERE type = 'flat'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'\n  AND duration IN ('freehold', 'leasehold')\nGROUP BY duration\nORDER BY duration",
+   "gpt_cost_usd": 0.00149
+  },
+  {
+   "id": "q-010",
+   "category": "aggregation",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT uniqExact(postcode1) AS distinct_outward_postcodes\nFROM uk.uk_price_paid\nWHERE date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\n  AND trimBoth(postcode1) != ''",
+   "gpt_cost_usd": 0.001398
+  },
+  {
+   "id": "q-011",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT count() AS properties_sold\nFROM uk.uk_price_paid\nWHERE price > 1000000\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.001252
+  },
+  {
+   "id": "q-012",
+   "category": "aggregation",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    100.0 * countIf(type = 'flat') / nullIf(count(), 0) AS flat_sales_percentage\nFROM uk.uk_price_paid\nWHERE date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.00135
+  },
+  {
+   "id": "q-013",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT avg(price) AS average_price\nFROM uk.uk_price_paid\nWHERE type = 'semi-detached'\n  AND date >= '2019-01-01'\n  AND date < '2020-01-01'",
+   "gpt_cost_usd": 0.001262
+  },
+  {
+   "id": "q-014",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE duration = 'leasehold'\n  AND type IN ('terraced', 'semi-detached', 'detached')\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')",
+   "gpt_cost_usd": 0.001552
+  },
+  {
+   "id": "q-015",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    type,\n    count() AS sales_count,\n    sum(price) AS total_value_pounds\nFROM uk.uk_price_paid\nWHERE date >= toDate('2021-01-01')\n  AND date < toDate('2022-01-01')\nGROUP BY type\nORDER BY\n    CASE type\n        WHEN 'terraced' THEN 1\n        WHEN 'semi-detached' THEN 2\n        WHEN 'detached' THEN 3\n        WHEN 'flat' THEN 4\n        WHEN 'other' THEN 5\n    END",
+   "gpt_cost_usd": 0.002008
+  },
+  {
+   "id": "q-016",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    min(price) AS lowest_price,\n    max(price) AS highest_price\nFROM uk.uk_price_paid\nWHERE date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.00126
+  },
+  {
+   "id": "q-017",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT quantileExactInclusive(0.9)(price) AS price_90th_percentile\nFROM uk.uk_price_paid\nWHERE date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.00131
+  },
+  {
+   "id": "q-018",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT count() AS sales_count\nFROM uk.uk_price_paid\nWHERE is_new = 1\n  AND type = 'detached'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.001302
+  },
+  {
+   "id": "q-019",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    100.0 * countIf(duration = 'freehold') / nullIf(count(), 0) AS freehold_percentage\nFROM uk.uk_price_paid\nWHERE type = 'detached'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.001444
+  },
+  {
+   "id": "q-020",
+   "category": "aggregation",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    type,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= toDate('1994-01-01')\n  AND date < toDate('1995-01-01')\nGROUP BY type\nORDER BY type",
+   "gpt_cost_usd": 0.001304
+  },
+  {
+   "id": "q-021",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "no_matching_columns (gold=2, predicted=2)",
+   "scores_correct_as_agent_answer": false,
+   "gpt_sql": "SELECT\n    toStartOfMonth(date) AS month,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY month\nORDER BY month",
+   "gpt_cost_usd": 0.001384,
+   "text": "How many property sales were recorded in each month of 2024?",
+   "gold_sql": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY month ORDER BY month",
+   "gold_result": {
+    "columns": [
+     "month",
+     "sales"
+    ],
+    "row_count": 12,
+    "rows": [
+     [
+      1,
+      56616
+     ],
+     [
+      2,
+      62233
+     ],
+     [
+      3,
+      73690
+     ],
+     [
+      4,
+      65269
+     ],
+     [
+      5,
+      77779
+     ],
+     [
+      6,
+      76538
+     ],
+     [
+      7,
+      82340
+     ],
+     [
+      8,
+      88184
+     ],
+     [
+      9,
+      80131
+     ],
+     [
+      10,
+      96133
+     ],
+     [
+      11,
+      89035
+     ],
+     [
+      12,
+      84266
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "month",
+     "sales_count"
+    ],
+    "row_count": 12,
+    "rows": [
+     [
+      "2024-01-01",
+      56616
+     ],
+     [
+      "2024-02-01",
+      62233
+     ],
+     [
+      "2024-03-01",
+      73690
+     ],
+     [
+      "2024-04-01",
+      65269
+     ],
+     [
+      "2024-05-01",
+      77779
+     ],
+     [
+      "2024-06-01",
+      76538
+     ],
+     [
+      "2024-07-01",
+      82340
+     ],
+     [
+      "2024-08-01",
+      88184
+     ],
+     [
+      "2024-09-01",
+      80131
+     ],
+     [
+      "2024-10-01",
+      96133
+     ],
+     [
+      "2024-11-01",
+      89035
+     ],
+     [
+      "2024-12-01",
+      84266
+     ]
+    ]
+   },
+   "triage": {
+    "class": "ambiguous_presentation",
+    "verdict": "flag for owner: neither SQL is wrong on substance; the question does not say how a month is shown",
+    "gold_reading": "month as its number 1-12 (toMonth(date))",
+    "second_author_reading": "month as its first day, a Date such as 2024-01-01 (toStartOfMonth(date))",
+    "evidence": "same period filter and grouping; every count/median per month is identical on both sides, only the month key differs (1 vs '2024-01-01')",
+    "scoring_consequence": "S2.1's matcher scores the second author's form wrong (no_matching_columns (gold=2, predicted=2)), so an agent that keys months by date would be marked incorrect on this question"
+   }
+  },
+  {
+   "id": "q-022",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "no_matching_columns (gold=2, predicted=2)",
+   "scores_correct_as_agent_answer": false,
+   "gpt_sql": "SELECT\n    toStartOfMonth(date) AS month,\n    quantileExactInclusive(0.5)(price) AS median_price_paid\nFROM uk.uk_price_paid\nWHERE date >= '2023-01-01'\n  AND date < '2024-01-01'\nGROUP BY month\nORDER BY month",
+   "gpt_cost_usd": 0.001444,
+   "text": "What was the median price paid in each month of 2023?",
+   "gold_sql": "SELECT toMonth(date) AS month, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2023 GROUP BY month ORDER BY month",
+   "gold_result": {
+    "columns": [
+     "month",
+     "median_price"
+    ],
+    "row_count": 12,
+    "rows": [
+     [
+      1,
+      275000.0
+     ],
+     [
+      2,
+      270000.0
+     ],
+     [
+      3,
+      270000.0
+     ],
+     [
+      4,
+      270000.0
+     ],
+     [
+      5,
+      270000.0
+     ],
+     [
+      6,
+      278000.0
+     ],
+     [
+      7,
+      280000.0
+     ],
+     [
+      8,
+      285000.0
+     ],
+     [
+      9,
+      285000.0
+     ],
+     [
+      10,
+      278000.0
+     ],
+     [
+      11,
+      273000.0
+     ],
+     [
+      12,
+      275000.0
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "month",
+     "median_price_paid"
+    ],
+    "row_count": 12,
+    "rows": [
+     [
+      "2023-01-01",
+      275000.0
+     ],
+     [
+      "2023-02-01",
+      270000.0
+     ],
+     [
+      "2023-03-01",
+      270000.0
+     ],
+     [
+      "2023-04-01",
+      270000.0
+     ],
+     [
+      "2023-05-01",
+      270000.0
+     ],
+     [
+      "2023-06-01",
+      278000.0
+     ],
+     [
+      "2023-07-01",
+      280000.0
+     ],
+     [
+      "2023-08-01",
+      285000.0
+     ],
+     [
+      "2023-09-01",
+      285000.0
+     ],
+     [
+      "2023-10-01",
+      278000.0
+     ],
+     [
+      "2023-11-01",
+      273000.0
+     ],
+     [
+      "2023-12-01",
+      275000.0
+     ]
+    ]
+   },
+   "triage": {
+    "class": "ambiguous_presentation",
+    "verdict": "flag for owner: neither SQL is wrong on substance; the question does not say how a month is shown",
+    "gold_reading": "month as its number 1-12 (toMonth(date))",
+    "second_author_reading": "month as its first day, a Date such as 2024-01-01 (toStartOfMonth(date))",
+    "evidence": "same period filter and grouping; every count/median per month is identical on both sides, only the month key differs (1 vs '2023-01-01')",
+    "scoring_consequence": "S2.1's matcher scores the second author's form wrong (no_matching_columns (gold=2, predicted=2)), so an agent that keys months by date would be marked incorrect on this question"
+   }
+  },
+  {
+   "id": "q-023",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toYear(date) AS year,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= toDate('2015-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY year\nORDER BY year",
+   "gpt_cost_usd": 0.001362
+  },
+  {
+   "id": "q-024",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toYear(date) AS year,\n    avg(price) AS average_price_paid\nFROM uk.uk_price_paid\nWHERE date >= '2010-01-01'\n  AND date < '2020-01-01'\nGROUP BY year\nORDER BY year",
+   "gpt_cost_usd": 0.001358
+  },
+  {
+   "id": "q-025",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toQuarter(date) AS quarter,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= toDate('2022-01-01')\n  AND date < toDate('2023-01-01')\nGROUP BY quarter\nORDER BY quarter",
+   "gpt_cost_usd": 0.001354
+  },
+  {
+   "id": "q-026",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT count() AS property_sales\nFROM uk.uk_price_paid\nWHERE date >= toDate('2025-01-01')\n  AND date < toDate('2026-01-01')",
+   "gpt_cost_usd": 0.001854
+  },
+  {
+   "id": "q-027",
+   "category": "time",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    type,\n    quantileExactInclusive(0.5)(price) AS median_price_paid\nFROM uk.uk_price_paid\nWHERE date >= toDate('2025-01-01')\n  AND date < toDate('2026-01-01')\nGROUP BY type\nORDER BY\n    CASE type\n        WHEN 'terraced' THEN 1\n        WHEN 'semi-detached' THEN 2\n        WHEN 'detached' THEN 3\n        WHEN 'flat' THEN 4\n        WHEN 'other' THEN 5\n    END",
+   "gpt_cost_usd": 0.002368
+  },
+  {
+   "id": "q-028",
+   "category": "time",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT count() AS property_sales\nFROM uk.uk_price_paid\nWHERE date >= toDate('2016-06-01')\n  AND date < toDate('2016-07-01')",
+   "gpt_cost_usd": 0.00118
+  },
+  {
+   "id": "q-029",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "rows_differ (columns=by_name, example_gold_row=('2016-04-01', 59896), unmatched_gold=0, unmatched_predicted=1)",
+   "scores_correct_as_agent_answer": false,
+   "gpt_sql": "SELECT\n    toStartOfMonth(date) AS month,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= toDate('2016-03-01')\n  AND date < toDate('2016-05-01')\nGROUP BY month\nORDER BY month",
+   "gpt_cost_usd": 0.001392,
+   "text": "How many sales were there in March 2016 and in April 2016? Give one row per month.",
+   "gold_sql": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE date >= '2016-03-01' AND date < '2016-05-01' GROUP BY month ORDER BY month",
+   "gold_result": {
+    "columns": [
+     "month",
+     "sales"
+    ],
+    "row_count": 2,
+    "rows": [
+     [
+      3,
+      143406
+     ],
+     [
+      4,
+      59896
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "month",
+     "sales"
+    ],
+    "row_count": 2,
+    "rows": [
+     [
+      "2016-03-01",
+      143406
+     ],
+     [
+      "2016-04-01",
+      59896
+     ]
+    ]
+   },
+   "triage": {
+    "class": "ambiguous_presentation",
+    "verdict": "flag for owner: neither SQL is wrong on substance; the question does not say how a month is shown",
+    "gold_reading": "month as its number 1-12 (toMonth(date))",
+    "second_author_reading": "month as its first day, a Date such as 2024-01-01 (toStartOfMonth(date))",
+    "evidence": "same period filter and grouping; every count/median per month is identical on both sides, only the month key differs (1 vs '2016-03-01')",
+    "scoring_consequence": "S2.1's matcher scores the second author's form wrong (rows_differ (columns=by_name, example_gold_row=('2016-03-01', 143406), unmatched_gold=0, unmatched_predicted=1)), so an agent that keys months by date would be marked incorrect on this question"
+   }
+  },
+  {
+   "id": "q-030",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "no_matching_columns (gold=2, predicted=2)",
+   "scores_correct_as_agent_answer": false,
+   "gpt_sql": "SELECT\n    toStartOfMonth(date) AS month,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE date >= toDate('2020-01-01')\n  AND date < toDate('2021-01-01')\nGROUP BY month\nORDER BY month",
+   "gpt_cost_usd": 0.001384,
+   "text": "How many property sales were recorded in each month of 2020?",
+   "gold_sql": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2020 GROUP BY month ORDER BY month",
+   "gold_result": {
+    "columns": [
+     "month",
+     "sales"
+    ],
+    "row_count": 12,
+    "rows": [
+     [
+      1,
+      71758
+     ],
+     [
+      2,
+      71462
+     ],
+     [
+      3,
+      75418
+     ],
+     [
+      4,
+      32340
+     ],
+     [
+      5,
+      39460
+     ],
+     [
+      6,
+      59281
+     ],
+     [
+      7,
+      70621
+     ],
+     [
+      8,
+      73148
+     ],
+     [
+      9,
+      83909
+     ],
+     [
+      10,
+      102703
+     ],
+     [
+      11,
+      102191
+     ],
+     [
+      12,
+      115903
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "month",
+     "sales_count"
+    ],
+    "row_count": 12,
+    "rows": [
+     [
+      "2020-01-01",
+      71758
+     ],
+     [
+      "2020-02-01",
+      71462
+     ],
+     [
+      "2020-03-01",
+      75418
+     ],
+     [
+      "2020-04-01",
+      32340
+     ],
+     [
+      "2020-05-01",
+      39460
+     ],
+     [
+      "2020-06-01",
+      59281
+     ],
+     [
+      "2020-07-01",
+      70621
+     ],
+     [
+      "2020-08-01",
+      73148
+     ],
+     [
+      "2020-09-01",
+      83909
+     ],
+     [
+      "2020-10-01",
+      102703
+     ],
+     [
+      "2020-11-01",
+      102191
+     ],
+     [
+      "2020-12-01",
+      115903
+     ]
+    ]
+   },
+   "triage": {
+    "class": "ambiguous_presentation",
+    "verdict": "flag for owner: neither SQL is wrong on substance; the question does not say how a month is shown",
+    "gold_reading": "month as its number 1-12 (toMonth(date))",
+    "second_author_reading": "month as its first day, a Date such as 2024-01-01 (toStartOfMonth(date))",
+    "evidence": "same period filter and grouping; every count/median per month is identical on both sides, only the month key differs (1 vs '2020-01-01')",
+    "scoring_consequence": "S2.1's matcher scores the second author's form wrong (no_matching_columns (gold=2, predicted=2)), so an agent that keys months by date would be marked incorrect on this question"
+   }
+  },
+  {
+   "id": "q-031",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT count() AS property_sales\nFROM uk.uk_price_paid\nWHERE date >= '2021-01-01'\n  AND date < '2021-07-01'",
+   "gpt_cost_usd": 0.00116
+  },
+  {
+   "id": "q-032",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toYear(date) AS year,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE type = 'flat'\n  AND date >= toDate('2015-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY year\nORDER BY year",
+   "gpt_cost_usd": 0.001536
+  },
+  {
+   "id": "q-033",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "no_matching_columns (gold=2, predicted=2)",
+   "scores_correct_as_agent_answer": false,
+   "gpt_sql": "SELECT\n    toStartOfMonth(date) AS month,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE date >= toDate('2008-01-01')\n  AND date < toDate('2009-01-01')\nGROUP BY month\nORDER BY month",
+   "gpt_cost_usd": 0.001384,
+   "text": "How many property sales were recorded in each month of 2008?",
+   "gold_sql": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2008 GROUP BY month ORDER BY month",
+   "gold_result": {
+    "columns": [
+     "month",
+     "sales"
+    ],
+    "row_count": 12,
+    "rows": [
+     [
+      1,
+      59617
+     ],
+     [
+      2,
+      63649
+     ],
+     [
+      3,
+      60216
+     ],
+     [
+      4,
+      64734
+     ],
+     [
+      5,
+      67192
+     ],
+     [
+      6,
+      60915
+     ],
+     [
+      7,
+      54359
+     ],
+     [
+      8,
+      49890
+     ],
+     [
+      9,
+      43156
+     ],
+     [
+      10,
+      46713
+     ],
+     [
+      11,
+      37722
+     ],
+     [
+      12,
+      41561
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "month",
+     "sales_count"
+    ],
+    "row_count": 12,
+    "rows": [
+     [
+      "2008-01-01",
+      59617
+     ],
+     [
+      "2008-02-01",
+      63649
+     ],
+     [
+      "2008-03-01",
+      60216
+     ],
+     [
+      "2008-04-01",
+      64734
+     ],
+     [
+      "2008-05-01",
+      67192
+     ],
+     [
+      "2008-06-01",
+      60915
+     ],
+     [
+      "2008-07-01",
+      54359
+     ],
+     [
+      "2008-08-01",
+      49890
+     ],
+     [
+      "2008-09-01",
+      43156
+     ],
+     [
+      "2008-10-01",
+      46713
+     ],
+     [
+      "2008-11-01",
+      37722
+     ],
+     [
+      "2008-12-01",
+      41561
+     ]
+    ]
+   },
+   "triage": {
+    "class": "ambiguous_presentation",
+    "verdict": "flag for owner: neither SQL is wrong on substance; the question does not say how a month is shown",
+    "gold_reading": "month as its number 1-12 (toMonth(date))",
+    "second_author_reading": "month as its first day, a Date such as 2024-01-01 (toStartOfMonth(date))",
+    "evidence": "same period filter and grouping; every count/median per month is identical on both sides, only the month key differs (1 vs '2008-01-01')",
+    "scoring_consequence": "S2.1's matcher scores the second author's form wrong (no_matching_columns (gold=2, predicted=2)), so an agent that keys months by date would be marked incorrect on this question"
+   }
+  },
+  {
+   "id": "q-034",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toYear(date) AS year,\n    100.0 * countIf(is_new = 1) / count() AS new_build_percentage\nFROM uk.uk_price_paid\nWHERE date >= toDate('2015-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY year\nORDER BY year",
+   "gpt_cost_usd": 0.001524
+  },
+  {
+   "id": "q-035",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toQuarter(date) AS quarter,\n    avg(price) AS average_price\nFROM uk.uk_price_paid\nWHERE date >= toDate('2023-01-01')\n  AND date < toDate('2024-01-01')\nGROUP BY quarter\nORDER BY quarter",
+   "gpt_cost_usd": 0.00138
+  },
+  {
+   "id": "q-036",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    type,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= toDate('2023-12-01')\n  AND date < toDate('2024-01-01')\nGROUP BY type\nORDER BY type",
+   "gpt_cost_usd": 0.001334
+  },
+  {
+   "id": "q-037",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT count() AS property_sales\nFROM uk.uk_price_paid\nWHERE date = toDate('2021-03-31')",
+   "gpt_cost_usd": 0.001066
+  },
+  {
+   "id": "q-038",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toYear(date) AS year,\n    sum(price) AS total_sales_value\nFROM uk.uk_price_paid\nWHERE date >= toDate('2019-01-01')\n  AND date < toDate('2024-01-01')\nGROUP BY year\nORDER BY year",
+   "gpt_cost_usd": 0.001396
+  },
+  {
+   "id": "q-039",
+   "category": "time",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toYear(date) AS year,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE date >= toStartOfYear(today()) - INTERVAL 3 YEAR\n  AND date < toStartOfYear(today())\nGROUP BY year\nORDER BY year",
+   "gpt_cost_usd": 0.002058
+  },
+  {
+   "id": "q-040",
+   "category": "time",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toStartOfMonth(date) AS month,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE date >= toDate('1993-01-01')\n  AND date < toDate('1994-01-01')\nGROUP BY month\nORDER BY month",
+   "gpt_cost_usd": 0.001474
+  },
+  {
+   "id": "q-041",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE type = 'detached'\n  AND town = 'MANCHESTER'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')",
+   "gpt_cost_usd": 0.001464
+  },
+  {
+   "id": "q-042",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT count() AS property_sales\nFROM uk.uk_price_paid\nWHERE town = 'LEEDS'\n  AND date >= toDate('2023-01-01')\n  AND date < toDate('2024-01-01')",
+   "gpt_cost_usd": 0.001268
+  },
+  {
+   "id": "q-043",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT avg(price) AS average_price\nFROM uk.uk_price_paid\nWHERE district = 'CITY OF WESTMINSTER'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.001276
+  },
+  {
+   "id": "q-044",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    county,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE date >= '2024-01-01'\n  AND date < '2025-01-01'\n  AND county IN ('GREATER LONDON', 'GREATER MANCHESTER', 'WEST YORKSHIRE')\nGROUP BY county\nORDER BY county",
+   "gpt_cost_usd": 0.001624
+  },
+  {
+   "id": "q-045",
+   "category": "geography",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    district,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE type = 'flat'\n  AND town = 'LONDON'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY district\nHAVING count() >= 100\nORDER BY district",
+   "gpt_cost_usd": 0.002062
+  },
+  {
+   "id": "q-046",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    type,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE town = 'BRISTOL'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY type\nORDER BY type",
+   "gpt_cost_usd": 0.001432
+  },
+  {
+   "id": "q-047",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    100.0 * countIf(is_new = 1) / nullIf(count(), 0) AS new_build_percentage\nFROM uk.uk_price_paid\nWHERE town = 'MILTON KEYNES'\n  AND date >= toDate('2023-01-01')\n  AND date < toDate('2024-01-01')",
+   "gpt_cost_usd": 0.001514
+  },
+  {
+   "id": "q-048",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT uniqExact(town) AS town_count\nFROM uk.uk_price_paid\nWHERE county = 'CORNWALL'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.001284
+  },
+  {
+   "id": "q-049",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT sum(price) AS total_sales_value\nFROM uk.uk_price_paid\nWHERE town = 'CAMBRIDGE'\n  AND date >= '2022-01-01'\n  AND date < '2023-01-01'",
+   "gpt_cost_usd": 0.001262
+  },
+  {
+   "id": "q-050",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    avg(price) AS average_price\nFROM uk.uk_price_paid\nWHERE type = 'terraced'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\n  AND town IN ('LIVERPOOL', 'MANCHESTER')\nGROUP BY town\nORDER BY town",
+   "gpt_cost_usd": 0.001588
+  },
+  {
+   "id": "q-051",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\n  AND town IN ('OXFORD', 'CAMBRIDGE')\nGROUP BY town\nORDER BY town",
+   "gpt_cost_usd": 0.00155
+  },
+  {
+   "id": "q-052",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    district,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE county = 'WEST YORKSHIRE'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY district\nORDER BY district",
+   "gpt_cost_usd": 0.001426
+  },
+  {
+   "id": "q-053",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT count() AS sales_count\nFROM uk.uk_price_paid\nWHERE postcode1 = 'SW1A'\n  AND date >= '2015-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.00126
+  },
+  {
+   "id": "q-054",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    type,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE town = 'CARDIFF'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY type\nORDER BY type",
+   "gpt_cost_usd": 0.001522
+  },
+  {
+   "id": "q-055",
+   "category": "geography",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    100.0 * countIf(duration = 'leasehold') / nullIf(count(), 0) AS leasehold_percentage\nFROM uk.uk_price_paid\nWHERE town = 'LONDON'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\n  AND type IN ('terraced', 'semi-detached', 'detached')",
+   "gpt_cost_usd": 0.001684
+  },
+  {
+   "id": "q-056",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT avg(price) AS average_price\nFROM uk.uk_price_paid\nWHERE county = 'SURREY'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.001254
+  },
+  {
+   "id": "q-057",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    duration AS tenure,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE town = 'BRIGHTON'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY duration\nORDER BY duration",
+   "gpt_cost_usd": 0.001438
+  },
+  {
+   "id": "q-058",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    county,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\n  AND county IN ('TYNE AND WEAR', 'NORTHUMBERLAND')\nGROUP BY county\nORDER BY county",
+   "gpt_cost_usd": 0.001612
+  },
+  {
+   "id": "q-059",
+   "category": "geography",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    countIf(is_new = 1) AS new_build_sales,\n    countIf(is_new = 0) AS non_new_build_sales\nFROM uk.uk_price_paid\nWHERE town = 'YORK'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')",
+   "gpt_cost_usd": 0.001534
+  },
+  {
+   "id": "q-060",
+   "category": "geography",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    quantileExactInclusiveIf(0.5)(price, type = 'flat') AS median_flat_price,\n    quantileExactInclusiveIf(0.5)(price, type IN ('terraced', 'semi-detached', 'detached')) AS median_house_price\nFROM uk.uk_price_paid\nWHERE district = 'KENSINGTON AND CHELSEA'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')",
+   "gpt_cost_usd": 0.001882
+  },
+  {
+   "id": "q-061",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    count() AS sales,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY town\nHAVING sales >= 500\nORDER BY median_price DESC, town ASC\nLIMIT 10",
+   "gpt_cost_usd": 0.001646,
+   "text": "Which 10 towns had the highest median price in 2024, among towns with at least 500 sales that year?",
+   "gold_sql": "SELECT town, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY town HAVING count() >= 500 ORDER BY median_price DESC, town ASC LIMIT 10",
+   "gold_result": {
+    "columns": [
+     "town",
+     "median_price"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "ASCOT",
+      699950.0
+     ],
+     [
+      "PINNER",
+      687500.0
+     ],
+     [
+      "LEATHERHEAD",
+      655000.0
+     ],
+     [
+      "TWICKENHAM",
+      625000.0
+     ],
+     [
+      "RICKMANSWORTH",
+      622492.5
+     ],
+     [
+      "KINGSTON UPON THAMES",
+      581500.0
+     ],
+     [
+      "RUISLIP",
+      570000.0
+     ],
+     [
+      "BARNET",
+      565500.0
+     ],
+     [
+      "LONDON",
+      565000.0
+     ],
+     [
+      "ST ALBANS",
+      565000.0
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "town",
+     "sales",
+     "median_price"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "ASCOT",
+      509,
+      699950.0
+     ],
+     [
+      "PINNER",
+      558,
+      687500.0
+     ],
+     [
+      "LEATHERHEAD",
+      870,
+      655000.0
+     ],
+     [
+      "TWICKENHAM",
+      903,
+      625000.0
+     ],
+     [
+      "RICKMANSWORTH",
+      616,
+      622492.5
+     ],
+     [
+      "KINGSTON UPON THAMES",
+      746,
+      581500.0
+     ],
+     [
+      "RUISLIP",
+      663,
+      570000.0
+     ],
+     [
+      "BARNET",
+      892,
+      565500.0
+     ],
+     [
+      "LONDON",
+      66833,
+      565000.0
+     ],
+     [
+      "ST ALBANS",
+      1790,
+      565000.0
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (sales)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (sales)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-062",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= toDate('2023-01-01')\n  AND date < toDate('2024-01-01')\nGROUP BY town\nORDER BY sales DESC, town ASC\nLIMIT 5",
+   "gpt_cost_usd": 0.001384
+  },
+  {
+   "id": "q-063",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    district,\n    avg(price) AS average_price,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY district\nHAVING count() >= 200\nORDER BY average_price DESC, district ASC\nLIMIT 10",
+   "gpt_cost_usd": 0.001592,
+   "text": "Which 10 districts had the highest average (mean) price in 2024, among districts with at least 200 sales that year?",
+   "gold_sql": "SELECT district, avg(price) AS avg_price FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY district HAVING count() >= 200 ORDER BY avg_price DESC, district ASC LIMIT 10",
+   "gold_result": {
+    "columns": [
+     "district",
+     "avg_price"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "CITY OF LONDON",
+      3499719.0699708457
+     ],
+     [
+      "CITY OF WESTMINSTER",
+      2983767.5646992056
+     ],
+     [
+      "KENSINGTON AND CHELSEA",
+      2270453.3821413456
+     ],
+     [
+      "CAMDEN",
+      1477447.8646089092
+     ],
+     [
+      "HAMMERSMITH AND FULHAM",
+      1122063.265843896
+     ],
+     [
+      "ISLINGTON",
+      999565.9644808744
+     ],
+     [
+      "ELMBRIDGE",
+      969267.5416841223
+     ],
+     [
+      "RICHMOND UPON THAMES",
+      935073.6483957219
+     ],
+     [
+      "TOWER HAMLETS",
+      880632.3893008474
+     ],
+     [
+      "WANDSWORTH",
+      880119.2543372073
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "district",
+     "average_price",
+     "sales_count"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "CITY OF LONDON",
+      3499719.0699708457,
+      343
+     ],
+     [
+      "CITY OF WESTMINSTER",
+      2983767.5646992056,
+      3524
+     ],
+     [
+      "KENSINGTON AND CHELSEA",
+      2270453.3821413456,
+      2363
+     ],
+     [
+      "CAMDEN",
+      1477447.8646089092,
+      2851
+     ],
+     [
+      "HAMMERSMITH AND FULHAM",
+      1122063.265843896,
+      2998
+     ],
+     [
+      "ISLINGTON",
+      999565.9644808744,
+      2928
+     ],
+     [
+      "ELMBRIDGE",
+      969267.5416841223,
+      2387
+     ],
+     [
+      "RICHMOND UPON THAMES",
+      935073.6483957219,
+      2992
+     ],
+     [
+      "TOWER HAMLETS",
+      880632.3893008474,
+      3776
+     ],
+     [
+      "WANDSWORTH",
+      880119.2543372073,
+      5937
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (sales_count)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (sales_count)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-064",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    quantileExactInclusive(0.5)(price) AS median_price,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= '2024-01-01'\n  AND date < '2025-01-01'\nGROUP BY town\nHAVING sales >= 500\nORDER BY median_price ASC, town ASC\nLIMIT 10",
+   "gpt_cost_usd": 0.001606,
+   "text": "Which 10 towns had the lowest median price in 2024, among towns with at least 500 sales that year?",
+   "gold_sql": "SELECT town, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY town HAVING count() >= 500 ORDER BY median_price ASC, town ASC LIMIT 10",
+   "gold_result": {
+    "columns": [
+     "town",
+     "median_price"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "PETERLEE",
+      65000.0
+     ],
+     [
+      "FERRYHILL",
+      71499.0
+     ],
+     [
+      "STANLEY",
+      87000.0
+     ],
+     [
+      "BISHOP AUCKLAND",
+      105000.0
+     ],
+     [
+      "NELSON",
+      105000.0
+     ],
+     [
+      "HARTLEPOOL",
+      115000.0
+     ],
+     [
+      "SEAHAM",
+      115000.0
+     ],
+     [
+      "BURNLEY",
+      116250.0
+     ],
+     [
+      "ASHINGTON",
+      119000.0
+     ],
+     [
+      "BOOTLE",
+      120000.0
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "town",
+     "median_price",
+     "sales"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "PETERLEE",
+      65000.0,
+      869
+     ],
+     [
+      "FERRYHILL",
+      71499.0,
+      521
+     ],
+     [
+      "STANLEY",
+      87000.0,
+      703
+     ],
+     [
+      "BISHOP AUCKLAND",
+      105000.0,
+      1203
+     ],
+     [
+      "NELSON",
+      105000.0,
+      728
+     ],
+     [
+      "HARTLEPOOL",
+      115000.0,
+      2175
+     ],
+     [
+      "SEAHAM",
+      115000.0,
+      565
+     ],
+     [
+      "BURNLEY",
+      116250.0,
+      2078
+     ],
+     [
+      "ASHINGTON",
+      119000.0,
+      639
+     ],
+     [
+      "BOOTLE",
+      120000.0,
+      646
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (sales)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (sales)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-065",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    county,\n    sum(price) AS total_sales_value\nFROM uk.uk_price_paid\nWHERE date >= toDate('2022-01-01')\n  AND date < toDate('2023-01-01')\nGROUP BY county\nORDER BY total_sales_value DESC, county ASC\nLIMIT 5",
+   "gpt_cost_usd": 0.00144
+  },
+  {
+   "id": "q-066",
+   "category": "top_n",
+   "selected_in_100": false,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=4)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    count() AS total_sales,\n    countIf(is_new = 1) AS new_build_sales,\n    100.0 * countIf(is_new = 1) / count() AS new_build_percentage\nFROM uk.uk_price_paid\nWHERE date >= toDate('2023-01-01')\n  AND date < toDate('2024-01-01')\nGROUP BY town\nHAVING count() >= 1000\nORDER BY new_build_percentage DESC, town ASC\nLIMIT 10",
+   "gpt_cost_usd": 0.001896,
+   "text": "Which 10 towns had the highest percentage of new-build sales in 2023, among towns with at least 1,000 sales that year?",
+   "gold_sql": "SELECT town, 100 * toFloat64(countIf(is_new = 1)) / count() AS new_build_pct FROM uk.uk_price_paid WHERE toYear(date) = 2023 GROUP BY town HAVING count() >= 1000 ORDER BY new_build_pct DESC, town ASC LIMIT 10",
+   "gold_result": {
+    "columns": [
+     "town",
+     "new_build_pct"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "BICESTER",
+      33.45132743362832
+     ],
+     [
+      "SALFORD",
+      32.176234979973295
+     ],
+     [
+      "LICHFIELD",
+      32.08292201382034
+     ],
+     [
+      "STRATFORD-UPON-AVON",
+      31.175934366453966
+     ],
+     [
+      "ELY",
+      28.810853950518755
+     ],
+     [
+      "WELLINGBOROUGH",
+      27.909738717339668
+     ],
+     [
+      "BISHOP'S STORTFORD",
+      27.906976744186046
+     ],
+     [
+      "ABINGDON",
+      27.272727272727273
+     ],
+     [
+      "WORKSOP",
+      27.119883040935672
+     ],
+     [
+      "BRENTWOOD",
+      26.873580620741862
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "town",
+     "total_sales",
+     "new_build_sales",
+     "new_build_percentage"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "BICESTER",
+      1130,
+      378,
+      33.45132743362832
+     ],
+     [
+      "SALFORD",
+      2247,
+      723,
+      32.176234979973295
+     ],
+     [
+      "LICHFIELD",
+      1013,
+      325,
+      32.08292201382034
+     ],
+     [
+      "STRATFORD-UPON-AVON",
+      1097,
+      342,
+      31.175934366453966
+     ],
+     [
+      "ELY",
+      1253,
+      361,
+      28.810853950518755
+     ],
+     [
+      "WELLINGBOROUGH",
+      1684,
+      470,
+      27.909738717339668
+     ],
+     [
+      "BISHOP'S STORTFORD",
+      1032,
+      288,
+      27.906976744186046
+     ],
+     [
+      "ABINGDON",
+      1034,
+      282,
+      27.272727272727273
+     ],
+     [
+      "WORKSOP",
+      1368,
+      371,
+      27.119883040935672
+     ],
+     [
+      "BRENTWOOD",
+      1321,
+      355,
+      26.873580620741862
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (total_sales, new_build_sales)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (total_sales, new_build_sales)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-067",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    district,\n    count() AS flat_sales\nFROM uk.uk_price_paid\nWHERE type = 'flat'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY district\nORDER BY flat_sales DESC, district ASC\nLIMIT 5",
+   "gpt_cost_usd": 0.001474
+  },
+  {
+   "id": "q-068",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    postcode1 AS outward_postcode,\n    count() AS sales,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\n  AND notEmpty(trimBoth(postcode1))\nGROUP BY postcode1\nHAVING sales >= 100\nORDER BY median_price DESC, outward_postcode ASC\nLIMIT 10",
+   "gpt_cost_usd": 0.001852,
+   "text": "Which 10 outward postcodes (such as SW1A) had the highest median price in 2024, among those with at least 100 sales? Ignore sales with no postcode.",
+   "gold_sql": "SELECT postcode1, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE postcode1 != '' AND toYear(date) = 2024 GROUP BY postcode1 HAVING count() >= 100 ORDER BY median_price DESC, postcode1 ASC LIMIT 10",
+   "gold_result": {
+    "columns": [
+     "postcode1",
+     "median_price"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "W1K",
+      3400000.0
+     ],
+     [
+      "SW1X",
+      2600000.0
+     ],
+     [
+      "SW1W",
+      1840000.0
+     ],
+     [
+      "W8",
+      1695000.0
+     ],
+     [
+      "W1H",
+      1607500.0
+     ],
+     [
+      "SW7",
+      1500000.0
+     ],
+     [
+      "W1U",
+      1425000.0
+     ],
+     [
+      "SW3",
+      1400000.0
+     ],
+     [
+      "W1T",
+      1300000.0
+     ],
+     [
+      "W11",
+      1175000.0
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "outward_postcode",
+     "sales",
+     "median_price"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "W1K",
+      105,
+      3400000.0
+     ],
+     [
+      "SW1X",
+      161,
+      2600000.0
+     ],
+     [
+      "SW1W",
+      170,
+      1840000.0
+     ],
+     [
+      "W8",
+      357,
+      1695000.0
+     ],
+     [
+      "W1H",
+      148,
+      1607500.0
+     ],
+     [
+      "SW7",
+      355,
+      1500000.0
+     ],
+     [
+      "W1U",
+      124,
+      1425000.0
+     ],
+     [
+      "SW3",
+      457,
+      1400000.0
+     ],
+     [
+      "W1T",
+      105,
+      1300000.0
+     ],
+     [
+      "W11",
+      351,
+      1175000.0
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (sales)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (sales)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-069",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    count() AS sales,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE county = 'GREATER MANCHESTER'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'\nGROUP BY town\nHAVING sales >= 200\nORDER BY median_price DESC, town ASC\nLIMIT 5",
+   "gpt_cost_usd": 0.001734,
+   "text": "Which 5 towns in the county of Greater Manchester had the highest median price in 2024, among towns with at least 200 sales?",
+   "gold_sql": "SELECT town, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE county = 'GREATER MANCHESTER' AND toYear(date) = 2024 GROUP BY town HAVING count() >= 200 ORDER BY median_price DESC, town ASC LIMIT 5",
+   "gold_result": {
+    "columns": [
+     "town",
+     "median_price"
+    ],
+    "row_count": 5,
+    "rows": [
+     [
+      "ALTRINCHAM",
+      435000.0
+     ],
+     [
+      "SALE",
+      373030.0
+     ],
+     [
+      "CHEADLE",
+      350000.0
+     ],
+     [
+      "STOCKPORT",
+      266000.0
+     ],
+     [
+      "MANCHESTER",
+      239000.0
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "town",
+     "sales",
+     "median_price"
+    ],
+    "row_count": 5,
+    "rows": [
+     [
+      "ALTRINCHAM",
+      1241,
+      435000.0
+     ],
+     [
+      "SALE",
+      925,
+      373030.0
+     ],
+     [
+      "CHEADLE",
+      927,
+      350000.0
+     ],
+     [
+      "STOCKPORT",
+      4063,
+      266000.0
+     ],
+     [
+      "MANCHESTER",
+      15745,
+      239000.0
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (sales)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (sales)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-070",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    count() AS new_build_sales\nFROM uk.uk_price_paid\nWHERE is_new = 1\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY town\nORDER BY new_build_sales DESC, town ASC\nLIMIT 5",
+   "gpt_cost_usd": 0.001506
+  },
+  {
+   "id": "q-071",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    rank() OVER (ORDER BY count() DESC) AS sales_rank,\n    type,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE date >= '2024-01-01'\n  AND date < '2025-01-01'\nGROUP BY type\nORDER BY sales_count DESC, type\nLIMIT 3",
+   "gpt_cost_usd": 0.001534,
+   "text": "Rank the 3 property types (terraced, semi-detached, detached, flat and other) with the most sales in 2024.",
+   "gold_sql": "SELECT type, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY type ORDER BY sales DESC, toString(type) ASC LIMIT 3",
+   "gold_result": {
+    "columns": [
+     "type",
+     "sales"
+    ],
+    "row_count": 3,
+    "rows": [
+     [
+      "semi-detached",
+      252254
+     ],
+     [
+      "terraced",
+      250223
+     ],
+     [
+      "detached",
+      211537
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "sales_rank",
+     "type",
+     "sales_count"
+    ],
+    "row_count": 3,
+    "rows": [
+     [
+      1,
+      "semi-detached",
+      252254
+     ],
+     [
+      2,
+      "terraced",
+      250223
+     ],
+     [
+      3,
+      "detached",
+      211537
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added a rank() column (1, 2, 3) before type",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with a rank() column (1, 2, 3) before type",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-072",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    quantileExactInclusive(0.5)(price) AS median_price,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE type = 'detached'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'\nGROUP BY town\nHAVING count() >= 100\nORDER BY median_price DESC, town ASC\nLIMIT 10",
+   "gpt_cost_usd": 0.001712,
+   "text": "Which 10 towns had the highest median price for detached houses in 2024, among towns with at least 100 detached-house sales?",
+   "gold_sql": "SELECT town, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE type = 'detached' AND toYear(date) = 2024 GROUP BY town HAVING count() >= 100 ORDER BY median_price DESC, town ASC LIMIT 10",
+   "gold_result": {
+    "columns": [
+     "town",
+     "median_price"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "COBHAM",
+      1600000.0
+     ],
+     [
+      "LONDON",
+      1500000.0
+     ],
+     [
+      "WEYBRIDGE",
+      1350000.0
+     ],
+     [
+      "ESHER",
+      1315000.0
+     ],
+     [
+      "BEACONSFIELD",
+      1300000.0
+     ],
+     [
+      "HARPENDEN",
+      1300000.0
+     ],
+     [
+      "BARNET",
+      1250000.0
+     ],
+     [
+      "GERRARDS CROSS",
+      1193500.0
+     ],
+     [
+      "ASCOT",
+      1175000.0
+     ],
+     [
+      "TADWORTH",
+      1097500.0
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "town",
+     "median_price",
+     "sales_count"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "COBHAM",
+      1600000.0,
+      139
+     ],
+     [
+      "LONDON",
+      1500000.0,
+      1132
+     ],
+     [
+      "WEYBRIDGE",
+      1350000.0,
+      124
+     ],
+     [
+      "ESHER",
+      1315000.0,
+      143
+     ],
+     [
+      "BEACONSFIELD",
+      1300000.0,
+      171
+     ],
+     [
+      "HARPENDEN",
+      1300000.0,
+      169
+     ],
+     [
+      "BARNET",
+      1250000.0,
+      108
+     ],
+     [
+      "GERRARDS CROSS",
+      1193500.0,
+      162
+     ],
+     [
+      "ASCOT",
+      1175000.0,
+      149
+     ],
+     [
+      "TADWORTH",
+      1097500.0,
+      106
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (sales_count)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (sales_count)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-073",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    avg(price) AS average_price,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE type = 'flat'\n  AND duration = 'leasehold'\n  AND date >= toDate('2023-01-01')\n  AND date < toDate('2024-01-01')\nGROUP BY town\nHAVING count() >= 200\nORDER BY average_price DESC, town ASC\nLIMIT 10",
+   "gpt_cost_usd": 0.001752,
+   "text": "Which 10 towns had the highest average (mean) price for leasehold flats in 2023, among towns with at least 200 leasehold flat sales?",
+   "gold_sql": "SELECT town, avg(price) AS avg_price FROM uk.uk_price_paid WHERE type = 'flat' AND duration = 'leasehold' AND toYear(date) = 2023 GROUP BY town HAVING count() >= 200 ORDER BY avg_price DESC, town ASC LIMIT 10",
+   "gold_result": {
+    "columns": [
+     "town",
+     "avg_price"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "LONDON",
+      712064.2530373954
+     ],
+     [
+      "TEDDINGTON",
+      603635.8634146341
+     ],
+     [
+      "RICHMOND",
+      576501.7052631578
+     ],
+     [
+      "KINGSTON UPON THAMES",
+      552618.1303538175
+     ],
+     [
+      "BRENTFORD",
+      518316.41025641025
+     ],
+     [
+      "TWICKENHAM",
+      494339.24207492796
+     ],
+     [
+      "BARNET",
+      414969.43445692887
+     ],
+     [
+      "WEMBLEY",
+      401151.37641723355
+     ],
+     [
+      "HOVE",
+      384845.4666666667
+     ],
+     [
+      "SURBITON",
+      382786.4498567335
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "town",
+     "average_price",
+     "sales_count"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "LONDON",
+      712064.2530373954,
+      38026
+     ],
+     [
+      "TEDDINGTON",
+      603635.8634146341,
+      205
+     ],
+     [
+      "RICHMOND",
+      576501.7052631578,
+      285
+     ],
+     [
+      "KINGSTON UPON THAMES",
+      552618.1303538175,
+      537
+     ],
+     [
+      "BRENTFORD",
+      518316.41025641025,
+      351
+     ],
+     [
+      "TWICKENHAM",
+      494339.24207492796,
+      347
+     ],
+     [
+      "BARNET",
+      414969.43445692887,
+      267
+     ],
+     [
+      "WEMBLEY",
+      401151.37641723355,
+      441
+     ],
+     [
+      "HOVE",
+      384845.4666666667,
+      810
+     ],
+     [
+      "SURBITON",
+      382786.4498567335,
+      349
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (sales_count)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (sales_count)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-074",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    county,\n    quantileExactInclusive(0.5)(price) AS median_price,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= '2024-01-01'\n  AND date < '2025-01-01'\nGROUP BY county\nHAVING count() >= 1000\nORDER BY median_price DESC, county ASC\nLIMIT 4",
+   "gpt_cost_usd": 0.001626,
+   "text": "Which 4 counties had the highest median price in 2024, among counties with at least 1,000 sales?",
+   "gold_sql": "SELECT county, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY county HAVING count() >= 1000 ORDER BY median_price DESC, county ASC LIMIT 4",
+   "gold_result": {
+    "columns": [
+     "county",
+     "median_price"
+    ],
+    "row_count": 4,
+    "rows": [
+     [
+      "WINDSOR AND MAIDENHEAD",
+      520000.0
+     ],
+     [
+      "GREATER LONDON",
+      511000.0
+     ],
+     [
+      "SURREY",
+      487250.0
+     ],
+     [
+      "WOKINGHAM",
+      480000.0
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "county",
+     "median_price",
+     "sales"
+    ],
+    "row_count": 4,
+    "rows": [
+     [
+      "WINDSOR AND MAIDENHEAD",
+      520000.0,
+      2439
+     ],
+     [
+      "GREATER LONDON",
+      511000.0,
+      106866
+     ],
+     [
+      "SURREY",
+      487250.0,
+      19162
+     ],
+     [
+      "WOKINGHAM",
+      480000.0,
+      2901
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (sales)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (sales)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-075",
+   "category": "top_n",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    count() AS sales_above_1m\nFROM uk.uk_price_paid\nWHERE price > 1000000\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'\nGROUP BY town\nORDER BY sales_above_1m DESC, town ASC\nLIMIT 10",
+   "gpt_cost_usd": 0.001546
+  },
+  {
+   "id": "q-076",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    district,\n    quantileExactInclusive(0.5)(price) AS median_price\nFROM uk.uk_price_paid\nWHERE county = 'SURREY'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY district\nORDER BY median_price DESC, district ASC\nLIMIT 5",
+   "gpt_cost_usd": 0.001594
+  },
+  {
+   "id": "q-077",
+   "category": "top_n",
+   "selected_in_100": false,
+   "agree": false,
+   "reason": "rows_differ (columns=by_name, example_gold_row=('2021-04-01', 100948), unmatched_gold=0, unmatched_predicted=1)",
+   "scores_correct_as_agent_answer": false,
+   "gpt_sql": "SELECT\n    toStartOfMonth(date) AS month,\n    count() AS sales\nFROM uk.uk_price_paid\nWHERE date >= '2021-01-01'\n  AND date < '2022-01-01'\nGROUP BY month\nORDER BY sales DESC, month ASC\nLIMIT 5",
+   "gpt_cost_usd": 0.001414,
+   "text": "Which 5 months of 2021 had the most property sales?",
+   "gold_sql": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2021 GROUP BY month ORDER BY sales DESC, month ASC LIMIT 5",
+   "gold_result": {
+    "columns": [
+     "month",
+     "sales"
+    ],
+    "row_count": 5,
+    "rows": [
+     [
+      6,
+      191732
+     ],
+     [
+      3,
+      154587
+     ],
+     [
+      9,
+      146867
+     ],
+     [
+      2,
+      107157
+     ],
+     [
+      4,
+      100948
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "month",
+     "sales"
+    ],
+    "row_count": 5,
+    "rows": [
+     [
+      "2021-06-01",
+      191732
+     ],
+     [
+      "2021-03-01",
+      154587
+     ],
+     [
+      "2021-09-01",
+      146867
+     ],
+     [
+      "2021-02-01",
+      107157
+     ],
+     [
+      "2021-04-01",
+      100948
+     ]
+    ]
+   },
+   "triage": {
+    "class": "ambiguous_presentation",
+    "verdict": "flag for owner: neither SQL is wrong on substance; the question does not say how a month is shown",
+    "gold_reading": "month as its number 1-12 (toMonth(date))",
+    "second_author_reading": "month as its first day, a Date such as 2024-01-01 (toStartOfMonth(date))",
+    "evidence": "same period filter and grouping; every count/median per month is identical on both sides, only the month key differs (1 vs '2021-06-01')",
+    "scoring_consequence": "S2.1's matcher scores the second author's form wrong (rows_differ (columns=by_name, example_gold_row=(6, 191732), unmatched_gold=5, unmatched_predicted=0)), so an agent that keys months by date would be marked incorrect on this question"
+   }
+  },
+  {
+   "id": "q-078",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    quantileExactInclusive(0.5)(price) AS median_price,\n    count() AS sales_count\nFROM uk.uk_price_paid\nWHERE type = 'terraced'\n  AND date >= '2024-01-01'\n  AND date < '2025-01-01'\nGROUP BY town\nHAVING sales_count >= 300\nORDER BY median_price DESC, town ASC\nLIMIT 5",
+   "gpt_cost_usd": 0.001716,
+   "text": "Which 5 towns had the highest median price for terraced houses in 2024, among towns with at least 300 terraced-house sales?",
+   "gold_sql": "SELECT town, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE type = 'terraced' AND toYear(date) = 2024 GROUP BY town HAVING count() >= 300 ORDER BY median_price DESC, town ASC LIMIT 5",
+   "gold_result": {
+    "columns": [
+     "town",
+     "median_price"
+    ],
+    "row_count": 5,
+    "rows": [
+     [
+      "LONDON",
+      750000.0
+     ],
+     [
+      "ST ALBANS",
+      563000.0
+     ],
+     [
+      "HARROW",
+      530000.0
+     ],
+     [
+      "SUTTON",
+      520000.0
+     ],
+     [
+      "ILFORD",
+      508750.0
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "town",
+     "median_price",
+     "sales_count"
+    ],
+    "row_count": 5,
+    "rows": [
+     [
+      "LONDON",
+      750000.0,
+      15078
+     ],
+     [
+      "ST ALBANS",
+      563000.0,
+      473
+     ],
+     [
+      "HARROW",
+      530000.0,
+      351
+     ],
+     [
+      "SUTTON",
+      520000.0,
+      336
+     ],
+     [
+      "ILFORD",
+      508750.0,
+      672
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (sales_count)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (sales_count)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-079",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    count() AS total_sales\nFROM uk.uk_price_paid\nWHERE date >= '2015-01-01'\n  AND date < '2025-01-01'\nGROUP BY town\nORDER BY total_sales DESC, town ASC\nLIMIT 5",
+   "gpt_cost_usd": 0.001382
+  },
+  {
+   "id": "q-080",
+   "category": "top_n",
+   "selected_in_100": true,
+   "agree": false,
+   "reason": "column_count (clickhouse=2, snowflake=3)",
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    district,\n    quantileExactInclusive(0.5)(price) AS median_flat_price,\n    count() AS flat_sales\nFROM uk.uk_price_paid\nWHERE town = 'LONDON'\n  AND type = 'flat'\n  AND date >= toDate('2024-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY district\nHAVING flat_sales >= 100\nORDER BY median_flat_price DESC, district ASC\nLIMIT 10",
+   "gpt_cost_usd": 0.001846,
+   "text": "Which 10 districts in the town of London had the highest median flat price in 2024, among districts with at least 100 flat sales?",
+   "gold_sql": "SELECT district, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE town = 'LONDON' AND type = 'flat' AND toYear(date) = 2024 GROUP BY district HAVING count() >= 100 ORDER BY median_price DESC, district ASC LIMIT 10",
+   "gold_result": {
+    "columns": [
+     "district",
+     "median_price"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "KENSINGTON AND CHELSEA",
+      995000.0
+     ],
+     [
+      "CITY OF WESTMINSTER",
+      850000.0
+     ],
+     [
+      "CITY OF LONDON",
+      802625.0
+     ],
+     [
+      "CAMDEN",
+      700000.0
+     ],
+     [
+      "HAMMERSMITH AND FULHAM",
+      666583.5
+     ],
+     [
+      "ISLINGTON",
+      590000.0
+     ],
+     [
+      "HOUNSLOW",
+      571150.0
+     ],
+     [
+      "RICHMOND UPON THAMES",
+      555000.0
+     ],
+     [
+      "WANDSWORTH",
+      550000.0
+     ],
+     [
+      "HACKNEY",
+      530000.0
+     ]
+    ]
+   },
+   "gpt_result": {
+    "columns": [
+     "district",
+     "median_flat_price",
+     "flat_sales"
+    ],
+    "row_count": 10,
+    "rows": [
+     [
+      "KENSINGTON AND CHELSEA",
+      995000.0,
+      1698
+     ],
+     [
+      "CITY OF WESTMINSTER",
+      850000.0,
+      2635
+     ],
+     [
+      "CITY OF LONDON",
+      802625.0,
+      256
+     ],
+     [
+      "CAMDEN",
+      700000.0,
+      2132
+     ],
+     [
+      "HAMMERSMITH AND FULHAM",
+      666583.5,
+      2066
+     ],
+     [
+      "ISLINGTON",
+      590000.0,
+      2200
+     ],
+     [
+      "HOUNSLOW",
+      571150.0,
+      324
+     ],
+     [
+      "RICHMOND UPON THAMES",
+      555000.0,
+      195
+     ],
+     [
+      "WANDSWORTH",
+      550000.0,
+      3983
+     ],
+     [
+      "HACKNEY",
+      530000.0,
+      2301
+     ]
+    ]
+   },
+   "triage": {
+    "class": "extra_columns_only",
+    "verdict": "agree on substance: same rows, same values in every gold column; the second author added sales-count column(s) (flat_sales)",
+    "gold_reading": "the gold's reading (same filter, threshold, ranking and N)",
+    "second_author_reading": "the same reading, with sales-count column(s) (flat_sales)",
+    "evidence": "the strict dual comparison (cross_engine_mismatch, equal column counts) fails on column_count; S2.1's agent matcher with allow_extra_columns scores the second author's result correct",
+    "scoring_consequence": "none: an agent answer shaped like this scores correct"
+   }
+  },
+  {
+   "id": "q-081",
+   "category": "yoy",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    median_price_2023,\n    median_price_2024,\n    100.0 * (median_price_2024 - median_price_2023)\n        / nullIf(median_price_2023, 0) AS percentage_change_2023_to_2024\nFROM\n(\n    SELECT\n        quantileExactInclusiveIf(0.5)(price, toYear(date) = 2023) AS median_price_2023,\n        quantileExactInclusiveIf(0.5)(price, toYear(date) = 2024) AS median_price_2024\n    FROM uk.uk_price_paid\n    WHERE date >= '2023-01-01'\n      AND date < '2025-01-01'\n)",
+   "gpt_cost_usd": 0.00238
+  },
+  {
+   "id": "q-082",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    countIf(toYear(date) = 2022) AS sales_2022,\n    countIf(toYear(date) = 2023) AS sales_2023,\n    100.0 * (toFloat64(sales_2023) - toFloat64(sales_2022))\n        / nullIf(sales_2022, 0) AS percentage_change\nFROM uk.uk_price_paid\nWHERE date >= '2022-01-01'\n  AND date < '2024-01-01'",
+   "gpt_cost_usd": 0.001914
+  },
+  {
+   "id": "q-083",
+   "category": "yoy",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    avgIf(price, toYear(date) = 2023) AS average_price_2023,\n    avgIf(price, toYear(date) = 2024) AS average_price_2024,\n    100.0 * (average_price_2024 - average_price_2023)\n        / nullIf(average_price_2023, 0) AS percentage_change\nFROM uk.uk_price_paid\nWHERE type = 'detached'\n  AND date >= '2023-01-01'\n  AND date < '2025-01-01'",
+   "gpt_cost_usd": 0.001988
+  },
+  {
+   "id": "q-084",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    type,\n    quantileExactInclusiveIf(0.5)(price, toYear(date) = 2023) AS median_price_2023,\n    quantileExactInclusiveIf(0.5)(price, toYear(date) = 2024) AS median_price_2024,\n    round(\n        100.0 * (median_price_2024 - median_price_2023)\n        / nullIf(median_price_2023, 0),\n        2\n    ) AS percentage_change\nFROM uk.uk_price_paid\nWHERE date >= toDate('2023-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY type\nORDER BY indexOf(\n    ['terraced', 'semi-detached', 'detached', 'flat', 'other'],\n    toString(type)\n)",
+   "gpt_cost_usd": 0.003528
+  },
+  {
+   "id": "q-085",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "WITH annual_sales AS\n(\n    SELECT\n        toYear(date) AS year,\n        count() AS sales\n    FROM uk.uk_price_paid\n    WHERE date >= toDate('2015-01-01')\n      AND date < toDate('2025-01-01')\n    GROUP BY year\n),\nsales_with_previous AS\n(\n    SELECT\n        year,\n        sales,\n        lagInFrame(sales, 1) OVER (\n            ORDER BY year\n            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW\n        ) AS previous_year_sales\n    FROM annual_sales\n)\nSELECT\n    year,\n    sales,\n    round(\n        100.0 * (toInt64(sales) - toInt64(previous_year_sales))\n        / nullIf(previous_year_sales, 0),\n        2\n    ) AS percentage_change\nFROM sales_with_previous\nWHERE year BETWEEN 2016 AND 2024\nORDER BY year",
+   "gpt_cost_usd": 0.00391
+  },
+  {
+   "id": "q-086",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    town,\n    countIf(toYear(date) = 2023) AS sales_2023,\n    countIf(toYear(date) = 2024) AS sales_2024,\n    100.0 * (toFloat64(sales_2024) - toFloat64(sales_2023))\n        / nullIf(sales_2023, 0) AS percentage_change\nFROM uk.uk_price_paid\nWHERE town IN ('LONDON', 'BIRMINGHAM', 'MANCHESTER', 'LEEDS', 'BRISTOL')\n  AND date >= toDate('2023-01-01')\n  AND date < toDate('2025-01-01')\nGROUP BY town\nORDER BY town",
+   "gpt_cost_usd": 0.002362
+  },
+  {
+   "id": "q-087",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    100.0 * countIf(toYear(date) = 2023 AND is_new = 1)\n        / nullIf(countIf(toYear(date) = 2023), 0) AS new_build_pct_2023,\n    100.0 * countIf(toYear(date) = 2024 AND is_new = 1)\n        / nullIf(countIf(toYear(date) = 2024), 0) AS new_build_pct_2024,\n    new_build_pct_2024 - new_build_pct_2023 AS change_percentage_points\nFROM uk.uk_price_paid\nWHERE date >= toDate('2023-01-01')\n  AND date < toDate('2025-01-01')",
+   "gpt_cost_usd": 0.003218
+  },
+  {
+   "id": "q-088",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    median_2023,\n    median_2024,\n    100.0 * (median_2024 - median_2023) / nullIf(median_2023, 0) AS percentage_change\nFROM\n(\n    SELECT\n        quantileExactInclusiveIf(0.5)(price, toYear(date) = 2023) AS median_2023,\n        quantileExactInclusiveIf(0.5)(price, toYear(date) = 2024) AS median_2024\n    FROM uk.uk_price_paid\n    WHERE town = 'LONDON'\n      AND date >= toDate('2023-01-01')\n      AND date < toDate('2025-01-01')\n)",
+   "gpt_cost_usd": 0.002336
+  },
+  {
+   "id": "q-089",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "WITH toStartOfYear(today()) AS this_year_start\nSELECT\n    maxIf(median_price, year = toYear(this_year_start) - 1) AS median_price_last_year,\n    maxIf(median_price, year = toYear(this_year_start) - 2) AS median_price_year_before,\n    100.0 * (median_price_last_year - median_price_year_before)\n        / nullIf(median_price_year_before, 0) AS percentage_change\nFROM\n(\n    SELECT\n        toYear(date) AS year,\n        quantileExactInclusive(0.5)(price) AS median_price\n    FROM uk.uk_price_paid\n    WHERE date >= subtractYears(this_year_start, 2)\n      AND date < this_year_start\n    GROUP BY year\n)",
+   "gpt_cost_usd": 0.004978
+  },
+  {
+   "id": "q-090",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "WITH\n    toDate('2026-08-31') AS as_of_date,\n    toStartOfYear(as_of_date) AS this_year_start,\n    subtractYears(this_year_start, 1) AS last_year_start,\n    subtractYears(this_year_start, 2) AS year_before_start\nSELECT\n    p.property_type,\n    coalesce(s.sales_last_year, 0) AS sales_last_year,\n    coalesce(s.sales_year_before, 0) AS sales_year_before,\n    round(\n        100.0 * (\n            toFloat64(coalesce(s.sales_last_year, 0))\n            - toFloat64(coalesce(s.sales_year_before, 0))\n        ) / nullIf(coalesce(s.sales_year_before, 0), 0),\n        2\n    ) AS percentage_change\nFROM\n(\n    SELECT arrayJoin([\n        'terraced', 'semi-detached', 'detached', 'flat', 'other'\n    ]) AS property_type\n) AS p\nLEFT JOIN\n(\n    SELECT\n        toString(type) AS property_type,\n        countIf(date >= last_year_start) AS sales_last_year,\n        countIf(date < last_year_start) AS sales_year_before\n    FROM uk.uk_price_paid\n    WHERE date >= year_before_start\n      AND date < this_year_start\n    GROUP BY type\n) AS s USING (property_type)\nORDER BY indexOf(\n    ['terraced', 'semi-detached', 'detached', 'flat', 'other'],\n    p.property_type\n)",
+   "gpt_cost_usd": 0.006386
+  },
+  {
+   "id": "q-091",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    toMonth(date) AS month,\n    countIf(toYear(date) = 2023) AS sales_2023,\n    countIf(toYear(date) = 2024) AS sales_2024,\n    100.0 * (toFloat64(sales_2024) - toFloat64(sales_2023))\n        / nullIf(sales_2023, 0) AS percentage_change\nFROM uk.uk_price_paid\nWHERE date >= '2023-01-01'\n  AND date < '2025-01-01'\nGROUP BY month\nORDER BY month",
+   "gpt_cost_usd": 0.002068
+  },
+  {
+   "id": "q-092",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    avgIf(price, toYear(date) = 2007) AS average_price_2007,\n    avgIf(price, toYear(date) = 2008) AS average_price_2008,\n    100.0 * (average_price_2008 - average_price_2007)\n        / nullIf(average_price_2007, 0) AS percentage_change\nFROM uk.uk_price_paid\nWHERE date >= toDate('2007-01-01')\n  AND date < toDate('2009-01-01')",
+   "gpt_cost_usd": 0.001942
+  },
+  {
+   "id": "q-093",
+   "category": "yoy",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    type,\n    countIf(toYear(date) = 2020) AS sales_2020,\n    countIf(toYear(date) = 2021) AS sales_2021,\n    100.0 * (toFloat64(sales_2021) - toFloat64(sales_2020))\n        / nullIf(sales_2020, 0) AS percentage_change\nFROM uk.uk_price_paid\nWHERE date >= '2020-01-01'\n  AND date < '2022-01-01'\nGROUP BY type\nORDER BY transform(\n    toString(type),\n    ['terraced', 'semi-detached', 'detached', 'flat', 'other'],\n    [1, 2, 3, 4, 5],\n    6\n)",
+   "gpt_cost_usd": 0.0025
+  },
+  {
+   "id": "q-094",
+   "category": "yoy",
+   "selected_in_100": false,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    county,\n    quantileExactInclusiveIf(0.5)(price, toYear(date) = 2019) AS median_price_2019,\n    quantileExactInclusiveIf(0.5)(price, toYear(date) = 2024) AS median_price_2024,\n    100.0 * (median_price_2024 - median_price_2019)\n        / nullIf(median_price_2019, 0) AS percentage_change\nFROM uk.uk_price_paid\nWHERE county IN ('GREATER LONDON', 'GREATER MANCHESTER', 'WEST MIDLANDS')\n  AND toYear(date) IN (2019, 2024)\nGROUP BY county\nORDER BY county",
+   "gpt_cost_usd": 0.002346
+  },
+  {
+   "id": "q-095",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    median_price_2023,\n    median_price_2024,\n    100.0 * (median_price_2024 - median_price_2023)\n        / nullIf(median_price_2023, 0) AS percentage_change\nFROM\n(\n    SELECT\n        quantileExactInclusiveIf(0.5)(price, toYear(date) = 2023) AS median_price_2023,\n        quantileExactInclusiveIf(0.5)(price, toYear(date) = 2024) AS median_price_2024\n    FROM uk.uk_price_paid\n    WHERE town = 'LEEDS'\n      AND type = 'detached'\n      AND date >= '2023-01-01'\n      AND date < '2025-01-01'\n)",
+   "gpt_cost_usd": 0.003352
+  },
+  {
+   "id": "q-096",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    sold_2023,\n    sold_2024,\n    toInt64(sold_2024) - toInt64(sold_2023) AS change_in_number,\n    round(\n        100.0 * (toInt64(sold_2024) - toInt64(sold_2023))\n        / nullIf(sold_2023, 0),\n        2\n    ) AS change_in_percent\nFROM\n(\n    SELECT\n        countIf(date < '2024-01-01') AS sold_2023,\n        countIf(date >= '2024-01-01') AS sold_2024\n    FROM uk.uk_price_paid\n    WHERE is_new = 1\n      AND date >= '2023-01-01'\n      AND date < '2025-01-01'\n)",
+   "gpt_cost_usd": 0.003222
+  },
+  {
+   "id": "q-097",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    sumIf(price, toYear(date) = 2021) AS total_value_2021,\n    sumIf(price, toYear(date) = 2022) AS total_value_2022,\n    100.0 * (toFloat64(total_value_2022) - toFloat64(total_value_2021))\n        / nullIf(total_value_2021, 0) AS percentage_change\nFROM uk.uk_price_paid\nWHERE date >= '2021-01-01'\n  AND date < '2023-01-01'",
+   "gpt_cost_usd": 0.00196
+  },
+  {
+   "id": "q-098",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    year,\n    median_price,\n    round(\n        100.0 * (median_price - previous_year_median)\n        / nullIf(previous_year_median, 0),\n        2\n    ) AS percentage_change\nFROM\n(\n    SELECT\n        year,\n        median_price,\n        lagInFrame(median_price, 1) OVER (\n            ORDER BY year\n            ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING\n        ) AS previous_year_median\n    FROM\n    (\n        SELECT\n            toYear(date) AS year,\n            quantileExactInclusive(0.5)(price) AS median_price\n        FROM uk.uk_price_paid\n        WHERE type = 'flat'\n          AND date >= toDate('2019-01-01')\n          AND date < toDate('2025-01-01')\n        GROUP BY year\n    )\n)\nWHERE year BETWEEN 2020 AND 2024\nORDER BY year",
+   "gpt_cost_usd": 0.003732
+  },
+  {
+   "id": "q-099",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    countIf(date >= '2023-01-01' AND date < '2023-04-01') AS sales_q1_2023,\n    countIf(date >= '2024-01-01' AND date < '2024-04-01') AS sales_q1_2024,\n    100.0 * (toInt64(sales_q1_2024) - toInt64(sales_q1_2023))\n        / nullIf(sales_q1_2023, 0) AS percentage_change\nFROM uk.uk_price_paid\nWHERE (date >= '2023-01-01' AND date < '2023-04-01')\n   OR (date >= '2024-01-01' AND date < '2024-04-01')",
+   "gpt_cost_usd": 0.002496
+  },
+  {
+   "id": "q-100",
+   "category": "yoy",
+   "selected_in_100": true,
+   "agree": true,
+   "reason": null,
+   "scores_correct_as_agent_answer": true,
+   "gpt_sql": "SELECT\n    freehold_pct_2023,\n    freehold_pct_2024,\n    freehold_pct_2024 - freehold_pct_2023 AS change_percentage_points\nFROM\n(\n    SELECT\n        100.0 * countIf(toYear(date) = 2023 AND duration = 'freehold')\n            / nullIf(countIf(toYear(date) = 2023), 0) AS freehold_pct_2023,\n        100.0 * countIf(toYear(date) = 2024 AND duration = 'freehold')\n            / nullIf(countIf(toYear(date) = 2024), 0) AS freehold_pct_2024\n    FROM uk.uk_price_paid\n    WHERE type IN ('terraced', 'semi-detached', 'detached')\n      AND date >= '2023-01-01'\n      AND date < '2025-01-01'\n)",
+   "gpt_cost_usd": 0.00273
+  }
+ ]
+}
