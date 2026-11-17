@@ -78,6 +78,18 @@ def _run_args(p: argparse.ArgumentParser, *, smoke: bool) -> None:
     _paths(p)
 
 
+def _demo_cache_args(p: argparse.ArgumentParser) -> None:
+    # defaults restate demo/cache.py's constants (a test keeps them equal; no import here)
+    p.add_argument("--questions", type=int, default=10, help="sample questions (default: 10)")
+    p.add_argument("--config", default="run.yaml", help="run configuration (default: run.yaml)")
+    p.add_argument("--pack", default="uk_price_paid", help="bundled pack name or pack directory")
+    p.add_argument("--backend", default="claude_mcp,cortex_analyst", help="comma list")
+    p.add_argument("--out", default="demo/replay.json", help="cache file (demo/replay.json)")
+    p.add_argument("--max-cost", type=float, default=10.0, help="stop before $N (default: 10)")
+    p.add_argument("--dry-run", action="store_true", help="print the bound; make no calls")
+    p.add_argument("--redo", action="store_true", help="re-ask samples with a failed panel")
+
+
 def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(prog=PROG, description=__doc__)
     ap.add_argument("--version", action="version", version=f"{PROG} {__version__}")
@@ -122,6 +134,8 @@ def build_parser() -> argparse.ArgumentParser:
                 "--credits", required=True, help='JSON file of metered credits: {"snowflake": 0.4}'
             )
             p.add_argument("--results", default="results", help="results folder")
+        elif name == "demo-cache":
+            _demo_cache_args(p)
         elif name == "load":
             from agentic_analytics.load.cli import add_load_args
 
@@ -481,6 +495,16 @@ def cmd_reconcile(ns: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_demo_cache(ns: argparse.Namespace) -> int:
+    from agentic_analytics.demo.cache import cli_demo_cache
+    from agentic_analytics.env import load_dotenv
+
+    load_dotenv()
+    code, payload, text = cli_demo_cache(ns, os.environ)
+    _emit(ns.json, payload, text, err=code != EXIT_OK)
+    return code
+
+
 def cmd_setup(ns: argparse.Namespace) -> int:
     """N1.7 (OWNER D-55). Output goes through the setup command's own secret box, which knows
     every secret it has seen; the printed Snowflake SQL holds public keys only."""
@@ -507,6 +531,7 @@ BUILT: dict[str, Callable[[argparse.Namespace], int]] = {
     "smoke": cmd_smoke,
     "report": cmd_report,
     "reconcile": cmd_reconcile,
+    "demo-cache": cmd_demo_cache,
     "setup": cmd_setup,
 }
 

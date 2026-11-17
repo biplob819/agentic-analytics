@@ -1,0 +1,1679 @@
+{
+ "attribution": "Contains HM Land Registry data © Crown copyright and database right 2021. This data is licensed under the Open Government Licence v3.0.",
+ "backends": [
+  "claude_mcp",
+  "cortex_analyst"
+ ],
+ "config": {
+  "as_of": "2026-09-30",
+  "backends": [
+   "claude_mcp",
+   "cortex_analyst"
+  ],
+  "concurrency": {
+   "claude_mcp": 2,
+   "cortex_analyst": 2
+  },
+  "effort": "medium",
+  "fixes": [],
+  "max_cost_usd": null,
+  "max_tool_calls": 6,
+  "max_turns": 10,
+  "models": {
+   "claude_mcp": "claude-sonnet-5-5"
+  },
+  "row_cap_exec": 10000,
+  "row_cap_model": 50,
+  "seed": 7,
+  "trials": 1
+ },
+ "created_at": "2026-11-15T12:00:00Z",
+ "entries": [
+  {
+   "category": "aggregation",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The answer is 240553.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 240553
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "value",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in England and Wales in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-aa4ace944d",
+      "sql": "SELECT count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2023",
+      "steps": [
+       {
+        "arguments": {
+         "query": "SELECT count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2023"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 85,
+        "rows_returned": 3,
+        "tokens_in": 2023,
+        "tokens_out": 119,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The answer is 240553.",
+         "clarification": null,
+         "sql": "SELECT count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2023",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 2360,
+        "rows_returned": null,
+        "tokens_in": 1530,
+        "tokens_out": 149,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.006408166666666666,
+     "execution_error": null,
+     "latency_ms": 2445,
+     "note": null,
+     "rows": {
+      "columns": [
+       "value"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        240553
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 240553.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 240553
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "value",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in England and Wales in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-842a7391b3",
+      "sql": "SELECT COUNT(*) AS sales FROM ANALYTICS.UK.UK_PRICE_PAID WHERE YEAR(date) = 2023",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20110416666666667,
+     "execution_error": null,
+     "latency_ms": 1854,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "value"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        240553
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "How many property sales were recorded in England and Wales in 2023?",
+   "question_id": "q-001",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "time",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The answer is 427903.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 427903
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "value",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in 2024, by month number (1–12)?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-901cb5f3a7",
+      "sql": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY month ORDER BY month",
+      "steps": [
+       {
+        "arguments": {
+         "query": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY month ORDER BY month"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 85,
+        "rows_returned": 3,
+        "tokens_in": 2455,
+        "tokens_out": 223,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The answer is 427903.",
+         "clarification": null,
+         "sql": "SELECT toMonth(date) AS month, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY month ORDER BY month",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 979,
+        "rows_returned": null,
+        "tokens_in": 1615,
+        "tokens_out": 186,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.007479166666666667,
+     "execution_error": null,
+     "latency_ms": 1064,
+     "note": null,
+     "rows": {
+      "columns": [
+       "value"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        427903
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 427903.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 427903
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "value",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in 2024, by month number (1–12)?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-69098bfa0c",
+      "sql": "SELECT MONTH(date) AS month, COUNT(*) AS sales FROM ANALYTICS.UK.UK_PRICE_PAID WHERE YEAR(date) = 2024 GROUP BY month ORDER BY month",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20110416666666667,
+     "execution_error": null,
+     "latency_ms": 2516,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "value"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        427903
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "How many property sales were recorded in 2024, by month number (1–12)?",
+   "question_id": "q-021",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "geography",
+   "panels": [
+    {
+     "answer": {
+      "answer": "",
+      "backend": "claude_mcp",
+      "chart": null,
+      "clarification": "Which period and property type do you mean?",
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-23f6054ea8",
+      "sql": null,
+      "steps": [
+       {
+        "arguments": {
+         "answer": null,
+         "clarification": "Which period and property type do you mean?",
+         "sql": null,
+         "suggestions": []
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1336,
+        "rows_returned": null,
+        "tokens_in": 2666,
+        "tokens_out": 238,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.005873,
+     "execution_error": null,
+     "latency_ms": 1336,
+     "note": null,
+     "rows": null,
+     "rows_total": null,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 176972.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 176972
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "median_price",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "What was the median price of a detached house in the town of Manchester in 2024?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-c57ef8334f",
+      "sql": "SELECT MEDIAN(price) AS median_price FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'MANCHESTER' AND type = 'detached' AND YEAR(date) = 2024",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20110416666666667,
+     "execution_error": null,
+     "latency_ms": 2556,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "median_price"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        176972
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "What was the median price of a detached house in the town of Manchester in 2024?",
+   "question_id": "q-041",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "top_n",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The answer is 419730.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 419730
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "median_price",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "Which 10 towns had the highest median price in 2024, among towns with at least 500 sales that year?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-110668bc34",
+      "sql": "SELECT town, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY town HAVING count() >= 500 ORDER BY median_price DESC, town ASC LIMIT 10",
+      "steps": [
+       {
+        "arguments": {
+         "query": "SELECT town, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY town HAVING count() >= 500 ORDER BY median_price DESC, town ASC LIMIT 10"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 85,
+        "rows_returned": 10,
+        "tokens_in": 2170,
+        "tokens_out": 210,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The answer is 419730.",
+         "clarification": null,
+         "sql": "SELECT town, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2024 GROUP BY town HAVING count() >= 500 ORDER BY median_price DESC, town ASC LIMIT 10",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 1138,
+        "rows_returned": null,
+        "tokens_in": 2749,
+        "tokens_out": 119,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.007923166666666667,
+     "execution_error": null,
+     "latency_ms": 1223,
+     "note": null,
+     "rows": {
+      "columns": [
+       "median_price"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        419730
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 419730.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 419730
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "median_price",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "Which 10 towns had the highest median price in 2024, among towns with at least 500 sales that year?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-05ef40610b",
+      "sql": "SELECT town, MEDIAN(price) AS median_price FROM ANALYTICS.UK.UK_PRICE_PAID WHERE YEAR(date) = 2024 GROUP BY town HAVING COUNT(*) >= 500 ORDER BY median_price DESC, town ASC LIMIT 10",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20110416666666667,
+     "execution_error": null,
+     "latency_ms": 1543,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "median_price"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        419730
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "Which 10 towns had the highest median price in 2024, among towns with at least 500 sales that year?",
+   "question_id": "q-061",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "yoy",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The answer is 268273.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 268273
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "median_2023",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "Show the median price paid in England and Wales in 2023 and in 2024, and the percentage change from 2023 to 2024.",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-fb6ef310a6",
+      "sql": "SELECT median_2023, median_2024, 100 * (toFloat64(median_2024) - median_2023) / median_2023 AS pct_change FROM (SELECT quantileExactInclusiveIf(0.5)(price, toYear(date) = 2023) AS median_2023, quantileExactInclusiveIf(0.5)(price, toYear(date) = 2024) AS median_2024 FROM uk.uk_price_paid WHERE toYear(date) IN (2023, 2024)) AS s",
+      "steps": [
+       {
+        "arguments": {
+         "query": "SELECT median_2023, median_2024, 100 * (toFloat64(median_2024) - median_2023) / median_2023 AS pct_change FROM (SELECT quantileExactInclusiveIf(0.5)(price, toYear(date) = 2023) AS median_2023, quantileExactInclusiveIf(0.5)(price, toYear(date) = 2024) AS median_2024 FROM uk.uk_price_paid WHERE toYear(date) IN (2023, 2024)) AS s"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 85,
+        "rows_returned": 3,
+        "tokens_in": 2867,
+        "tokens_out": 235,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The answer is 268273.",
+         "clarification": null,
+         "sql": "SELECT median_2023, median_2024, 100 * (toFloat64(median_2024) - median_2023) / median_2023 AS pct_change FROM (SELECT quantileExactInclusiveIf(0.5)(price, toYear(date) = 2023) AS median_2023, quantileExactInclusiveIf(0.5)(price, toYear(date) = 2024) AS median_2024 FROM uk.uk_price_paid WHERE toYear(date) IN (2023, 2024)) AS s",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 2148,
+        "rows_returned": null,
+        "tokens_in": 2940,
+        "tokens_out": 152,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.007832166666666666,
+     "execution_error": null,
+     "latency_ms": 2233,
+     "note": null,
+     "rows": {
+      "columns": [
+       "median_2023"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        268273
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 268273.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 268273
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "median_2023",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "Show the median price paid in England and Wales in 2023 and in 2024, and the percentage change from 2023 to 2024.",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-992e56c697",
+      "sql": "SELECT median_2023, median_2024, 100 * (CAST(median_2024 AS DOUBLE) - median_2023) / median_2023 AS pct_change FROM (SELECT MEDIAN(IFF(YEAR(date) = 2023, price, NULL)) AS median_2023, MEDIAN(IFF(YEAR(date) = 2024, price, NULL)) AS median_2024 FROM ANALYTICS.UK.UK_PRICE_PAID WHERE YEAR(date) IN (2023, 2024)) AS s",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20110416666666667,
+     "execution_error": null,
+     "latency_ms": 2670,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "median_2023"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        268273
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "Show the median price paid in England and Wales in 2023 and in 2024, and the percentage change from 2023 to 2024.",
+   "question_id": "q-081",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "ambiguous",
+   "panels": [
+    {
+     "answer": {
+      "answer": "",
+      "backend": "claude_mcp",
+      "chart": null,
+      "clarification": "Which period and property type do you mean?",
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-bf4f588d40",
+      "sql": null,
+      "steps": [
+       {
+        "arguments": {
+         "answer": null,
+         "clarification": "Which period and property type do you mean?",
+         "sql": null,
+         "suggestions": []
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 1493,
+        "rows_returned": null,
+        "tokens_in": 2859,
+        "tokens_out": 144,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.004325,
+     "execution_error": null,
+     "latency_ms": 1493,
+     "note": null,
+     "rows": null,
+     "rows_total": null,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "",
+      "backend": "cortex_analyst",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-9594f27ae0",
+      "sql": null,
+      "steps": [],
+      "suggestions": [
+       "Average price in 2024?"
+      ],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.201,
+     "execution_error": null,
+     "latency_ms": 2788,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": null,
+     "rows_total": null,
+     "timed_out": false
+    }
+   ],
+   "question": "What was the average price in Leeds last year?",
+   "question_id": "q-101",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "aggregation",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The answer is 355856.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 355856
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "median_price",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "What was the median price paid for a property in England and Wales in 2024?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-20eb6af5ba",
+      "sql": "SELECT quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2024",
+      "steps": [
+       {
+        "arguments": {
+         "query": "SELECT quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2024"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 85,
+        "rows_returned": 3,
+        "tokens_in": 1996,
+        "tokens_out": 139,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The answer is 355856.",
+         "clarification": null,
+         "sql": "SELECT quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2024",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 2330,
+        "rows_returned": null,
+        "tokens_in": 1518,
+        "tokens_out": 147,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.009617166666666666,
+     "execution_error": null,
+     "latency_ms": 2415,
+     "note": null,
+     "rows": {
+      "columns": [
+       "median_price"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        355856
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The query failed (sql_error).",
+      "backend": "cortex_analyst",
+      "chart": null,
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-e4340eb391",
+      "sql": "SELECT missing_column FROM ANALYTICS.UK.UK_PRICE_PAID",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20110416666666667,
+     "execution_error": "sql_error",
+     "latency_ms": 2036,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": null,
+     "rows_total": null,
+     "timed_out": false
+    }
+   ],
+   "question": "What was the median price paid for a property in England and Wales in 2024?",
+   "question_id": "q-002",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "time",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The answer is 174822.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 174822
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "median_price",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "What was the median price paid in 2023, by month number (1–12)?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-2701350180",
+      "sql": "SELECT toMonth(date) AS month, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2023 GROUP BY month ORDER BY month",
+      "steps": [
+       {
+        "arguments": {
+         "query": "SELECT toMonth(date) AS month, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2023 GROUP BY month ORDER BY month"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 85,
+        "rows_returned": 3,
+        "tokens_in": 2974,
+        "tokens_out": 205,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The answer is 174822.",
+         "clarification": null,
+         "sql": "SELECT toMonth(date) AS month, quantileExactInclusive(0.5)(price) AS median_price FROM uk.uk_price_paid WHERE toYear(date) = 2023 GROUP BY month ORDER BY month",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 775,
+        "rows_returned": null,
+        "tokens_in": 2324,
+        "tokens_out": 102,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.007138166666666668,
+     "execution_error": null,
+     "latency_ms": 860,
+     "note": null,
+     "rows": {
+      "columns": [
+       "median_price"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        174822
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 174822.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 174822
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "median_price",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "What was the median price paid in 2023, by month number (1–12)?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-807944259a",
+      "sql": "SELECT MONTH(date) AS month, MEDIAN(price) AS median_price FROM ANALYTICS.UK.UK_PRICE_PAID WHERE YEAR(date) = 2023 GROUP BY month ORDER BY month",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20110416666666667,
+     "execution_error": null,
+     "latency_ms": 2541,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "median_price"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        174822
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "What was the median price paid in 2023, by month number (1–12)?",
+   "question_id": "q-022",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "geography",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The answer is 175371.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 175371
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "value",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in the town of Leeds in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-487a8bf1dd",
+      "sql": "SELECT count() AS sales FROM uk.uk_price_paid WHERE town = 'LEEDS' AND toYear(date) = 2023",
+      "steps": [
+       {
+        "arguments": {
+         "query": "SELECT count() AS sales FROM uk.uk_price_paid WHERE town = 'LEEDS' AND toYear(date) = 2023"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 85,
+        "rows_returned": 3,
+        "tokens_in": 2296,
+        "tokens_out": 129,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The answer is 175371.",
+         "clarification": null,
+         "sql": "SELECT count() AS sales FROM uk.uk_price_paid WHERE town = 'LEEDS' AND toYear(date) = 2023",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 2467,
+        "rows_returned": null,
+        "tokens_in": 1701,
+        "tokens_out": 105,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.010789166666666667,
+     "execution_error": null,
+     "latency_ms": 2552,
+     "note": null,
+     "rows": {
+      "columns": [
+       "value"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        175371
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 175371.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 175371
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "value",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "How many property sales were recorded in the town of Leeds in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-3282658d39",
+      "sql": "SELECT COUNT(*) AS sales FROM ANALYTICS.UK.UK_PRICE_PAID WHERE town = 'LEEDS' AND YEAR(date) = 2023",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20110416666666667,
+     "execution_error": null,
+     "latency_ms": 2877,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "value"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        175371
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "How many property sales were recorded in the town of Leeds in 2023?",
+   "question_id": "q-042",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  },
+  {
+   "category": "top_n",
+   "panels": [
+    {
+     "answer": {
+      "answer": "The answer is 410984.",
+      "backend": "claude_mcp",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 410984
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "value",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "Which 5 towns recorded the most property sales in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": null,
+      "model_snapshot": "claude-sonnet-5-5-20261101",
+      "request_id": "req-d92f10c40d",
+      "sql": "SELECT town, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2023 GROUP BY town ORDER BY sales DESC, town ASC LIMIT 5",
+      "steps": [
+       {
+        "arguments": {
+         "query": "SELECT town, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2023 GROUP BY town ORDER BY sales DESC, town ASC LIMIT 5"
+        },
+        "error": null,
+        "index": 0,
+        "latency_ms": 85,
+        "rows_returned": 5,
+        "tokens_in": 2070,
+        "tokens_out": 202,
+        "tool": "run_select_query",
+        "truncated": false
+       },
+       {
+        "arguments": {
+         "answer": "The answer is 410984.",
+         "clarification": null,
+         "sql": "SELECT town, count() AS sales FROM uk.uk_price_paid WHERE toYear(date) = 2023 GROUP BY town ORDER BY sales DESC, town ASC LIMIT 5",
+         "suggestions": []
+        },
+        "error": null,
+        "index": 1,
+        "latency_ms": 2044,
+        "rows_returned": null,
+        "tokens_in": 2777,
+        "tokens_out": 103,
+        "tool": "final_answer",
+        "truncated": false
+       }
+      ],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "claude_mcp",
+     "bound_usd": 0.4863522222222222,
+     "capped": false,
+     "cost_usd": 0.006243166666666667,
+     "execution_error": null,
+     "latency_ms": 2129,
+     "note": null,
+     "rows": {
+      "columns": [
+       "value"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        410984
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    },
+    {
+     "answer": {
+      "answer": "The result is 410985.",
+      "backend": "cortex_analyst",
+      "chart": {
+       "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+       "data": {
+        "values": [
+         {
+          "value": 410985
+         }
+        ]
+       },
+       "encoding": {
+        "text": {
+         "field": "value",
+         "format": ",",
+         "title": "value",
+         "type": "quantitative"
+        }
+       },
+       "mark": {
+        "fontSize": 48,
+        "fontWeight": "bold",
+        "type": "text"
+       },
+       "title": "Which 5 towns recorded the most property sales in 2023?",
+       "usermeta": {
+        "chart": "kpi",
+        "rows_shown": 1,
+        "rows_total": 1
+       }
+      },
+      "clarification": null,
+      "error": null,
+      "interpretation": "Interpretation: ...",
+      "model_snapshot": "claude-sonnet-5-5",
+      "request_id": "req-81f647a9f7",
+      "sql": "SELECT 410985 AS value",
+      "steps": [],
+      "suggestions": [],
+      "trace_export": null,
+      "trace_url": null
+     },
+     "backend": "cortex_analyst",
+     "bound_usd": 0.251,
+     "capped": false,
+     "cost_usd": 0.20110416666666667,
+     "execution_error": null,
+     "latency_ms": 2676,
+     "note": "Cortex Analyst returns SQL; its answer text here is a template over the rows it returned.",
+     "rows": {
+      "columns": [
+       "value"
+      ],
+      "kind": "result_set",
+      "ordered": false,
+      "rows": [
+       [
+        410985
+       ]
+      ]
+     },
+     "rows_total": 1,
+     "timed_out": false
+    }
+   ],
+   "question": "Which 5 towns recorded the most property sales in 2023?",
+   "question_id": "q-062",
+   "stamp": {
+    "as_of": "2026-09-30",
+    "backends": [
+     "claude_mcp",
+     "cortex_analyst"
+    ],
+    "effort": "medium",
+    "fix_hash": null,
+    "models": {
+     "claude_mcp": "claude-sonnet-5-5"
+    },
+    "pack": "uk_price_paid@1.0"
+   }
+  }
+ ],
+ "fix_hash": null,
+ "kind": "demo_cache",
+ "label": "SYNTHETIC EXAMPLE: these answers were generated from the test fakes, not by the real backends. Run `agentic-analytics demo-cache` to record real ones.",
+ "pack": "uk_price_paid@1.0",
+ "schema_version": "1.0",
+ "synthetic": true
+}
