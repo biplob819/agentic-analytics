@@ -1,0 +1,30 @@
+# Read by the portfolio site (biplob819.github.io), which pulls docs/case-study.md.
+title: "agentic-analytics: an MCP agent against Snowflake Cortex Analyst"
+slug: agentic-analytics
+summary: "A 100-question UK house-price benchmark of Claude and GPT agents over ClickHouse's MCP server against Snowflake Cortex Analyst, scored against cross-engine gold SQL with no LLM judge."
+case_study: docs/case-study.md
+repo: https://github.com/biplob819/agentic-analytics
+links:
+  readme_results: https://github.com/biplob819/agentic-analytics#results
+  readme_screenshots: https://github.com/biplob819/agentic-analytics#screenshots
+  readme_guide: https://github.com/biplob819/agentic-analytics#step-by-step-guide
+  data_card: https://github.com/biplob819/agentic-analytics/blob/main/DATA_CARD.md
+  decisions: https://github.com/biplob819/agentic-analytics/blob/main/docs/decisions.md
+  measurements: https://github.com/biplob819/agentic-analytics/tree/main/docs/measurements
+  published_run: https://github.com/biplob819/agentic-analytics/blob/main/docs/results/summary.json
+  dashboard: null  # set when the Pages dashboard is deployed
+  demo: null  # set when the Streamlit demo is live
+images:
+  walkthrough: docs/assets/walkthrough.gif
+  architecture: docs/assets/architecture.svg
+  dataflow: docs/assets/dataflow.svg
+  headline: docs/assets/headline.svg
+  uplift: docs/assets/uplift.svg
+  categories: docs/assets/categories.svg
+  dashboard: docs/assets/dashboard.png
+  demo: docs/assets/demo.png
+  demo_passcode: docs/assets/demo-passcode.png
+  cli: docs/assets/cli.png
+  cli_doctor: docs/assets/cli-doctor.png
+tech: [Python, uv, Anthropic API, OpenAI API, MCP, ClickHouse Cloud, Snowflake Cortex Analyst, sqlglot, Pydantic, Streamlit, Postgres, EvalKit, GitHub Actions]
+status: draft  # the owner approves
