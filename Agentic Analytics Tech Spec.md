@@ -681,8 +681,8 @@ Status vocabulary: `not-started | spec | building | green`. Changelog lines read
 | **F3.1** | Fixes as flags | A2.1, N1.4, Q2.2 | Three fixes, frozen hashes, leak check, self-check rules | US2 |
 | **F3.2** | Fix runs and uplift | F3.1, R3.2 | Fix runs, uplift table, hand-labelled failure taxonomy | US2, US4 |
 | **B3.1** | Dashboard | M2.1, A2.3 | Static dashboard: category × backend, uplift, cost, clarification, failure explorer | US1–US5 |
-| **B3.2** | README, deploy and write-up figures | B3.1, F3.2, M4.1 | README headline, Cloudflare Pages deploy, decision log, data card, figures for the write-up | US6 |
-| **B3.3** | Open-source release v0.1.0 | B3.2, D4.2 | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0, the hosted demo deployed with its live p95 (DEM-15, D-93), run history and drift from EvalKit's ledger once v0.4.0 ships it (MON-07, OWNER D-98) | US6, US7, US8 |
+| **B3.2** | README, deploy and write-up figures | B3.1, F3.2, M4.1 | README headline, Pages publishing (the deploy itself is REL-05 in B3.3, OWNER D-107), decision log, data card, figures for the write-up | US6 |
+| **B3.3** | Open-source release v0.1.0 | B3.2, D4.2 | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0, the hosted demo deployed with its live p95 (DEM-15, D-93), run history and drift from EvalKit's ledger once v0.4.0 ships it (MON-07, OWNER D-98), the results dashboard deployed on GitHub Pages (REL-05, OWNER D-107) | US6, US7, US8 |
 | **D4.1** | `ask()` and guard | A2.3, R3.1 | `ask()`, replay cache, live path behind EvalKit's guard, warm-up | US7 |
 | **D4.2** | Demo page | D4.1, B3.1 | Streamlit app from this repo (D-57), packaged for deploy, with the p95 tool (the deployed live p95 is DEM-15 in B3.3, D-93) | US7 |
 | **M4.1** | Monitoring and EvalKit reuse | R3.2, B3.1 | Scheduled smoke gated by `evalkit gate`, run pairs through `evalkit compare` (history and drift are MON-07 in B3.3, OWNER D-98), metrics-summary export, `attack_outcome` probe scoring, step efficiency, upstreamed scorers with parity tests (OWNER D-74, D-75) | US1, US5 |
@@ -1018,7 +1018,7 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 | Cap | Capability | Trace |
 | --- | --- | --- |
 | REL-01 | README opens with one chart and three sentences, generated from `summary.json` | US6 |
-| REL-02 | Dashboard deployed to Cloudflare Pages (GitHub Pages as fallback, as in EvalKit D-47) | Deliverables |
+| REL-02 | Results dashboard publishing: `scripts/publish_results.py` renders a finished run into `site/` and the committed published-run record, and the hand-run Pages workflow deploys `site/` to GitHub Pages (REL-02's fallback host, D-46) under least privilege; the deploy itself is REL-05 in B3.3 | Deliverables, OWNER D-107 |
 | REL-03 | Decision log, data card and "how I built it" note linked from the README | Deliverables |
 | REL-04 | Write-up figures generated from the summary; no hand-typed numbers | Deliverables |
 
@@ -1035,6 +1035,7 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 | OSS-07 | Tag v0.1.0, semver policy, install test against the published package | D-27 |
 | DEM-15 | Deployed on Streamlit Community Cloud with secrets in the host store; live page-mode p95 under 30 s over 20 owner-budget asks, no timed-out or errored panel | NFR2, D-93 |
 | MON-07 | Run history and drift through EvalKit: every run's metrics-1 export goes into EvalKit's run ledger (B5.7 LED-01, LED-02); the dashboard's trend page shows accuracy with intervals, cost per correct and p95 latency across runs from `evalkit history`, and a run outside its alarm band is flagged (moved from M4.1 MON-02: EvalKit B5.7 ships in v0.4.0, which B3.3 already waits for) | OWNER D-74, OWNER D-75, US1, OWNER D-98 |
+| REL-05 | Results dashboard deployed on GitHub Pages from the hand-run pages workflow, from the committed published run, traces pass the secret scan (moved from B3.2 REL-02) | Deliverables, OWNER D-107 |
 
 **D4.1 `ask()` and guard**
 

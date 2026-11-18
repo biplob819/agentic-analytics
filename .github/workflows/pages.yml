@@ -1,0 +1,43 @@
+name: pages
+
+# REL-02: deploy site/ (written by scripts/publish_results.py from a finished run) to GitHub
+# Pages, the fallback host named in REL-02 (D-46). Run by hand only until the first real run
+# is published; it refuses an empty site and the SYNTHETIC example.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: read
+      pages: write
+      id-token: write   # proves to Pages that this run may deploy; no stored token
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - name: Refuse an empty site or the synthetic example
+        run: |
+          [ -f site/index.html ] || { echo "site/index.html is missing" >&2; exit 1; }
+          [ -f site/summary.json ] || { echo "site/summary.json is missing" >&2; exit 1; }
+          if grep -q "SYNTHETIC EXAMPLE" site/index.html; then
+            echo "site/ holds the synthetic example, not results" >&2
+            exit 1
+          fi
+      - name: Secret-scan the site, traces included
+        run: python3 scripts/secret_scan.py site
+      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+      - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

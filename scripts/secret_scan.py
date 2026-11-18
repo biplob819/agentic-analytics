@@ -8,7 +8,7 @@ Known limit: a key split across string literals ("sk-ant-" "abc...") is not dete
 Provider-side secret scanning on GitHub is the backstop for that case.
 
 Usage:
-    python scripts/secret_scan.py [paths...]
+    python scripts/secret_scan.py [paths...]   (a directory is scanned recursively)
     python scripts/secret_scan.py --self-test
 """
 
@@ -71,6 +71,14 @@ def candidate_files(root: Path) -> list[Path]:
         return [p for p in root.rglob("*") if p.is_file() and not (skip & set(p.parts))]
 
 
+def expand(paths: list[Path]) -> list[Path]:
+    """Files named, plus every file under each directory named (e.g. the published site/)."""
+    out: list[Path] = []
+    for p in paths:
+        out += sorted(f for f in p.rglob("*") if f.is_file()) if p.is_dir() else [p]
+    return out
+
+
 def scan(files: list[Path]) -> list[str]:
     hits: list[str] = []
     for f in files:
@@ -122,7 +130,7 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     if args.self_test:
         return self_test()
-    files = args.paths or candidate_files(ROOT)
+    files = expand(args.paths) if args.paths else candidate_files(ROOT)
     hits = scan(files)
     if hits:
         print("secret scan: FAIL")

@@ -1,0 +1,74 @@
+{
+  "as_of": "2026-08-31",
+  "called": 0,
+  "code": {
+    "dirty": true,
+    "git_sha": "a638db93c74c573fb663637f8f9826aee6b457de",
+    "label": "a638db93c74c573fb663637f8f9826aee6b457de+dirty",
+    "version": "0.0.1"
+  },
+  "config": {
+    "as_of": "2026-08-31",
+    "backends": [
+      "claude_mcp",
+      "gpt_mcp",
+      "cortex_analyst"
+    ],
+    "concurrency": {
+      "claude_mcp": 4,
+      "cortex_analyst": 2,
+      "gpt_mcp": 4
+    },
+    "effort": "medium",
+    "fixes": [
+      "descriptions",
+      "examples",
+      "self_check"
+    ],
+    "max_cost_usd": 25.0,
+    "max_tool_calls": 6,
+    "max_turns": 10,
+    "models": {
+      "claude_mcp": "claude-sonnet-5-5",
+      "gpt_mcp": "gpt-6.1-sol"
+    },
+    "row_cap_exec": 10000,
+    "row_cap_model": 50,
+    "seed": 0,
+    "snowflake_region": "AWS_AP_SOUTHEAST_7",
+    "trials": 3
+  },
+  "config_hash": "6ccebe034ddf31734175f533062f7a6a3f59a7916bba3f17bbaa87709894d70c",
+  "cumulative_usd": 26.733247,
+  "engines": [
+    "clickhouse",
+    "snowflake"
+  ],
+  "exit_code": 1,
+  "finished_at": "2026-11-17T12:22:22.730198+00:00",
+  "fix_freeze_reason": "D-48 re-freeze after the owner's semantic-layer review (OWNER D-67): 'area' dropped from district synonyms, as-of wording per D-50; pre-baseline",
+  "fix_hash": "7ae1907888981b098f20eb0e48ba5aaf9c6d92a95b191db2ea0fae70de647fc1",
+  "fix_hash_override": null,
+  "git_sha": "a638db93c74c573fb663637f8f9826aee6b457de",
+  "gold_check_id": "c38f90b243d8faf1bd10268d6a225429e9b6e3a7b608391ec2285290d2814719",
+  "gold_mode": "cross_engine",
+  "kind": "rescore",
+  "n_resamples": 10000,
+  "pack": "uk_price_paid@1.0",
+  "pack_source": "uk_price_paid",
+  "reconciled_credits": {
+    "clickhouse": 0.0,
+    "snowflake": 0.313194458
+  },
+  "run_id": "rescore-20261117T122217Z-6ccebe",
+  "schema_version": "1.0",
+  "seed": 0,
+  "semantic_hash": "8699741eb1c3381eafd0b7b7724d9a47b3aa52a65b87e70e6b41b0e405fabd80",
+  "snapshot_sha256": "96f93c64e676dcc1afffb86893616ee0d994cb774915b0b1a754ee7e6d1bc56a",
+  "snowflake_region": {
+    "region": "AWS_AP_SOUTHEAST_7",
+    "source": "run.yaml"
+  },
+  "spent_usd": 0.0,
+  "started_at": "2026-11-17T12:22:17.009584+00:00"
+}

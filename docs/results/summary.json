@@ -1,0 +1,1688 @@
+{
+  "schema_version": "1.0",
+  "run_id": "rescore-20261117T122217Z-6ccebe",
+  "config_hash": "6ccebe034ddf31734175f533062f7a6a3f59a7916bba3f17bbaa87709894d70c",
+  "snapshot_sha256": "96f93c64e676dcc1afffb86893616ee0d994cb774915b0b1a754ee7e6d1bc56a",
+  "as_of": "2026-08-31",
+  "gold_check_id": "c38f90b243d8faf1bd10268d6a225429e9b6e3a7b608391ec2285290d2814719",
+  "pack": "uk_price_paid@1.0",
+  "gold_mode": "cross_engine",
+  "backends": [
+    {
+      "backend": "claude_mcp",
+      "fixes": [],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.76,
+        "lo": 0.6766666666666667,
+        "hi": 0.84
+      },
+      "accuracy_strict": {
+        "point": 0.76,
+        "lo": 0.6766666666666667,
+        "hi": 0.84
+      },
+      "equivalence_passes": {},
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9215686274509803,
+            "lo": 0.7843137254901961,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9215686274509803,
+            "lo": 0.7843137254901961,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 0.8627450980392156,
+            "lo": 0.6862745098039216,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8627450980392156,
+            "lo": 0.6862745098039216,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 0.8333333333333334,
+            "lo": 0.6458333333333334,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8333333333333334,
+            "lo": 0.6458333333333334,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.020833333333333332,
+            "lo": 0.0,
+            "hi": 0.08333333333333333
+          },
+          "accuracy_strict": {
+            "point": 0.020833333333333332,
+            "lo": 0.0,
+            "hi": 0.08333333333333333
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.020833333333333332,
+        "lo": 0.0,
+        "hi": 0.0625
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.74,
+        "lo": 0.65,
+        "hi": 0.82
+      },
+      "trial_agreement": 0.7,
+      "answer_from_rows_violations": 52,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.015779260087719297,
+      "latency_p50_ms": 5902,
+      "latency_p95_ms": 9469,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 2.0833333333333335,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 1.2433333333333334,
+        "at_minimum": 0.0033333333333333335
+      }
+    },
+    {
+      "backend": "claude_mcp",
+      "fixes": [
+        "descriptions"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.8433333333333333,
+        "lo": 0.7732500000000001,
+        "hi": 0.9066666666666667
+      },
+      "accuracy_strict": {
+        "point": 0.8333333333333333,
+        "lo": 0.7566666666666667,
+        "hi": 0.9
+      },
+      "equivalence_passes": {
+        "period_number": 3
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9607843137254901,
+            "lo": 0.8627450980392156,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9607843137254901,
+            "lo": 0.8627450980392156,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9607843137254901,
+            "lo": 0.8627450980392156,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9019607843137255,
+            "lo": 0.7450980392156863,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9215686274509803,
+            "lo": 0.7843137254901961,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9215686274509803,
+            "lo": 0.7843137254901961,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 0.8125,
+            "lo": 0.625,
+            "hi": 0.9583333333333334
+          },
+          "accuracy_strict": {
+            "point": 0.8125,
+            "lo": 0.625,
+            "hi": 0.9583333333333334
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.4375,
+            "lo": 0.20833333333333334,
+            "hi": 0.6666666666666666
+          },
+          "accuracy_strict": {
+            "point": 0.4375,
+            "lo": 0.20833333333333334,
+            "hi": 0.6666666666666666
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.4375,
+        "lo": 0.20833333333333334,
+        "hi": 0.6666666666666666
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.81,
+        "lo": 0.73,
+        "hi": 0.88
+      },
+      "trial_agreement": 0.76,
+      "answer_from_rows_violations": 28,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.012432279051383398,
+      "latency_p50_ms": 3960,
+      "latency_p95_ms": 8026,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 0.9733333333333334,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 0.13333333333333333,
+        "at_minimum": 0.8866666666666667
+      }
+    },
+    {
+      "backend": "claude_mcp",
+      "fixes": [
+        "examples"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.9166666666666667,
+        "lo": 0.86,
+        "hi": 0.9666666666666667
+      },
+      "accuracy_strict": {
+        "point": 0.8966666666666667,
+        "lo": 0.8333333333333333,
+        "hi": 0.95
+      },
+      "equivalence_passes": {
+        "period_number": 6
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9607843137254901,
+            "lo": 0.8627450980392156,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8431372549019608,
+            "lo": 0.6666666666666667,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 0.8958333333333334,
+            "lo": 0.75,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8958333333333334,
+            "lo": 0.75,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.625,
+            "lo": 0.375,
+            "hi": 0.8140624999999773
+          },
+          "accuracy_strict": {
+            "point": 0.625,
+            "lo": 0.375,
+            "hi": 0.8140624999999773
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.625,
+        "lo": 0.375,
+        "hi": 0.8140624999999773
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.91,
+        "lo": 0.85,
+        "hi": 0.96
+      },
+      "trial_agreement": 0.88,
+      "answer_from_rows_violations": 8,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.010076256727272727,
+      "latency_p50_ms": 3996,
+      "latency_p95_ms": 6807,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 0.99,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 0.15,
+        "at_minimum": 0.85
+      }
+    },
+    {
+      "backend": "claude_mcp",
+      "fixes": [
+        "self_check"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.74,
+        "lo": 0.65,
+        "hi": 0.8233333333333333
+      },
+      "accuracy_strict": {
+        "point": 0.74,
+        "lo": 0.65,
+        "hi": 0.8233333333333333
+      },
+      "equivalence_passes": {},
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 0.8823529411764706,
+            "lo": 0.7058823529411765,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8823529411764706,
+            "lo": 0.7058823529411765,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 0.8431372549019608,
+            "lo": 0.6470588235294118,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8431372549019608,
+            "lo": 0.6470588235294118,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 0.7916666666666666,
+            "lo": 0.5833333333333334,
+            "hi": 0.9583333333333334
+          },
+          "accuracy_strict": {
+            "point": 0.7916666666666666,
+            "lo": 0.5833333333333334,
+            "hi": 0.9583333333333334
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.0,
+            "lo": 0.0,
+            "hi": 0.0
+          },
+          "accuracy_strict": {
+            "point": 0.0,
+            "lo": 0.0,
+            "hi": 0.0
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.73,
+        "lo": 0.64,
+        "hi": 0.82
+      },
+      "trial_agreement": 0.67,
+      "answer_from_rows_violations": 51,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.014689151801801801,
+      "latency_p50_ms": 5652,
+      "latency_p95_ms": 8017,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 2.0833333333333335,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 1.2433333333333334,
+        "at_minimum": 0.0033333333333333335
+      }
+    },
+    {
+      "backend": "claude_mcp",
+      "fixes": [
+        "descriptions",
+        "examples",
+        "self_check"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.9066666666666667,
+        "lo": 0.8466666666666667,
+        "hi": 0.96
+      },
+      "accuracy_strict": {
+        "point": 0.8866666666666667,
+        "lo": 0.82,
+        "hi": 0.9433333333333332
+      },
+      "equivalence_passes": {
+        "period_number": 6
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8823529411764706,
+            "lo": 0.7058823529411765,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 0.9166666666666666,
+            "lo": 0.7708333333333334,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9166666666666666,
+            "lo": 0.7708333333333334,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.5,
+            "lo": 0.25,
+            "hi": 0.75
+          },
+          "accuracy_strict": {
+            "point": 0.5,
+            "lo": 0.25,
+            "hi": 0.75
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.5,
+        "lo": 0.25,
+        "hi": 0.75
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.9,
+        "lo": 0.84,
+        "hi": 0.95
+      },
+      "trial_agreement": 0.89,
+      "answer_from_rows_violations": 15,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.013041423897058825,
+      "latency_p50_ms": 3911,
+      "latency_p95_ms": 5832,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 0.9433333333333334,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 0.10333333333333333,
+        "at_minimum": 0.9066666666666666
+      }
+    },
+    {
+      "backend": "gpt_mcp",
+      "fixes": [],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.97,
+        "lo": 0.93,
+        "hi": 1.0
+      },
+      "accuracy_strict": {
+        "point": 0.92,
+        "lo": 0.86,
+        "hi": 0.97
+      },
+      "equivalence_passes": {
+        "empty_check": 6,
+        "period_number": 3,
+        "pivot": 6
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8823529411764706,
+            "lo": 0.7058823529411765,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8823529411764706,
+            "lo": 0.7058823529411765,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.8125,
+            "lo": 0.625,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8125,
+            "lo": 0.625,
+            "hi": 1.0
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.8125,
+        "lo": 0.625,
+        "hi": 1.0
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.97,
+        "lo": 0.93,
+        "hi": 1.0
+      },
+      "trial_agreement": 0.78,
+      "answer_from_rows_violations": 4,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.004844411340206186,
+      "latency_p50_ms": 6505,
+      "latency_p95_ms": 9606,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 1.78,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 0.94,
+        "at_minimum": 0.12666666666666668
+      }
+    },
+    {
+      "backend": "gpt_mcp",
+      "fixes": [
+        "descriptions"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.9233333333333333,
+        "lo": 0.87,
+        "hi": 0.9666666666666667
+      },
+      "accuracy_strict": {
+        "point": 0.8866666666666667,
+        "lo": 0.8233333333333333,
+        "hi": 0.94
+      },
+      "equivalence_passes": {
+        "empty_check": 4,
+        "period_number": 3,
+        "pivot": 4
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8823529411764706,
+            "lo": 0.7058823529411765,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9019607843137255,
+            "lo": 0.7647058823529411,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9607843137254901,
+            "lo": 0.8823529411764706,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9607843137254901,
+            "lo": 0.8823529411764706,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 0.9166666666666666,
+            "lo": 0.7708333333333334,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9166666666666666,
+            "lo": 0.7708333333333334,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.7083333333333334,
+            "lo": 0.5,
+            "hi": 0.9166666666666666
+          },
+          "accuracy_strict": {
+            "point": 0.7083333333333334,
+            "lo": 0.5,
+            "hi": 0.9166666666666666
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.7083333333333334,
+        "lo": 0.5,
+        "hi": 0.8958333333333334
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.88,
+        "lo": 0.81,
+        "hi": 0.94
+      },
+      "trial_agreement": 0.67,
+      "answer_from_rows_violations": 0,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.005946857039711191,
+      "latency_p50_ms": 7464,
+      "latency_p95_ms": 13543,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 1.78,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 0.94,
+        "at_minimum": 0.11333333333333333
+      }
+    },
+    {
+      "backend": "gpt_mcp",
+      "fixes": [
+        "examples"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.96,
+        "lo": 0.92,
+        "hi": 0.99
+      },
+      "accuracy_strict": {
+        "point": 0.9366666666666668,
+        "lo": 0.8866666666666667,
+        "hi": 0.9767499999999988
+      },
+      "equivalence_passes": {
+        "empty_check": 4,
+        "period_number": 1,
+        "pivot": 2
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9803921568627452,
+            "lo": 0.9215686274509803,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8823529411764706,
+            "lo": 0.7058823529411765,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9607843137254901,
+            "lo": 0.8823529411764706,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.8333333333333334,
+            "lo": 0.6458333333333334,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8333333333333334,
+            "lo": 0.6458333333333334,
+            "hi": 1.0
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.8333333333333334,
+        "lo": 0.6458333333333334,
+        "hi": 1.0
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.95,
+        "lo": 0.9,
+        "hi": 0.99
+      },
+      "trial_agreement": 0.77,
+      "answer_from_rows_violations": 1,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.003613194791666667,
+      "latency_p50_ms": 4725,
+      "latency_p95_ms": 6859,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 0.9566666666666667,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 0.11666666666666667,
+        "at_minimum": 0.8933333333333333
+      }
+    },
+    {
+      "backend": "gpt_mcp",
+      "fixes": [
+        "self_check"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.9566666666666667,
+        "lo": 0.9166666666666667,
+        "hi": 0.99
+      },
+      "accuracy_strict": {
+        "point": 0.91,
+        "lo": 0.8533333333333333,
+        "hi": 0.96
+      },
+      "equivalence_passes": {
+        "empty_check": 6,
+        "period_number": 3,
+        "pivot": 5
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9803921568627452,
+            "lo": 0.9215686274509803,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8823529411764706,
+            "lo": 0.7058823529411765,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8823529411764706,
+            "lo": 0.7254901960784315,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.75,
+            "lo": 0.5416666666666666,
+            "hi": 0.9375
+          },
+          "accuracy_strict": {
+            "point": 0.75,
+            "lo": 0.5416666666666666,
+            "hi": 0.9375
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.75,
+        "lo": 0.5416666666666666,
+        "hi": 0.9375
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.94,
+        "lo": 0.89,
+        "hi": 0.98
+      },
+      "trial_agreement": 0.7,
+      "answer_from_rows_violations": 2,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.004943772822299652,
+      "latency_p50_ms": 6165,
+      "latency_p95_ms": 8549,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 1.8,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 0.96,
+        "at_minimum": 0.11333333333333333
+      }
+    },
+    {
+      "backend": "gpt_mcp",
+      "fixes": [
+        "descriptions",
+        "examples",
+        "self_check"
+      ],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.9433333333333332,
+        "lo": 0.8933333333333333,
+        "hi": 0.9833333333333333
+      },
+      "accuracy_strict": {
+        "point": 0.94,
+        "lo": 0.89,
+        "hi": 0.98
+      },
+      "equivalence_passes": {
+        "period_number": 1
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9803921568627452,
+            "lo": 0.9215686274509803,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.7708333333333334,
+            "lo": 0.5625,
+            "hi": 0.9375
+          },
+          "accuracy_strict": {
+            "point": 0.7708333333333334,
+            "lo": 0.5625,
+            "hi": 0.9375
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.7708333333333334,
+        "lo": 0.5625,
+        "hi": 0.9375
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.94,
+        "lo": 0.89,
+        "hi": 0.98
+      },
+      "trial_agreement": 0.86,
+      "answer_from_rows_violations": 0,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.0038209473498233212,
+      "latency_p50_ms": 4927,
+      "latency_p95_ms": 6900,
+      "step_efficiency": {
+        "answers": 300,
+        "tool_calls_mean": 0.8933333333333333,
+        "min_tool_calls_mean": 0.84,
+        "excess_mean": 0.05333333333333334,
+        "at_minimum": 0.95
+      }
+    },
+    {
+      "backend": "cortex_analyst",
+      "fixes": [],
+      "trials": 3,
+      "accuracy": {
+        "point": 0.85,
+        "lo": 0.78,
+        "hi": 0.92
+      },
+      "accuracy_strict": {
+        "point": 0.62,
+        "lo": 0.52,
+        "hi": 0.71
+      },
+      "equivalence_passes": {
+        "percent_scale": 60,
+        "period_number": 9
+      },
+      "by_category": [
+        {
+          "category": "aggregation",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.8823529411764706,
+            "lo": 0.7058823529411765,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "time",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.7647058823529411,
+            "lo": 0.5294117647058824,
+            "hi": 0.9411764705882353
+          }
+        },
+        {
+          "category": "geography",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.9411764705882353,
+            "lo": 0.8235294117647058,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "top_n",
+          "n": 17,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          }
+        },
+        {
+          "category": "yoy",
+          "n": 16,
+          "accuracy": {
+            "point": 1.0,
+            "lo": 1.0,
+            "hi": 1.0
+          },
+          "accuracy_strict": {
+            "point": 0.0,
+            "lo": 0.0,
+            "hi": 0.0
+          }
+        },
+        {
+          "category": "ambiguous",
+          "n": 16,
+          "accuracy": {
+            "point": 0.0625,
+            "lo": 0.0,
+            "hi": 0.1875
+          },
+          "accuracy_strict": {
+            "point": 0.0625,
+            "lo": 0.0,
+            "hi": 0.1875
+          }
+        }
+      ],
+      "clarification_rate": {
+        "point": 0.0625,
+        "lo": 0.0,
+        "hi": 0.1875
+      },
+      "false_clarification_rate": {
+        "point": 0.0,
+        "lo": 0.0,
+        "hi": 0.0
+      },
+      "pass_all_trials": {
+        "point": 0.85,
+        "lo": 0.78,
+        "hi": 0.92
+      },
+      "trial_agreement": 0.74,
+      "answer_from_rows_violations": 0,
+      "policy_violations": 0,
+      "errors": {},
+      "cost_per_correct_usd": 0.23995684957884197,
+      "latency_p50_ms": 4324,
+      "latency_p95_ms": 7459
+    }
+  ],
+  "uplifts": [
+    {
+      "backend": "claude_mcp",
+      "fix": "descriptions",
+      "delta_points": {
+        "point": 8.333333333333332,
+        "lo": 2.666666666666666,
+        "hi": 14.333333333333332
+      },
+      "p_value": 0.006999300069993001,
+      "separated": true
+    },
+    {
+      "backend": "claude_mcp",
+      "fix": "examples",
+      "delta_points": {
+        "point": 15.666666666666668,
+        "lo": 8.333333333333334,
+        "hi": 23.333333333333336
+      },
+      "p_value": 0.00019998000199980003,
+      "separated": true
+    },
+    {
+      "backend": "claude_mcp",
+      "fix": "self_check",
+      "delta_points": {
+        "point": -2.0,
+        "lo": -4.333333333333333,
+        "hi": 0.0
+      },
+      "p_value": 0.07079292070792921,
+      "separated": false
+    },
+    {
+      "backend": "claude_mcp",
+      "fix": "all",
+      "delta_points": {
+        "point": 14.666666666666668,
+        "lo": 7.666666666666666,
+        "hi": 22.0
+      },
+      "p_value": 0.00019998000199980003,
+      "separated": true
+    },
+    {
+      "backend": "gpt_mcp",
+      "fix": "descriptions",
+      "delta_points": {
+        "point": -4.666666666666668,
+        "lo": -8.333333333333336,
+        "hi": -1.6666666666666672
+      },
+      "p_value": 0.00019998000199980003,
+      "separated": true
+    },
+    {
+      "backend": "gpt_mcp",
+      "fix": "examples",
+      "delta_points": {
+        "point": -1.0000000000000002,
+        "lo": -3.666666666666667,
+        "hi": 0.6666666666666665
+      },
+      "p_value": 0.3555644435556444,
+      "separated": false
+    },
+    {
+      "backend": "gpt_mcp",
+      "fix": "self_check",
+      "delta_points": {
+        "point": -1.3333333333333337,
+        "lo": -3.0000000000000004,
+        "hi": 0.0
+      },
+      "p_value": 0.08919108089191082,
+      "separated": false
+    },
+    {
+      "backend": "gpt_mcp",
+      "fix": "all",
+      "delta_points": {
+        "point": -2.666666666666667,
+        "lo": -6.666666666666666,
+        "hi": 0.33333333333333326
+      },
+      "p_value": 0.09819018098190181,
+      "separated": false
+    }
+  ],
+  "probes": {
+    "p-id01": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-id02": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-id03": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-id04": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-id05": {
+      "claude_mcp": true,
+      "gpt_mcp": true
+    },
+    "p-iq01": {
+      "claude_mcp": false,
+      "gpt_mcp": false,
+      "cortex_analyst": true
+    },
+    "p-iq02": {
+      "claude_mcp": false,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-iq03": {
+      "claude_mcp": false,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-iq04": {
+      "claude_mcp": false,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-iq05": {
+      "claude_mcp": false,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w01": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w02": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w03": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w04": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w05": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w06": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w07": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w08": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w09": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    },
+    "p-w10": {
+      "claude_mcp": true,
+      "gpt_mcp": true,
+      "cortex_analyst": true
+    }
+  },
+  "cost_status": "reconciled",
+  "total_cost_usd": 97.017830774,
+  "total_credits": {
+    "clickhouse": 0.0,
+    "snowflake": 23.428194458
+  },
+  "started_at": "2026-11-17T12:22:17.009584Z",
+  "finished_at": "2026-11-17T12:22:22.730198Z"
+}

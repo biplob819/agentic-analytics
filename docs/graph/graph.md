@@ -69,8 +69,8 @@ Generated from Agentic Analytics Tech Spec §12.2 on 2026-11-15; edit here from 
 | Node | Title | Depends on | Verified by | Deliverable | Stories |
 | --- | --- | --- | --- | --- | --- |
 | **B3.1** | Dashboard | M2.1, A2.3 | node_converge + verifier | Static dashboard: category × backend, uplift, cost, clarification, failure explorer | US1–US5 |
-| **B3.2** | README, deploy and write-up figures | B3.1, F3.2, M4.1 | node_converge + verifier | README headline, Cloudflare Pages deploy, decision log, data card, figures for the write-up | US6 |
-| **B3.3** | Open-source release v0.1.0 | B3.2, D4.2 | node_converge + verifier | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0, the hosted demo deployed with its live p95 (DEM-15, D-93), run history and drift from EvalKit's ledger once v0.4.0 ships it (MON-07, OWNER D-98) | US6, US7, US8 |
+| **B3.2** | README, deploy and write-up figures | B3.1, F3.2, M4.1 | node_converge + verifier | README headline, Pages publishing (the deploy itself is REL-05 in B3.3, OWNER D-107), decision log, data card, figures for the write-up | US6 |
+| **B3.3** | Open-source release v0.1.0 | B3.2, D4.2 | node_converge + verifier | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0, the hosted demo deployed with its live p95 (DEM-15, D-93), run history and drift from EvalKit's ledger once v0.4.0 ships it (MON-07, OWNER D-98), the results dashboard deployed on GitHub Pages (REL-05, OWNER D-107) | US6, US7, US8 |
 
 ## Wave 4 — demo and monitoring
 

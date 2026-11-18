@@ -46,8 +46,8 @@ def test_catalog_matches_tech_spec_capabilities():
             expected.append((m.group(1), node, f"{m.group(2)} [{m.group(3)}]"))
     caps = load_catalog()
     assert (
-        len(expected) == 157
-    )  # SET D-55, DEM-06..15 D-56..D-60/D-93, MON-01..07 D-74/D-75/OWNER D-98
+        len(expected) == 158
+    )  # SET D-55, DEM-06..15 D-56..D-60/D-93, MON-01..07 D-74/D-75/OWNER D-98, REL-05 OWNER D-107
     assert [(c.cap_id, c.node, c.note) for c in caps] == expected
 
 
@@ -113,6 +113,32 @@ MONITOR_SECRETS = frozenset(
     }
 )
 _SECRET_REF = re.compile(r"\$\{\{\s*secrets\.([A-Za-z0-9_]+)\s*\}\}")
+# B3.2 REL-02 (D-46): the one job that may hold more than read, the hand-run Pages deploy of
+# site/, exactly these grants in environment `github-pages`; it reads no secret.
+PAGES = "pages.yml"
+PAGES_GRANTS = {"contents": "read", "pages": "write", "id-token": "write"}
+
+
+def _pages_problems(f: Path) -> list[str]:
+    import yaml
+
+    data = yaml.safe_load(f.read_text(encoding="utf-8"))
+    problems = []
+    on = data.get("on", data.get(True))  # PyYAML reads a bare `on` key as True
+    if on != {"workflow_dispatch": None}:
+        problems.append(f"{PAGES}: triggers {on!r}, expected workflow_dispatch only")
+    if data.get("permissions") != {"contents": "read"}:
+        problems.append(f"{PAGES}: no top-level read-only permissions")
+    jobs = data.get("jobs") or {}
+    if set(jobs) != {"deploy"}:
+        problems.append(f"{PAGES}: jobs {sorted(jobs)!r}, expected only deploy")
+    for job_id, job in jobs.items():
+        if job.get("permissions") != PAGES_GRANTS:
+            problems.append(f"{PAGES}:{job_id}: grants {job.get('permissions')!r}")
+        env = job.get("environment")
+        if (env.get("name") if isinstance(env, dict) else env) != "github-pages":
+            problems.append(f"{PAGES}:{job_id}: must run in environment 'github-pages'")
+    return problems
 
 
 def _secret_problems(f: Path, code: str) -> list[str]:
@@ -165,14 +191,18 @@ def workflow_problems(files: list[Path]) -> list[str]:
         code = _yaml_code(f)
         if re.search(r"\bsecrets\b", code):
             problems += _secret_problems(f, code)
-        if re.search(r"write-all|:\s*write\b|id-token", code):
+        if f.name == PAGES:
+            problems += _pages_problems(f)
+            if re.search(r"write-all|read-all", code):
+                problems.append(f"{f.name}: blanket permissions")
+        elif re.search(r"write-all|:\s*write\b|id-token", code):
             problems.append(f"{f.name}: grants write or id-token")
         if re.search(r"uv publish|twine|pypi-publish|gh-action-pypi", code):
             problems.append(f"{f.name}: publishes a package")
         if not re.search(r"^permissions:\n  contents: read$", code, re.M):
             problems.append(f"{f.name}: no top-level read-only permissions")
         perms = re.findall(r"^\s*permissions:.*$", code, re.M)
-        if len(perms) != 1:
+        if len(perms) != (2 if f.name == PAGES else 1):
             problems.append(f"{f.name}: permissions set more than once")
     return problems
 
