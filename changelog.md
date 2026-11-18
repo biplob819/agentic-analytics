@@ -106,3 +106,6 @@ Format: `[TYPE] [NODE] — summary`. Types: FEAT, FIX, DOCS, HARNESS, MEASURE.
 - [HARNESS] [B3.2] — verifier round 1 (NOT GREEN, fixed): every README image parsed and checked (alt text, file, size, PNG chunks) with planted mutants; in-page anchors; wider no-date and hand-typed-number checks; the publish guard test runs on a copy posing as the repository; exact status, hand-check and taxonomy wording; dashboard screenshot cropped above the all-fixes row; offline CLI screenshots (`init`, `pack check`, `report --example`, `run --dry-run`, `doctor` with no keys); strict always drawn as a ring; an all-fixes-only summary names no figure
 - [HARNESS] [B3.2] — independent verifier GREEN in round 2 (reconcile reproduced byte for byte, every README number traced to a record, screenshots opened, image/date/number/anchor checks with planted cases)
 - [DOCS] [B3.2] — portfolio walkthrough GIF (`docs/assets/walkthrough.gif`, 10 real screens of committed outputs, no keys or spend; shot list in `docs/walkthrough.md`) and `portfolio.yml` (status draft, the owner approves)
+
+## 2026-11-18
+- [DOCS] [—] — README shows the looping walkthrough GIF (`docs/assets/walkthrough.gif`) near the top, linked to its shot list; owner request
