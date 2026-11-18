@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import json
-import os
 import re
-import stat
 from html.parser import HTMLParser
 from unittest.mock import ANY
 
@@ -13,6 +11,7 @@ import pytest
 
 from agentic_analytics.report import render_html, vega_lite_specs
 from tests.aggregate.helpers import rec
+from tests.file_modes import mode_problems
 from tests.report.helpers import html, render, summary
 
 SECTIONS = ("overview", "categories", "uplift", "cost", "probes", "failures")
@@ -24,7 +23,7 @@ def test_writes_index_and_vega_lite_and_returns_the_html_path(tmp_path):
     assert path == out / "index.html"
     assert sorted(p.name for p in out.iterdir()) == ["index.html", "summary.vl.json"]
     for p in out.iterdir():
-        assert stat.S_IMODE(os.stat(p).st_mode) == 0o644
+        assert mode_problems(p, 0o644) == []  # shared: readable by all (POSIX)
     page = path.read_text("utf-8")
     assert page.startswith("<!doctype html>") and page.endswith("</html>\n")
     for sid in SECTIONS:

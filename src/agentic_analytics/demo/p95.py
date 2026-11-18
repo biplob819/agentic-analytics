@@ -378,7 +378,7 @@ def main(argv: Sequence[str] | None = None, environ: Mapping[str, str] | None = 
         root / "docs" / "measurements" / f"demo-p95-{datetime.now(UTC):%Y-%m-%d}-{ns.mode}.json"
     )  # fmt: skip
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(rec, indent=2) + "\n", encoding="utf-8", newline="\n")
     print(f"{MODE_LABELS[ns.mode]}: p95 {rec['p95_ms']} ms over {rec['n']} asks, "
           f"passed={rec['passed']}; wrote {out}")  # fmt: skip
     return 0 if rec["passed"] else 1

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import stat
 import subprocess
 from pathlib import Path
 
@@ -13,6 +12,7 @@ from agentic_analytics.env import load_dotenv
 from agentic_analytics.setup import envfile
 from agentic_analytics.setup.envfile import EnvFileError, read_env_file, update_env_file
 from harness_lib import ROOT
+from tests.file_modes import mode_problems
 
 ORIGINAL = """\
 # Copy to .env and fill in. Never commit .env.
@@ -24,10 +24,6 @@ weird line without equals
 CLICKHOUSE_HOST=duplicate-is-dropped
 LANGFUSE_HOST=
 """
-
-
-def _mode(p: Path) -> int:
-    return stat.S_IMODE(p.stat().st_mode)
 
 
 def test_update_keeps_other_lines_and_comments(tmp_path: Path) -> None:
@@ -65,10 +61,10 @@ def test_env_file_mode_is_600_and_write_is_atomic(
     env.write_text("A=1\n", encoding="utf-8")
     os.chmod(env, 0o644)
     update_env_file(env, {"B": "2"})
-    assert _mode(env) == 0o600
+    assert mode_problems(env, 0o600) == []
     new = tmp_path / "fresh" / ".env"
     update_env_file(new, {"X": "y"})
-    assert new.read_text(encoding="utf-8") == "X=y\n" and _mode(new) == 0o600
+    assert new.read_text(encoding="utf-8") == "X=y\n" and mode_problems(new, 0o600) == []
 
     def boom(src: str, dst: str) -> None:
         raise OSError("disk full")

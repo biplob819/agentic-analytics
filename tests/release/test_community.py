@@ -37,9 +37,25 @@ NETWORK_LIBS = {
     "httpx2",
     "requests",
     "aiohttp",
+    "urllib3",
     "urllib.request",
     "http.client",
     "socket",
+    "socketserver",
+    "ftplib",
+    "smtplib",
+    "poplib",
+    "imaplib",
+    "telnetlib",
+    "xmlrpc.client",
+    "websocket",
+    "websockets",
+    "paramiko",
+    "pycurl",
+    "httplib2",
+    "grpc",
+    "boto3",
+    "botocore",
     "clickhouse_connect",
     "snowflake",
     "langfuse",
@@ -49,7 +65,64 @@ NETWORK_LIBS = {
     "ssl",
     "asyncio.open_connection",
 }
-_IMPORTERS = {"importlib.import_module", "import_module", "__import__"}
+# an event loop's or socket helper's connection calls, by attribute or bare name, whatever the
+# object is called (`loop.create_connection(...)`, `create_connection(...)`)
+NETWORK_CALLS = {
+    "create_connection",
+    "open_connection",
+    "create_datagram_endpoint",
+    "create_unix_connection",
+    "open_unix_connection",
+    "sock_connect",
+    "create_server",
+    "start_server",
+}
+_IMPORTERS = {
+    "importlib.import_module",
+    "importlib.__import__",
+    "builtins.__import__",
+    "__import__",
+}
+# modules allowed to import by a computed name (none today): each one is a reviewed exception
+DYNAMIC_IMPORTS: dict[str, str] = {}
+# Modules that start a process, and what it is; PRIVACY.md must name any that goes online
+# (D-117). The git lookups read the local checkout only (`git_subcommands` below proves it).
+SUBPROCESS_MODULES = {
+    "setup/clickhousectl.py": "clickhousectl",  # the ClickHouse Cloud API (PRIVACY.md)
+    "run/runner.py": "git",  # local: rev-parse, ls-files, status
+    "demo/p95.py": "git",  # local: rev-parse
+}
+LOCAL_GIT = {"rev-parse", "ls-files", "status"}
+_SPAWNERS = {
+    "subprocess.run",
+    "subprocess.call",
+    "subprocess.check_call",
+    "subprocess.check_output",
+    "subprocess.Popen",
+    "subprocess.getoutput",
+    "subprocess.getstatusoutput",
+    "os.system",
+    "os.popen",
+    "asyncio.create_subprocess_exec",
+    "asyncio.create_subprocess_shell",
+    "pty.spawn",
+}
+_SPAWN_PREFIXES = ("os.exec", "os.spawn", "os.posix_spawn")
+NETWORK_TOOLS = {
+    "curl",
+    "wget",
+    "nc",
+    "ncat",
+    "netcat",
+    "socat",
+    "ssh",
+    "scp",
+    "sftp",
+    "rsync",
+    "telnet",
+    "ftp",
+}
+GIT_NETWORK = {"clone", "fetch", "pull", "push", "ls-remote", "remote", "submodule", "send-email"}
 
 
 def _dotted(node: ast.AST) -> str:
@@ -64,34 +137,141 @@ def _dotted(node: ast.AST) -> str:
     return ""
 
 
-def _text(rel: str) -> str:
-    return (ROOT / rel).read_text(encoding="utf-8")
+def _aliases(tree: ast.AST) -> dict[str, str]:
+    """Local names bound to a module or a module's attribute: `import x as y` (y -> x),
+    `from a import b as c` (c -> a.b) and `n = a.b` (n -> a.b, followed through earlier
+    aliases), so `im = importlib.import_module; im("requests")` resolves to the importer."""
+    names: dict[str, str] = {}
+    for _ in range(3):  # a chain of re-bindings settles in a few passes
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for a in node.names:
+                    if a.asname:
+                        names[a.asname] = a.name
+            elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                for a in node.names:
+                    names[a.asname or a.name] = f"{node.module}.{a.name}"
+            elif isinstance(node, ast.Assign | ast.AnnAssign | ast.NamedExpr):
+                value = _resolve(node.value, names) if node.value is not None else ""
+                if not value:
+                    continue
+                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                for t in targets:
+                    if isinstance(t, ast.Name):
+                        names[t.id] = value
+    return names
+
+
+def _resolve(node: ast.AST, names: dict[str, str]) -> str:
+    dotted = _dotted(node)
+    if not dotted:
+        return ""
+    head, _, rest = dotted.partition(".")
+    if head in names:
+        return names[head] + ("." + rest if rest else "")
+    return dotted
+
+
+def _strings(node: ast.AST) -> list[str]:
+    return [
+        n.value for n in ast.walk(node) if isinstance(n, ast.Constant) and isinstance(n.value, str)
+    ]
+
+
+def _spawns(name: str) -> bool:
+    return name in _SPAWNERS or name.startswith(_SPAWN_PREFIXES)
+
+
+def _argv_words(call: ast.Call) -> list[str]:
+    """Every word of every string constant in a process call's command (list or shell form)."""
+    args = list(call.args[:1]) + [k.value for k in call.keywords if k.arg in ("args", "cmd")]
+    return [w for a in args for s in _strings(a) for w in s.split()]
+
+
+def _network_argv(words: list[str]) -> bool:
+    tools = {w.replace("\\", "/").rsplit("/", 1)[-1].removesuffix(".exe") for w in words}
+    if tools & NETWORK_TOOLS:
+        return True
+    return "git" in tools and bool(set(words) & GIT_NETWORK)
 
 
 def network_importers(base: Path) -> set[str]:
-    """Modules under `base` that import a networking or provider library anywhere."""
+    """Modules under `base` that import a networking or provider library anywhere, connect a
+    socket by an event loop's call, import by a computed name (unless DYNAMIC_IMPORTS lists
+    them), or start a network tool (curl, ssh, `git fetch`, ...) as a process."""
+    found = set()
+    for path in base.rglob("*.py"):
+        rel = path.relative_to(base).as_posix()
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        names = _aliases(tree)
+        for node in ast.walk(tree):
+            mods: list[str] = []
+            if isinstance(node, ast.Import):
+                mods = [a.name for a in node.names]
+            elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                mods = [node.module] + [f"{node.module}.{a.name}" for a in node.names]
+            elif isinstance(node, ast.Call):
+                func = _resolve(node.func, names)
+                if func in _IMPORTERS:
+                    arg = node.args[0] if node.args else None
+                    if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                        mods = [arg.value]  # importlib.import_module("x") / __import__("x")
+                    elif rel not in DYNAMIC_IMPORTS:
+                        found.add(rel)  # a computed name could be any library
+                elif _dotted(node.func) == "getattr" and set(_strings(node)) & {
+                    "import_module",
+                    "__import__",
+                }:
+                    found.add(rel)  # getattr(importlib, "import_module")
+                elif _spawns(func) and _network_argv(_argv_words(node)):
+                    found.add(rel)
+                elif func.rsplit(".", 1)[-1] in NETWORK_CALLS:
+                    found.add(rel)  # loop.create_connection(...), create_connection(...)
+            elif isinstance(node, ast.Attribute):
+                mods = [_resolve(node, names)]  # e.g. asyncio.open_connection, an aliased module
+            if any(n == lib or n.startswith(lib + ".") for n in mods for lib in NETWORK_LIBS):
+                found.add(rel)
+    return found
+
+
+def subprocess_modules(base: Path) -> set[str]:
+    """Modules under `base` that start a process by any spelling (aliases followed)."""
     found = set()
     for path in base.rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"))
+        names = _aliases(tree)
         for node in ast.walk(tree):
-            names: list[str] = []
-            if isinstance(node, ast.Import):
-                names = [a.name for a in node.names]
-            elif isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
-                names = [node.module] + [f"{node.module}.{a.name}" for a in node.names]
-            elif (
-                isinstance(node, ast.Call)
-                and _dotted(node.func) in _IMPORTERS
-                and node.args
-                and isinstance(node.args[0], ast.Constant)
-                and isinstance(node.args[0].value, str)
-            ):
-                names = [node.args[0].value]  # importlib.import_module("x") / __import__("x")
-            elif isinstance(node, ast.Attribute):
-                names = [_dotted(node)]  # e.g. asyncio.open_connection(...)
-            if any(n == lib or n.startswith(lib + ".") for n in names for lib in NETWORK_LIBS):
+            if isinstance(node, ast.Call) and _spawns(_resolve(node.func, names)):
                 found.add(path.relative_to(base).as_posix())
     return found
+
+
+def git_subcommands(path: Path) -> set[str]:
+    """The git subcommand of every git process `path` starts: the word after `git` (and any
+    `-C dir`) in a literal argv, or the first argument of each call of a local `_git` helper."""
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    found: set[str] = set()
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        if _dotted(node.func) == "_git" and len(node.args) > 1:
+            arg = node.args[1]
+            found.add(str(arg.value) if isinstance(arg, ast.Constant) else "<computed>")
+        elif node.args and isinstance(node.args[0], ast.List | ast.Tuple):
+            items = node.args[0].elts
+            if items and isinstance(items[0], ast.Constant) and items[0].value == "git":
+                rest = items[1:]
+                if rest and isinstance(rest[0], ast.Constant) and rest[0].value == "-C":
+                    rest = rest[2:]
+                if rest and isinstance(rest[0], ast.Constant):
+                    found.add(str(rest[0].value))
+                elif rest and not isinstance(rest[0], ast.Starred):
+                    found.add("<computed>")
+    return found
+
+
+def _text(rel: str) -> str:
+    return (ROOT / rel).read_text(encoding="utf-8")
 
 
 def test_privacy_statement_matches_the_code():
@@ -101,6 +281,20 @@ def test_privacy_statement_matches_the_code():
     assert network_importers(SRC) == set(NETWORK_MODULES)
     for destination in set(NETWORK_MODULES.values()):
         assert destination in privacy, destination
+
+
+def test_every_process_the_code_starts_is_listed_and_local_or_documented():
+    """D-117: a process can reach the network too. Each module that starts one is listed; git
+    runs only local subcommands; clickhousectl (the ClickHouse Cloud API) is in PRIVACY.md."""
+    assert subprocess_modules(SRC) == set(SUBPROCESS_MODULES)
+    privacy = _text("PRIVACY.md")
+    for rel, tool in SUBPROCESS_MODULES.items():
+        if tool == "git":
+            subs = git_subcommands(SRC / rel)
+            assert subs and subs <= LOCAL_GIT, (rel, subs)
+        else:
+            assert f"`{tool}`" in privacy, tool
+    assert "git" in privacy  # the code-version lookup is named as local
 
 
 def test_network_check_bites(tmp_path):
@@ -120,10 +314,59 @@ def test_network_check_bites(tmp_path):
         ),
         "tls.py": "def f():\n    import ssl\n    return ssl.create_default_context()\n",
         "browser.py": "import importlib\nimportlib.import_module('playwright.sync_api')\n",
+        # D-117: the verifier's survivors of the D-116 check
+        "aliased.py": "import importlib\nim = importlib.import_module\nim('requests')\n",
+        "aliased_from.py": "from importlib import import_module as load\nload('httpx')\n",
+        "aliased_module.py": "import importlib as il\nf = il.import_module\ng = f\ng('openai')\n",
+        "computed.py": "import importlib\ndef f(name):\n    return importlib.import_module(name)\n",
+        "computed_dunder.py": "def f(n):\n    return __import__('re' + n)\n",
+        "getattr_importer.py": "import importlib\ngetattr(importlib, 'import_module')('x')\n",
+        "loop.py": (
+            "import asyncio\nasync def f(p):\n"
+            "    loop = asyncio.get_running_loop()\n"
+            "    await loop.create_connection(p, 'h', 1)\n"
+        ),
+        "bare_create.py": "def f(create_connection):\n    return create_connection(('h', 1))\n",
+        "urllib3_pool.py": "import urllib3\nurllib3.PoolManager().request('GET', 'https://x')\n",
+        "curl.py": "import subprocess\nsubprocess.run(['curl', '-d', '@f', 'https://x'])\n",
+        "curl_path.py": "import subprocess\nsubprocess.run(['/usr/bin/curl', 'https://x'])\n",
+        "wget_shell.py": "import os\nos.system('wget -q https://x')\n",
+        "ssh_alias.py": "from subprocess import Popen as P\nP(['ssh', 'host', 'ls'])\n",
+        "nc_kw.py": "import subprocess\nsubprocess.check_output(args=['nc', 'h', '1'])\n",
+        "scp_exec.py": "import os\nos.execvp('scp', ['scp', 'f', 'h:'])\n",
+        "git_push.py": "import subprocess\nsubprocess.run(['git', '-C', '.', 'push'])\n",
     }
     for name, code in planted.items():
         (tmp_path / name).write_text(code, encoding="utf-8")
+    (tmp_path / "local_proc.py").write_text(
+        "import subprocess\nsubprocess.run(['git', 'rev-parse', 'HEAD'])\n"
+        "subprocess.run(['clickhousectl', 'cloud', 'service', 'list', '--json'])\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "loop_ok.py").write_text(
+        "import asyncio\nloop = asyncio.new_event_loop()\nloop.run_until_complete(None)\n",
+        encoding="utf-8",
+    )
     assert network_importers(tmp_path) == {"phone_home.py", "sdk.py", *planted}
+
+
+def test_process_checks_bite(tmp_path):
+    (tmp_path / "a.py").write_text("import subprocess\nsubprocess.run(['ls'])\n", encoding="utf-8")
+    (tmp_path / "b.py").write_text("from os import system as s\ns('ls')\n", encoding="utf-8")
+    (tmp_path / "c.py").write_text("import subprocess\n", encoding="utf-8")  # imported, never run
+    assert subprocess_modules(tmp_path) == {"a.py", "b.py"}
+    git = tmp_path / "g.py"
+    git.write_text(
+        "import subprocess\n"
+        "def _git(folder, *args):\n"
+        "    return subprocess.run(['git', '-C', str(folder), *args])\n"
+        "_git('.', 'rev-parse', 'HEAD')\n"
+        "_git('.', 'fetch', 'origin')\n"
+        "subprocess.run(['git', 'pull'])\n",
+        encoding="utf-8",
+    )
+    assert git_subcommands(git) == {"rev-parse", "fetch", "pull"}
+    assert not git_subcommands(git) <= LOCAL_GIT
 
 
 def test_streamlit_sends_no_usage_statistics():

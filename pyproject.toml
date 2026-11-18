@@ -103,6 +103,12 @@ exclude = [
     "/docs/decisions.md",
     "/docs/graph",
     "/docs/lessons.md",
+    # build-harness tools: they read the graph, catalog and specs left out above (D-117);
+    # scripts/harness_lib.py stays because scripts/secret_scan.py imports it
+    "/scripts/node_converge.py",
+    "/scripts/node_start.py",
+    "/scripts/status.py",
+    "/scripts/verify_graph_eligibility.py",
 ]
 
 [tool.ruff]

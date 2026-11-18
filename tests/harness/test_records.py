@@ -130,6 +130,9 @@ _SECRET_REF = re.compile(r"\$\{\{\s*secrets\.([A-Za-z0-9_]+)\s*\}\}")
 # the pinned deploy action after `build` (STEP_ALLOW), with no checkout and no `run:` step.
 # D-116: release.yml's `build` job builds and smokes the wheel with the read-only token, and its
 # `publish` job holds `id-token: write` alone and runs no repository code (STEP_ALLOW).
+# D-117: release.yml's `checks` and `build` jobs are pinned too, step by step: every step is
+# exactly the reviewed action with exactly its `with:`, or exactly the reviewed `run:` command,
+# in order, with no `env:`, `shell:` or `working-directory:`, under `bash -euo pipefail`.
 TRUSTED = "uv publish --trusted-publishing always"
 PUBLISH_CMD = f"{TRUSTED} dist/*"
 JOB_GRANTS = {
@@ -140,25 +143,116 @@ JOBS = {
     "release.yml": {"checks", "build", "publish", "smoke"},
     "pages.yml": {"build", "deploy"},
 }
-# job -> (the job it must wait for, the only actions its steps may use, the only `run:` commands)
+UV_PIN = "0.11.21"
+RELEASE_UV = {"version": UV_PIN, "enable-cache": False}
+TAG_CHECK_RUN = """\
+version=$(uv run --no-project python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+if [ "v$version" != "${GITHUB_REF_NAME}" ]; then
+  echo "tag ${GITHUB_REF_NAME} does not match pyproject version v$version" >&2
+  exit 1
+fi"""  # noqa: E501 (the workflow's line, verbatim)
+_NO_KEYS = 'env -i HOME="$PWD" PATH=/usr/bin:/bin "$bin/'
+WHEEL_SMOKE_RUN = f"""\
+uv venv "$RUNNER_TEMP/wheel"
+uv pip install --python "$RUNNER_TEMP/wheel/bin/python" dist/*.whl
+bin="$RUNNER_TEMP/wheel/bin"
+mkdir "$RUNNER_TEMP/onboarding"
+cd "$RUNNER_TEMP/onboarding"
+{_NO_KEYS}agentic-analytics" --version
+{_NO_KEYS}aa" --version
+{_NO_KEYS}agentic-analytics" init
+{_NO_KEYS}agentic-analytics" pack check
+{_NO_KEYS}agentic-analytics" report --example --out example
+[ -f example/index.html ] || {{ echo "report --example wrote no page" >&2; exit 1; }}"""
+
+
+def _uses(action: str, **with_: object) -> tuple[str, str, dict]:
+    return ("uses", action + "@", with_)
+
+
+def _run(command: str) -> tuple[str, str, dict]:
+    return ("run", command, {})
+
+
+_CHECKOUT = _uses("actions/checkout")
+_RELEASE_SETUP = _uses("astral-sh/setup-uv", **RELEASE_UV, **{"python-version": "3.12"})
+# job -> (the job it must wait for, its exact steps in order: the action with exactly its
+# `with:`, or the exact `run:` command)
 STEP_ALLOW = {
-    ("pages.yml", "deploy"): ("build", ("actions/deploy-pages@",), ()),
+    ("pages.yml", "deploy"): ("build", (_uses("actions/deploy-pages"),)),
+    ("release.yml", "checks"): (
+        None,
+        (
+            _CHECKOUT,
+            _RELEASE_SETUP,
+            _run("uv sync --locked"),
+            _run("uv run ruff check ."),
+            _run("uv run ruff format --check ."),
+            _run("uv run pyright"),
+            _run('uv run pytest -q -m "not live"'),
+            _run("uv run python scripts/secret_scan.py"),
+        ),
+    ),
+    ("release.yml", "build"): (
+        "checks",
+        (
+            _CHECKOUT,
+            _RELEASE_SETUP,
+            _run(TAG_CHECK_RUN),
+            _run("uv run --no-project python scripts/release_preflight.py pyproject"),
+            _run("uv build"),
+            _run("uv run --no-project python scripts/release_preflight.py wheel dist"),
+            _run(WHEEL_SMOKE_RUN),
+            _uses(
+                "actions/upload-artifact",
+                **{"name": "dist", "path": "dist/", "if-no-files-found": "error"},
+                **{"retention-days": 7},
+            ),
+        ),
+    ),
     ("release.yml", "publish"): (
         "build",
-        ("actions/download-artifact@", "astral-sh/setup-uv@"),
-        (PUBLISH_CMD,),
+        (
+            _uses("actions/download-artifact", name="dist", path="dist/"),
+            _uses("astral-sh/setup-uv", **RELEASE_UV),
+            _run(PUBLISH_CMD),
+        ),
     ),
 }
-DEPLOY_ONLY = {k: v for k, v in STEP_ALLOW.items() if k[0] == "pages.yml"}  # D-114's name
-PUBLISH_ONLY = {k: v for k, v in STEP_ALLOW.items() if k[0] == "release.yml"}  # D-116
-# release jobs whose failure must stop the release: no `if:`, no `continue-on-error`, and no
-# `|| true` / `; true` that would swallow a failing command (D-116)
+DEPLOY_ONLY = {k: v for k, v in STEP_ALLOW.items() if k == ("pages.yml", "deploy")}  # D-114
+PUBLISH_ONLY = {k: v for k, v in STEP_ALLOW.items() if k == ("release.yml", "publish")}  # D-116
+# the only keys a pinned job or step may have: no `env:` (UV_PUBLISH_URL, PYTEST_ADDOPTS),
+# `container:`, `services:`, `shell:` or `working-directory:` can change what a reviewed step does
+JOB_KEYS = {"runs-on", "needs", "environment", "permissions", "defaults", "steps"}
+STEP_KEYS = {"name", "id", "uses", "with", "run"}
+# release jobs whose failure must stop the release: no `if:`, no `continue-on-error`, no
+# swallowed failure, and every `run:` under this shell (D-116, D-117)
 STRICT_JOBS = {("release.yml", "checks"), ("release.yml", "build"), ("release.yml", "publish")}
-SWALLOW = re.compile(r"\|\|\s*(?:true\b|:(?=\s|$)|exit 0\b)|;\s*(?:true|:)\s*$|\bset \+e\b", re.M)
-# contexts an outsider can set (an issue title, a branch name, a dispatch input): never in a `run:`
-UNTRUSTED = re.compile(
-    r"\$\{\{[^}]*\b(?:github\.event\.|github\.head_ref\b|inputs\.|github\.event_path)"
+STRICT_SHELL = "bash --noprofile --norc -euo pipefail {0}"
+SWALLOW = re.compile(
+    r"\|\|\s*(?:true\b|:(?=\s|$)|exit 0\b|echo\b|printf\b|(?:/usr)?/bin/true\b)"
+    r"|;\s*(?:true|:)\s*$|\bset \+[a-z]*e|\bset \+o pipefail\b|(?<![&|>])&\s*$",
+    re.M,
 )
+# contexts an outsider can set (an issue title, a branch name, a dispatch input): never expanded
+# in a `run:` (D-116). Each `${{ }}` is read with `x['y']` taken as `x.y`, so `github['event']`,
+# `toJSON(github.event)` and `toJSON(github)` are caught; passing one through a step's `env:`
+# and quoting `"$NAME"` in the script is the safe form and stays allowed.
+_EXPR = re.compile(r"\$\{\{(.*?)\}\}", re.S)
+_BRACKET = re.compile(r"\[\s*['\"]([\w-]+)['\"]\s*\]")
+UNTRUSTED = re.compile(
+    r"\bgithub\.(?:event(?![\w-])|event_path\b|head_ref\b)|\bgithub\b(?![.\w-])|\binputs\b(?!\w)"
+    r"|\benv\b(?!\w)"  # two hops: `env: T: ${{ github.event... }}` then `${{ env.T }}` in a run
+)
+UNTRUSTED_KEYS = ("run", "shell", "working-directory")
+
+
+def untrusted_expressions(text: str) -> list[str]:
+    """The `${{ }}` expressions in `text` that read an attacker-controlled context."""
+    # context names are case-insensitive on the runner, so `GITHUB.EVENT` reads the same context
+    return [e for e in _EXPR.findall(text) if UNTRUSTED.search(_BRACKET.sub(r".\1", e).lower())]
+
+
 UV_VERSION = re.compile(r"^\d+\.\d+\.\d+$")
 TRIGGERS = {
     "ci.yml": {"push": {"branches": ["main"]}, "pull_request": None},
@@ -166,6 +260,7 @@ TRIGGERS = {
     "pages.yml": {"workflow_dispatch": None},
     **SECRET_TRIGGERS,
 }
+WORKFLOW_KEYS = {"name", "on", True, "permissions", "concurrency", "jobs"}  # no workflow `env:`
 RELEASE_JOB = ("release.yml", "publish")
 PUBLISH = re.compile(r"uv publish|twine|pypi-publish|gh-action-pypi|flit publish|poetry publish")
 
@@ -173,6 +268,42 @@ PUBLISH = re.compile(r"uv publish|twine|pypi-publish|gh-action-pypi|flit publish
 def _env_name(job: dict) -> str | None:
     env = job.get("environment")
     return env.get("name") if isinstance(env, dict) else env
+
+
+def _steps(job: dict) -> list[dict]:
+    steps = job.get("steps") or []
+    return [st if isinstance(st, dict) else {"run": str(st)} for st in steps]
+
+
+def _pinned_step_problems(where: str, job: dict, needs: str | None, want: tuple) -> list[str]:
+    """A STEP_ALLOW job: waits for `needs`, has only JOB_KEYS, and its steps are exactly `want`."""
+    problems = []
+    if job.get("needs") != needs:
+        problems.append(f"{where}: must wait for the {needs} job")
+    if job.get("runs-on") != "ubuntu-latest":
+        problems.append(
+            f"{where}: must run on ubuntu-latest (GitHub-hosted), not {job.get('runs-on')!r}"
+        )
+    for key in sorted(set(job) - JOB_KEYS, key=str):
+        problems.append(f"{where}: `{key}` on a pinned job")
+    steps = _steps(job)
+    if len(steps) != len(want):
+        problems.append(f"{where}: {len(steps)} steps, expected the {len(want)} reviewed steps")
+    shown = tuple(w[1] for w in want)
+    for i, st in enumerate(steps):
+        for key in sorted(set(st) - STEP_KEYS, key=str):
+            problems.append(f"{where}: `{key}` on a step ({st.get('name') or st})")
+        kind, value, with_ = want[i] if i < len(want) else ("", "", {})
+        if kind == "uses":
+            ok = "run" not in st and str(st.get("uses", "")).startswith(value)
+            ok = ok and (st.get("with") or {}) == with_
+        else:
+            ok = "uses" not in st and "with" not in st and str(st.get("run", "")).strip() == value
+        if kind and not ok:
+            problems.append(f"{where}: runs a step other than {shown!r}: step {i + 1} {st!r}")
+        elif not kind:
+            problems.append(f"{where}: runs a step other than {shown!r}: extra step {st!r}")
+    return problems
 
 
 def _job_problems(name: str, job_id: str, job: dict) -> list[str]:
@@ -187,7 +318,10 @@ def _job_problems(name: str, job_id: str, job: dict) -> list[str]:
             problems.append(f"{where}: must grant exactly {grants!r}")
         if _env_name(job) != env:
             problems.append(f"{where}: must run in environment {env!r}")
-    runs = [str(st.get("run", "")) + " " + str(st.get("uses", "")) for st in job.get("steps", [])]
+    if "uses" in job:  # a reusable workflow runs code this policy has not read
+        problems.append(f"{where}: calls a reusable workflow {job['uses']!r}")
+    steps = _steps(job)
+    runs = [str(st.get("run", "")) + " " + str(st.get("uses", "")) for st in steps]
     publishing = [r for r in runs if PUBLISH.search(r)]
     if publishing and (name, job_id) != RELEASE_JOB:
         problems.append(f"{where}: publishes a package")
@@ -197,37 +331,29 @@ def _job_problems(name: str, job_id: str, job: dict) -> list[str]:
     if _env_name(job) is not None and grants is None and (name, job_id) not in SECRET_JOBS:
         problems.append(f"{where}: runs in an environment without being allowed one")
     if (name, job_id) in STEP_ALLOW:
-        needs, allowed, commands = STEP_ALLOW[(name, job_id)]
-        if job.get("needs") != needs:
-            problems.append(f"{where}: must wait for the {needs} job")
-        for st in job.get("steps", []):
-            uses = str(st.get("uses", ""))
-            ok = (
-                "run" not in st and uses.startswith(allowed)
-                if "uses" in st
-                else str(st.get("run", "")).strip() in commands
-            )
-            if not ok:
-                problems.append(f"{where}: runs a step other than {allowed + commands!r}: {st!r}")
+        problems += _pinned_step_problems(where, job, *STEP_ALLOW[(name, job_id)])
     if (name, job_id) == RELEASE_JOB and [r.strip() for r in publishing] != [PUBLISH_CMD]:
         problems.append(f"{where}: must run exactly `{PUBLISH_CMD}` once")
     if (name, job_id) in STRICT_JOBS:
+        if job.get("defaults") != {"run": {"shell": STRICT_SHELL}}:
+            problems.append(f"{where}: must run every step under `{STRICT_SHELL}`")
         for key in ("if", "continue-on-error"):
             if key in job:
                 problems.append(f"{where}: `{key}` on a release job")
-        for st in job.get("steps", []):
+        for st in steps:
             for key in ("if", "continue-on-error"):
                 if key in st:
                     problems.append(f"{where}: `{key}` on a step ({st.get('name') or st})")
             if SWALLOW.search(str(st.get("run", ""))):
                 problems.append(f"{where}: a run step swallows a failure: {st.get('run')!r}")
     if (name, job_id) == ("release.yml", "checks"):
-        runs_only = [str(st.get("run", "")).strip() for st in job.get("steps", [])]
+        runs_only = [str(st.get("run", "")).strip() for st in steps]
         if "uv sync --locked" not in runs_only:
             problems.append(f"{where}: must install with `uv sync --locked`")
-    for st in job.get("steps", []):
-        if UNTRUSTED.search(str(st.get("run", ""))):
-            problems.append(f"{where}: an untrusted context in a run step: {st.get('run')!r}")
+    for st in steps:
+        for key in UNTRUSTED_KEYS:
+            if untrusted_expressions(str(st.get(key, ""))):
+                problems.append(f"{where}: an untrusted context in a {key} step: {st.get(key)!r}")
         uses = str(st.get("uses", ""))
         if name == "release.yml" and uses.startswith("astral-sh/setup-uv@"):
             w = st.get("with") or {}
@@ -307,6 +433,8 @@ def workflow_problems(files: list[Path]) -> list[str]:
             problems.append(f"{f.name}: triggers {on!r}, expected {TRIGGERS[f.name]!r}")
         if data.get("permissions") != {"contents": "read"}:
             problems.append(f"{f.name}: no top-level read-only permissions")
+        for key in sorted(set(data) - WORKFLOW_KEYS, key=str):  # `env:` / `defaults:` reach all
+            problems.append(f"{f.name}: workflow-level `{key}`")
         granted = [job for wf, job in JOB_GRANTS if wf == f.name]
         # YAML keeps only the last of two equal keys, so count the blocks in the text as well
         if len(re.findall(r"^\s*permissions:.*$", code, re.M)) != 1 + len(granted):
@@ -374,6 +502,15 @@ _PUBLISH_UV = (
     "      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0\n"
     "        with:\n"
 )
+
+_STRICT_DEFAULTS = (
+    "    defaults:\n      run:\n"
+    "        # D-117: a failing command anywhere in a pipe, or an unset variable, fails the step\n"
+    "        shell: bash --noprofile --norc -euo pipefail {0}\n"
+)
+_PYTEST = '      - run: uv run pytest -q -m "not live"\n'
+_DOWNLOAD_WITH = "          name: dist\n          path: dist/\n      - uses: astral-sh"
+_EVIL_URL = "https://example.org/legacy/"
 
 
 @pytest.mark.parametrize(
@@ -567,6 +704,243 @@ _PUBLISH_UV = (
             _STEPS + '      - run: git checkout "${{ github.head_ref }}"\n',
             "ci.yml:test: an untrusted context",
         ),
+        # D-117 (verifier B3.3 part 2): every survivor of the D-116 policy, now caught. A
+        # swallowed failure in checks, build or publish: each job runs only its reviewed steps
+        (
+            "release.yml",
+            "      - run: uv run pyright\n",
+            "      - run: uv run pyright || echo failed\n",
+            "release.yml:checks: runs a step other than",
+        ),
+        (
+            "release.yml",
+            "      - run: uv run ruff check .\n",
+            "      - run: uv run ruff check . || /bin/true\n",
+            "release.yml:checks: a run step swallows a failure",
+        ),
+        (
+            "release.yml",
+            _PYTEST,
+            _PYTEST.replace('"not live"', '"not live" | tee out.txt'),
+            "release.yml:checks: runs a step other than",
+        ),
+        (
+            "release.yml",
+            "      - run: uv run python scripts/secret_scan.py\n",
+            "      - run: uv run python scripts/secret_scan.py &\n",
+            "release.yml:checks: a run step swallows a failure",
+        ),
+        (
+            "release.yml",
+            _PYTEST,
+            _PYTEST.replace('"not live"', '"not live" --collect-only'),
+            "release.yml:checks: runs a step other than",
+        ),
+        ("release.yml", _PYTEST, "", "release.yml:checks: 7 steps, expected the 8 reviewed"),
+        (
+            "release.yml",
+            _PYTEST,
+            _PYTEST + "        env:\n          PYTEST_ADDOPTS: --collect-only\n",
+            "release.yml:checks: `env` on a step",
+        ),
+        (
+            "release.yml",
+            "      - run: uv run pyright\n",
+            "      - run: uv run pyright\n        shell: sh\n",
+            "release.yml:checks: `shell` on a step",
+        ),
+        (
+            "release.yml",
+            "      - run: uv build\n",
+            "      - run: uv build || echo failed\n",
+            "release.yml:build: runs a step other than",
+        ),
+        (
+            "release.yml",
+            "      - run: uv build\n",
+            "      - run: uv build || /bin/true\n",
+            "release.yml:build: a run step swallows a failure",
+        ),
+        (
+            "release.yml",
+            "release_preflight.py wheel dist\n",
+            "release_preflight.py wheel dist | tee wheel.txt\n",
+            "release.yml:build: runs a step other than",
+        ),
+        (
+            "release.yml",
+            '"$bin/agentic-analytics" pack check\n',
+            '"$bin/agentic-analytics" pack check &\n',
+            "release.yml:build: a run step swallows a failure",
+        ),
+        (
+            "release.yml",
+            '"$bin/agentic-analytics" init\n',
+            '"$bin/agentic-analytics" init || true\n',
+            "release.yml:build: runs a step other than",
+        ),
+        (
+            "release.yml",
+            "    needs: checks\n    runs-on: ubuntu-latest\n" + _STRICT_DEFAULTS,
+            "    needs: checks\n    runs-on: ubuntu-latest\n",
+            "release.yml:build: must run every step under `bash --noprofile --norc -euo pipefail",
+        ),
+        (
+            "release.yml",
+            "    needs: checks\n    runs-on: ubuntu-latest\n" + _STRICT_DEFAULTS,
+            "    needs: checks\n    runs-on: ubuntu-latest\n"
+            + _STRICT_DEFAULTS.replace("-euo pipefail", "-e"),
+            "release.yml:build: must run every step under",
+        ),
+        (
+            "release.yml",
+            "uv publish --trusted-publishing always dist/*",
+            "uv publish --trusted-publishing always dist/* || /bin/true",
+            "release.yml:publish: runs a step other than",
+        ),
+        (
+            "release.yml",
+            "uv publish --trusted-publishing always dist/*",
+            "uv publish --trusted-publishing always dist/* | tee out.txt",
+            "release.yml:publish: runs a step other than",
+        ),
+        # publish: exactly the reviewed `with:` and no `env:` (D-117)
+        (
+            "release.yml",
+            _DOWNLOAD_WITH,
+            _DOWNLOAD_WITH.replace("dist/\n", "dist/\n          run-id: 123456\n"),
+            "release.yml:publish: runs a step other than",
+        ),
+        (
+            "release.yml",
+            _DOWNLOAD_WITH,
+            _DOWNLOAD_WITH.replace("dist/\n", "dist/\n          repository: someone/fork\n"),
+            "release.yml:publish: runs a step other than",
+        ),
+        (
+            "release.yml",
+            _DOWNLOAD_WITH,
+            _DOWNLOAD_WITH.replace("dist/\n", "dist/\n          github-token: x\n"),
+            "release.yml:publish: runs a step other than",
+        ),
+        (
+            "release.yml",
+            "          enable-cache: false\n" + _PUBLISH_RUN,
+            '          enable-cache: false\n          python-version: "3.12"\n' + _PUBLISH_RUN,
+            "release.yml:publish: runs a step other than",
+        ),
+        (
+            "release.yml",
+            "    environment: pypi\n",
+            f"    environment: pypi\n    env:\n      UV_PUBLISH_URL: {_EVIL_URL}\n",
+            "release.yml:publish: `env` on a pinned job",
+        ),
+        (
+            "release.yml",
+            _PUBLISH_RUN,
+            _PUBLISH_RUN + f"        env:\n          UV_PUBLISH_URL: {_EVIL_URL}\n",
+            "release.yml:publish: `env` on a step",
+        ),
+        (
+            "release.yml",
+            _PUBLISH_RUN,
+            _PUBLISH_RUN + "        working-directory: elsewhere\n",
+            "release.yml:publish: `working-directory` on a step",
+        ),
+        (
+            "release.yml",
+            "    environment: pypi\n",
+            "    environment: pypi\n    container: someone/image:latest\n",
+            "release.yml:publish: `container` on a pinned job",
+        ),
+        (
+            "release.yml",
+            "permissions:\n  contents: read\n",
+            f"env:\n  UV_PUBLISH_URL: {_EVIL_URL}\npermissions:\n  contents: read\n",
+            "release.yml: workflow-level `env`",
+        ),
+        # flow-style steps are read as parsed steps, not lines
+        (
+            "release.yml",
+            _PUBLISH_RUN,
+            "      - {uses: evil/act@main}\n" + _PUBLISH_RUN,
+            "release.yml:publish: runs a step other than",
+        ),
+        (
+            "release.yml",
+            "      - run: uv build\n",
+            "      - {uses: evil/act@main}\n      - run: uv build\n",
+            "release.yml:build: runs a step other than",
+        ),
+        (
+            "ci.yml",
+            "jobs:\n",
+            "jobs:\n  evil:\n    uses: evil/repo/.github/workflows/x.yml@main\n",
+            "ci.yml:evil: calls a reusable workflow",
+        ),
+        # every spelling of an attacker-controlled context in a `run:`
+        (
+            "ci.yml",
+            _STEPS,
+            _STEPS + "      - run: echo '${{ toJSON(github.event) }}'\n",
+            "ci.yml:test: an untrusted context",
+        ),
+        (
+            "ci.yml",
+            _STEPS,
+            _STEPS + "      - run: echo \"${{ github['event']['pull_request']['title'] }}\"\n",
+            "ci.yml:test: an untrusted context",
+        ),
+        (
+            "ci.yml",
+            _STEPS,
+            _STEPS + "      - run: echo '${{ toJSON(github) }}'\n",
+            "ci.yml:test: an untrusted context",
+        ),
+        (
+            "release.yml",
+            "  publish:\n    needs: build\n    runs-on: ubuntu-latest\n",
+            "  publish:\n    needs: build\n    runs-on: [self-hosted]\n",
+            "release.yml:publish: must run on ubuntu-latest",
+        ),
+        (
+            "ci.yml",
+            _STEPS,
+            _STEPS + '      - run: echo "${{ GITHUB.EVENT.pull_request.title }}"\n',
+            "ci.yml:test: an untrusted context",
+        ),
+        (
+            "ci.yml",
+            _STEPS,
+            _STEPS + '      - run: echo "${{ Github.Event.issue.title }}"\n',
+            "ci.yml:test: an untrusted context",
+        ),
+        (
+            "ci.yml",
+            _STEPS,
+            _STEPS
+            + "      - env:\n          T: ${{ github.event.pull_request.title }}\n"
+            + '        run: echo "${{ env.T }}"\n',
+            "ci.yml:test: an untrusted context",
+        ),
+        (
+            "ci.yml",
+            _STEPS,
+            _STEPS + "      - run: echo ${{ github.event_path }}\n",
+            "ci.yml:test: an untrusted context",
+        ),
+        (
+            "ci.yml",
+            _STEPS,
+            _STEPS + "      - run: echo ${{ inputs['name'] }}\n",
+            "ci.yml:test: an untrusted context",
+        ),
+        (
+            "ci.yml",
+            _STEPS,
+            _STEPS + '      - run: make\n        shell: bash -c "${{ github.head_ref }}" {0}\n',
+            "ci.yml:test: an untrusted context in a shell step",
+        ),
         # the Pages deploy (REL-02): hand-run only, exactly its grants
         ("pages.yml", "  workflow_dispatch:\n", "  workflow_dispatch:\n  push:\n", "triggers"),
         (
@@ -646,6 +1020,26 @@ def test_workflow_check_catches_planted_defects(tmp_path, workflow, old, new, wh
     target.write_text(text.replace(old, new), encoding="utf-8")
     found = workflow_problems(_workflow_files(tmp_path))
     assert any(why in p for p in found), found
+
+
+def test_the_env_indirected_form_of_an_untrusted_context_is_allowed(tmp_path):
+    """D-117: an untrusted value passed through a step's `env:` and quoted in the script is the
+    safe form (the shell never parses it as code), so the check does not refuse it."""
+    for f in _workflow_files(WORKFLOWS):
+        (tmp_path / f.name).write_text(f.read_text(encoding="utf-8"), encoding="utf-8")
+    ci = tmp_path / "ci.yml"
+    safe = (
+        "      - env:\n"
+        "          TITLE: ${{ github.event.pull_request.title }}\n"
+        "          REF: ${{ github['head_ref'] }}\n"
+        '        run: echo "$TITLE $REF"\n'
+        "      - run: echo ${{ github.event_name }} ${{ github.repository }}\n"
+    )
+    text = ci.read_text(encoding="utf-8")
+    assert text.count(_STEPS) == 1
+    ci.write_text(text.replace(_STEPS, _STEPS + safe), encoding="utf-8")
+    assert workflow_problems(_workflow_files(tmp_path)) == []
+    assert untrusted_expressions('echo "${{ github.event.issue.title }}"')  # the check bites
 
 
 def test_workflow_check_catches_an_unreviewed_workflow(tmp_path):

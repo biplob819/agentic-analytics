@@ -87,7 +87,7 @@ def self_test() -> int:
         good = specs / "N1.1-schemas"
         good.mkdir(parents=True)
         for f in SPEC_FILES:
-            (good / f).write_text("SCH-01 SCH-02\n", encoding="utf-8")
+            (good / f).write_text("SCH-01 SCH-02\n", encoding="utf-8", newline="\n")
         cases = [
             (
                 "all good",
@@ -167,7 +167,7 @@ def start(
         assert d is not None
         base = d / ".base"
         if reset_base or not base.is_file():
-            base.write_text(_git_head(root) + "\n", encoding="utf-8")
+            base.write_text(_git_head(root) + "\n", encoding="utf-8", newline="\n")
             print(f"  changed-tests baseline: {base.read_text(encoding='utf-8').strip()[:12]}")
         else:
             print(f"  keeping existing baseline {base.read_text(encoding='utf-8').strip()[:12]}")

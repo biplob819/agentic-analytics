@@ -25,8 +25,6 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from snowflake.connector import errors as sf_errors
-
 from agentic_analytics.schemas import Engine, Execution
 from agentic_analytics.warehouse._common import (
     ROW_CAP,
@@ -94,6 +92,10 @@ def classify(exc: BaseException) -> ErrorKind:
         or isinstance(exc, TimeoutError)
     ):
         return "timeout"
+    # imported here, not at module load: `init`, `pack check`, `report` and `run --dry-run`
+    # never load the connector, which needs a platform config directory to import (Windows)
+    from snowflake.connector import errors as sf_errors
+
     if isinstance(exc, sf_errors.OperationalError | sf_errors.InterfaceError | OSError):
         return "transport"
     if isinstance(exc, sf_errors.Error):

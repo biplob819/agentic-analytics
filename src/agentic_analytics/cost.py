@@ -277,6 +277,6 @@ def append_ledger(
         "note": note,
     }
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as fh:
+    with path.open("a", encoding="utf-8", newline="\n") as fh:
         fh.write(json.dumps(row, sort_keys=True) + "\n")
     return row

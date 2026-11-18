@@ -1,0 +1,25 @@
+{
+  "schema_version": "1.0",
+  "kind": "pages_deploy",
+  "node": "B3.3",
+  "criterion": "REL-05",
+  "decisions": ["OWNER D-107", "OWNER D-111", "D-114"],
+  "workflow": "pages.yml",
+  "workflow_run_id": 44296912477,
+  "workflow_run_url": "https://github.com/biplob819/agentic-analytics/actions/runs/44296912477",
+  "commit": "39814b9",
+  "jobs": {"build": "success", "deploy": "success"},
+  "url": "https://biplob819.github.io/agentic-analytics/",
+  "http_status": 200,
+  "source_record": "docs/results/summary.json",
+  "published_run": "rescore-20261117T122217Z-6ccebe",
+  "checks": {
+    "licence_credit_present": true,
+    "region_caveat_present": true,
+    "per_answer_traces_absent": true,
+    "headline_accuracies_present": ["76.0%", "97.0%", "85.0%"],
+    "summary_json_served": true,
+    "secret_scan_in_workflow": true,
+    "no_keys_emails_or_local_paths": true
+  }
+}

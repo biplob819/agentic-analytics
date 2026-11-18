@@ -10,12 +10,14 @@ import re
 import shutil
 import subprocess
 import sys
+from collections import Counter
+from collections.abc import Sequence
 from pathlib import Path
 
 import pytest
 import yaml
 
-from tests.harness.test_records import TRIGGERS, _workflow_files, workflow_problems
+from tests.harness.test_records import STRICT_SHELL, TRIGGERS, _workflow_files, workflow_problems
 
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOWS = ROOT / ".github" / "workflows"
@@ -227,7 +229,9 @@ def test_pages_scans_the_site_for_secrets_before_upload():
 
 # --- the guard script itself, run the way GitHub runs a `run:` step --------------------------
 
-GH_BASH = ["bash", "--noprofile", "--norc", "-eo", "pipefail"]
+GH_BASH = ["bash", "--noprofile", "--norc", "-euo", "pipefail"]  # the release jobs' shell
+# D-117: release.yml's checks, build and publish jobs run under STRICT_SHELL
+STRICT_BASH = STRICT_SHELL.removesuffix(" {0}").split()
 needs_bash = pytest.mark.skipif(
     sys.platform == "win32" or shutil.which("bash") is None,
     reason="the guarded jobs run on ubuntu; Windows bash may be WSL",
@@ -248,11 +252,11 @@ def _step_script(workflow: str, job: str, name: str) -> str:
     return next(s["run"] for s in steps if s.get("name") == name)
 
 
-def _bash(script: str, cwd: Path, **env: str) -> int:
+def _bash(script: str, cwd: Path, shell: Sequence[str] = GH_BASH, **env: str) -> int:
     path = cwd / "step.sh"
     path.write_text(script, encoding="utf-8")
     full = {**os.environ, **env}
-    return subprocess.run([*GH_BASH, str(path)], cwd=cwd, env=full, capture_output=True).returncode
+    return subprocess.run([*shell, str(path)], cwd=cwd, env=full, capture_output=True).returncode
 
 
 def _site(root: Path, *, index: str | None = None, summary: bool = True) -> Path:
@@ -304,10 +308,11 @@ def test_tag_check_compares_tag_and_version(tmp_path):
     (tmp_path / "pyproject.toml").write_text(
         '[project]\nname = "x"\nversion = "0.1.0"\n', encoding="utf-8"
     )
-    assert _bash(script, tmp_path, GITHUB_REF_NAME="v0.1.0") == 0
-    assert _bash(script, tmp_path, GITHUB_REF_NAME="v0.1.1") != 0
-    assert _bash(script, tmp_path, GITHUB_REF_NAME="0.1.0") != 0
-    assert _bash(script, tmp_path, GITHUB_REF_NAME="") != 0
+    strict = STRICT_BASH  # as the build job runs it
+    assert _bash(script, tmp_path, strict, GITHUB_REF_NAME="v0.1.0") == 0
+    assert _bash(script, tmp_path, strict, GITHUB_REF_NAME="v0.1.1") != 0
+    assert _bash(script, tmp_path, strict, GITHUB_REF_NAME="0.1.0") != 0
+    assert _bash(script, tmp_path, strict, GITHUB_REF_NAME="") != 0
 
 
 def chained_test_problems(script: str) -> list[str]:
@@ -344,16 +349,48 @@ EXPECTED_PINS = {
 USES = re.compile(r"^\s*(?:-\s+)?uses:\s+([\w.-]+/[\w./-]+)@([0-9a-f]{40}) # (v[\d.]+)$")
 
 
-def pin_problems(text: str) -> list[str]:
-    problems = []
-    for line in text.splitlines():
-        if not re.match(r"^\s*(?:-\s+)?uses:", line):
+def _parsed_uses(data: object) -> list[str]:
+    """Every `uses:` value in a parsed workflow, step or job, block or flow style (D-117)."""
+    found: list[str] = []
+    jobs = data.get("jobs") if isinstance(data, dict) else None
+    for job in (jobs or {}).values() if isinstance(jobs, dict) else []:
+        if not isinstance(job, dict):
             continue
-        m = USES.match(line)
-        if not m or not PINNED.match(line):
+        if "uses" in job:
+            found.append(str(job["uses"]))  # a reusable workflow
+        for st in job.get("steps") or []:
+            if isinstance(st, dict) and "uses" in st:
+                found.append(str(st["uses"]))
+    return found
+
+
+def pin_problems(text: str) -> list[str]:
+    """Each action a workflow uses, read from the parsed file (so `- {uses: x@main}` is seen),
+    must be a reviewed action at the reviewed commit of its tag; and its line must carry that
+    tag as a comment, so a reader sees the version without looking the commit up."""
+    problems = []
+    # each parsed use needs its own `uses: action@sha # tag` line: counted, not "any line"
+    commented = Counter(
+        f"{m[1]}@{m[2]}"
+        for line in text.splitlines()
+        if (m := USES.match(line))
+        and PINNED.match(line)
+        and EXPECTED_PINS.get(m[1]) == (m[3], m[2])
+    )
+    for value in _parsed_uses(yaml.safe_load(text)):
+        action, _, ref = value.partition("@")
+        _tag, sha = EXPECTED_PINS.get(action, ("", ""))
+        if not sha:
+            problems.append(f"not a reviewed action: {value}")
+        elif ref != sha:
+            problems.append(f"unexpected pin for {action}: {ref}")
+        elif commented[value] > 0:
+            commented[value] -= 1
+        else:
+            problems.append(f"not pinned to a commit with its tag comment: {value}")
+    for line in text.splitlines():  # a `uses:` line that does not parse as a step still counts
+        if re.match(r"^\s*(?:-\s+)?uses:", line) and not PINNED.match(line):
             problems.append(f"not pinned to a commit with its tag: {line.strip()}")
-        elif EXPECTED_PINS.get(m[1]) != (m[3], m[2]):
-            problems.append(f"unexpected pin for {m[1]}: {m[3]} {m[2]}")
     return problems
 
 
@@ -364,14 +401,47 @@ def test_actions_are_pinned_to_commit_shas():
     assert not PINNED.match("      - uses: actions/checkout@v4")
 
 
+_CI_STEPS = "    steps:\n"
+
+
 @pytest.mark.parametrize(
-    "line",
+    "step",
     [
-        "      - uses: actions/checkout@v4",
-        "      - uses: actions/checkout@" + "0" * 40 + " # v4.4.0",
-        "      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.3.0",
-        "      - uses: someone/action@" + "a" * 40 + " # v1.0.0",
+        "      - uses: actions/checkout@v4\n",
+        "      - uses: actions/checkout@" + "0" * 40 + " # v4.4.0\n",
+        "      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.3.0\n",
+        "      - uses: someone/action@" + "a" * 40 + " # v1.0.0\n",
+        # D-117: flow-style steps carry no `uses:` line for a line regex to find
+        "      - {uses: evil/act@main}\n",
+        "      - {name: x, uses: actions/checkout@v4}\n",
+        "      - {uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262}\n",
+        "      - uses: docker://alpine:3\n",
+        "      - uses: ./local-action\n",
     ],
 )
-def test_pin_check_catches_planted_pins(line):
-    assert pin_problems(line)
+def test_pin_check_catches_planted_pins(step):
+    """Each planted step, in a copy of ci.yml, is a pin problem (L-11: the edit matches once)."""
+    ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
+    assert pin_problems(ci) == []
+    assert ci.count(_CI_STEPS) == 1
+    assert pin_problems(ci.replace(_CI_STEPS, _CI_STEPS + step))
+
+
+def test_pin_check_reads_a_reusable_workflow_job():
+    ci = (WORKFLOWS / "ci.yml").read_text(encoding="utf-8")
+    planted = ci.replace(
+        "jobs:\n", "jobs:\n  evil: {uses: evil/repo/.github/workflows/x.yml@main}\n"
+    )
+    assert planted != ci
+    assert pin_problems(planted) == [
+        "not a reviewed action: evil/repo/.github/workflows/x.yml@main"
+    ]
+
+
+@needs_bash
+def test_a_pipe_fails_under_the_release_shell(tmp_path):
+    """D-117: without pipefail, `pytest | tee` exits with tee's 0; the release shell fails it."""
+    script = "false | tee out.txt\n"
+    assert _bash(script, tmp_path, ["bash", "--noprofile", "--norc", "-e"]) == 0
+    assert _bash(script, tmp_path, STRICT_BASH) != 0
+    assert _bash('echo "$UNSET_IN_THE_RELEASE"\n', tmp_path, STRICT_BASH) != 0

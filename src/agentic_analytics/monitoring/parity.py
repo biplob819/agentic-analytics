@@ -199,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
         return EXIT_ERROR
     text = json.dumps(result, indent=2, ensure_ascii=False) + "\n"
     if ns.out:
-        Path(ns.out).write_text(text, encoding="utf-8")
+        Path(ns.out).write_text(text, encoding="utf-8", newline="\n")
     print(text, end="")
     return EXIT_OK if result["identical"] else EXIT_DIFFERS
 

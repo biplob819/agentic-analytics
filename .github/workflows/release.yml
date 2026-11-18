@@ -6,7 +6,9 @@ name: release
 # Four jobs, least privilege (D-116): `checks` and `build` run the repository's code with the
 # read-only token; `build` smokes the built wheel with no keys before it uploads `dist/`;
 # `publish` alone holds `id-token: write` and runs no repository code (download the artifact,
-# set up uv, `uv publish`); `smoke` installs the published version on three OSes.
+# set up uv, `uv publish`); `smoke` installs the published version on three OSes. D-117: the
+# first three run every step under `bash -euo pipefail` and only the reviewed steps
+# (tests/harness/test_records.py STEP_ALLOW), with no `env:`.
 on:
   push:
     tags: ["v*"]
@@ -18,6 +20,10 @@ jobs:
   checks:
     # Nothing is published from a commit whose checks fail.
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        # D-117: a failing command anywhere in a pipe, or an unset variable, fails the step
+        shell: bash --noprofile --norc -euo pipefail {0}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
@@ -35,6 +41,10 @@ jobs:
   build:
     needs: checks
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        # D-117: a failing command anywhere in a pipe, or an unset variable, fails the step
+        shell: bash --noprofile --norc -euo pipefail {0}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
@@ -78,6 +88,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
+    defaults:
+      run:
+        # D-117: a failing command anywhere in a pipe, or an unset variable, fails the step
+        shell: bash --noprofile --norc -euo pipefail {0}
     permissions:
       id-token: write   # PyPI trusted publishing; no stored token
     steps:

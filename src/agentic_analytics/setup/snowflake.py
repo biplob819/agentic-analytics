@@ -374,7 +374,7 @@ def setup_snowflake(
     sql = bootstrap_sql(keys, pack_name=opts.pack)
     sql_path = key_dir / SQL_FILE
     tmp = sql_path.with_name(f".{SQL_FILE}.tmp")
-    tmp.write_text(sql, encoding="utf-8")
+    tmp.write_text(sql, encoding="utf-8", newline="\n")
     os.chmod(tmp, KEY_MODE)
     os.replace(tmp, sql_path)
     result = SnowflakeResult(key_dir=key_dir, keys=keys, sql=sql, sql_path=sql_path)

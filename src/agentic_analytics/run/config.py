@@ -130,7 +130,9 @@ def concurrency_for(cfg: RunConfig, backend: BackendName) -> int:
 def save_assumptions(path: Path, measured: Mapping[str, AgentAssumptions]) -> Path:
     data = {b: asdict(a) for b, a in sorted(measured.items())}
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
+    )
     return path
 
 

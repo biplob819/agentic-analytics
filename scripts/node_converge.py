@@ -451,8 +451,11 @@ def self_test() -> int:
             "def test_realistic():\n    pass\n\n"
             "@pytest.mark.skip\ndef test_skipped():\n    pass\n",
             encoding="utf-8",
+            newline="\n",
         )
-        (root / "outside.py").write_text("def test_real():\n    pass\n", encoding="utf-8")
+        (root / "outside.py").write_text(
+            "def test_real():\n    pass\n", encoding="utf-8", newline="\n"
+        )
         ok = "; ".join(
             [f'{d}=tests/test_x.py›"test_real"' for d in PROOF_DIMENSIONS[:3]]
             + ["repro=n/a:no state to reproduce here", "safety=n/a:no secrets or spend involved"]
@@ -482,7 +485,7 @@ def self_test() -> int:
         # 4 ruff — must name the planted rule, so a missing tool cannot pass for a caught defect
         lint = root / "lint"
         lint.mkdir()
-        (lint / "bad.py").write_text("import os\n", encoding="utf-8")
+        (lint / "bad.py").write_text("import os\n", encoding="utf-8", newline="\n")
         cmd = [sys.executable, "-m", "ruff", "check", "--isolated", "--select", "F", "."]
         r = _tool_gate(cmd, lint, "")
         check("4 ruff fails naming F401", r.status == "FAIL" and "F401" in r.detail)
@@ -490,8 +493,8 @@ def self_test() -> int:
         # 5 pyright
         types = root / "types"
         types.mkdir()
-        (types / "bad.py").write_text('x: int = "a"\n', encoding="utf-8")
-        (types / "pyrightconfig.json").write_text("{}", encoding="utf-8")
+        (types / "bad.py").write_text('x: int = "a"\n', encoding="utf-8", newline="\n")
+        (types / "pyrightconfig.json").write_text("{}", encoding="utf-8", newline="\n")
         r = _tool_gate([sys.executable, "-m", "pyright"], types, "")
         check("5 pyright fails naming bad.py", r.status == "FAIL" and "bad.py" in r.detail)
 
@@ -505,6 +508,7 @@ def self_test() -> int:
             "@pytest.mark.gold\ndef test_gold_fails():\n    assert False\n\n"
             "@pytest.mark.safety\ndef test_safety_fails():\n    assert False\n",
             encoding="utf-8",
+            newline="\n",
         )
         r = _pytest(pt, PYTEST_UNIT_MARKERS, "unit")
         check(
@@ -528,21 +532,25 @@ def self_test() -> int:
         )
         empty = root / "empty"
         empty.mkdir()
-        (empty / "test_none.py").write_text("def test_ok():\n    pass\n", encoding="utf-8")
+        (empty / "test_none.py").write_text(
+            "def test_ok():\n    pass\n", encoding="utf-8", newline="\n"
+        )
         check(
             "7 golden reports SKIP, not PASS, with no golden tests",
             _pytest(empty, "golden", "g").status == "SKIP",
         )
         leak = root / "leak"
         leak.mkdir()
-        (leak / "k.py").write_text('K = "sk-ant-' + "Q" * 30 + '"\n', encoding="utf-8")
+        (leak / "k.py").write_text(
+            'K = "sk-ant-' + "Q" * 30 + '"\n', encoding="utf-8", newline="\n"
+        )
         r = gate_safety(ctx("H-1\tW0.1\tbuilding\t\t\n", at=leak))
         check("9 safety fails on a leaked key", r.status == "FAIL" and "anthropic key" in r.detail)
 
         # 10 build
         broken = root / "broken"
         broken.mkdir()
-        (broken / "pyproject.toml").write_text("[project\nname=", encoding="utf-8")
+        (broken / "pyproject.toml").write_text("[project\nname=", encoding="utf-8", newline="\n")
         r = gate_build(Ctx("W0.1", broken, graph, [], specs), smoke=[])
         check("10 build fails on a broken project", r.status == "FAIL" and "uv build" in r.detail)
 
@@ -588,9 +596,11 @@ def self_test() -> int:
         check(
             "12 records fails with no changelog", bool(records_problems("W0.1", cat, root, specs))
         )
-        (root / "changelog.md").write_text("[FEAT] [W0.1] — harness\n", encoding="utf-8")
-        (specs / "W0.1-harness" / "criteria.md").write_text("H-1\n", encoding="utf-8")
-        (specs / "W0.1-harness" / "RUN-STATE.md").write_text("ok\n", encoding="utf-8")
+        (root / "changelog.md").write_text(
+            "[FEAT] [W0.1] — harness\n", encoding="utf-8", newline="\n"
+        )
+        (specs / "W0.1-harness" / "criteria.md").write_text("H-1\n", encoding="utf-8", newline="\n")
+        (specs / "W0.1-harness" / "RUN-STATE.md").write_text("ok\n", encoding="utf-8", newline="\n")
         check("12 records passes when complete", records_problems("W0.1", cat, root, specs) == [])
     print("self-test", "PASSED" if failures == 0 else f"FAILED ({failures})")
     return 0 if failures == 0 else 1
@@ -638,7 +648,7 @@ def main(argv: list[str] | None = None) -> int:
     log_dir = ROOT / ".harness" / args.node
     log_dir.mkdir(parents=True, exist_ok=True)
     stamp = dt.datetime.now().strftime("%Y%m%dT%H%M%S")
-    (log_dir / f"converge-{stamp}.txt").write_text(report + "\n", encoding="utf-8")
+    (log_dir / f"converge-{stamp}.txt").write_text(report + "\n", encoding="utf-8", newline="\n")
     return 1 if failed else 0
 
 

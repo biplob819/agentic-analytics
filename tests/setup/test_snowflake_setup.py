@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import base64
-import stat
 from pathlib import Path
 
 import pytest
@@ -20,6 +19,7 @@ from agentic_analytics.setup.snowflake import (
     setup_snowflake,
 )
 from agentic_analytics.warehouse.roles import role_sql_problems
+from tests.file_modes import mode_problems
 from tests.setup.fakes import SF_PASSCODE, SF_PASSWORD, FakeSnowflake
 
 
@@ -94,9 +94,9 @@ def test_print_mode_generates_keys_and_prints_sql_with_public_keys(tmp_path: Pat
 
 def test_key_files_and_folder_are_private(tmp_path: Path) -> None:
     keys = ensure_keys(tmp_path / "keys")
-    assert stat.S_IMODE((tmp_path / "keys").stat().st_mode) == 0o700
+    assert mode_problems(tmp_path / "keys", 0o700) == []
     for k in keys:
-        assert stat.S_IMODE(k.private_path.stat().st_mode) == 0o600
+        assert mode_problems(k.private_path, 0o600) == []
 
 
 def test_existing_keys_are_never_overwritten(tmp_path: Path) -> None:
@@ -203,7 +203,7 @@ def test_run_uses_mfa_authenticator_then_key_pair_logins(tmp_path: Path) -> None
         "SNOWFLAKE_WAREHOUSE": "ANALYTICS_XS",
         "SNOWFLAKE_ACCOUNT": "MYORG-AB12345",
     }
-    assert stat.S_IMODE((tmp_path / ".env").stat().st_mode) == 0o600
+    assert mode_problems(tmp_path / ".env", 0o600) == []
     assert len(prompts.asked_hidden) == 2 and "Password" in prompts.asked_hidden[0]
     assert "Duo push" in prompts.asked_hidden[1]
 

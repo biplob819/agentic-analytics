@@ -82,7 +82,7 @@ def write_as_of(config_path: Path, as_of: dt.date) -> None:
         data = dict(loaded or {})
     data["as_of"] = as_of
     config_path.parent.mkdir(parents=True, exist_ok=True)
-    config_path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8")
+    config_path.write_text(yaml.safe_dump(data, sort_keys=False), encoding="utf-8", newline="\n")
 
 
 __all__ = [

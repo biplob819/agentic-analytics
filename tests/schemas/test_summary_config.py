@@ -168,3 +168,18 @@ def test_load_run_config_on_directory_and_missing(tmp_path):
         load_run_config(tmp_path)
     with pytest.raises(ConfigError, match="cannot read"):
         load_run_config(tmp_path / "nope.yaml")
+
+
+def test_load_run_config_names_a_directory_where_reading_one_is_permission_denied(
+    tmp_path, monkeypatch
+):
+    """Windows CI: reading a directory there raises PermissionError, not IsADirectoryError."""
+
+    def windows_read_bytes(self):
+        raise PermissionError(13, "Permission denied", str(self))
+
+    monkeypatch.setattr(Path, "read_bytes", windows_read_bytes)
+    with pytest.raises(ConfigError, match="is a directory"):
+        load_run_config(tmp_path)
+    with pytest.raises(ConfigError, match="cannot read"):
+        load_run_config(tmp_path / "locked.yaml")

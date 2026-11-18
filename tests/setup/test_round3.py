@@ -96,7 +96,8 @@ def test_a_name_after_a_rare_line_break_is_replaced_not_shadowed(tmp_path: Path,
     writer split on \\n only, so it appended the new value after a stale one it could not see,
     and the stale value was what every later read got."""
     env = tmp_path / ".env"
-    env.write_text(f"# keep\nA=1{sep}CLICKHOUSE_HOST=stale.example\nB=2\n", encoding="utf-8")
+    # bytes, not write_text: on Windows write_text turns each \n into \r\n
+    env.write_bytes(f"# keep\nA=1{sep}CLICKHOUSE_HOST=stale.example\nB=2\n".encode())
     assert read_env_file(env)["CLICKHOUSE_HOST"] == "stale.example"
     assert update_env_file(env, {"CLICKHOUSE_HOST": "new.clickhouse.cloud"}) == ["CLICKHOUSE_HOST"]
     assert read_env_file(env) == {"A": "1", "CLICKHOUSE_HOST": "new.clickhouse.cloud", "B": "2"}

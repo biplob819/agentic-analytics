@@ -126,6 +126,10 @@ _UniqueKeyLoader.add_constructor(
 
 def load_run_config(path: str | Path) -> RunConfig:
     p = Path(path)
+    # checked first: reading a directory raises IsADirectoryError on POSIX but PermissionError
+    # on Windows, so the error would otherwise name the wrong cause there
+    if p.is_dir():
+        raise ConfigError(f"{p}: is a directory, not a config file")
     try:
         text = p.read_bytes().decode("utf-8")
     except IsADirectoryError as exc:

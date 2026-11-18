@@ -35,11 +35,20 @@ ONBOARDING = [
 ]
 
 
-def _clean_env(home: Path) -> dict[str, str]:
+# what every Windows session has (a real Windows user always has these): without them the OS
+# libraries cannot find the system folder or a per-user config folder
+WINDOWS_KEEP = ("SYSTEMDRIVE", "WINDIR", "COMSPEC", "PATHEXT", "PROGRAMDATA")
+
+
+def _clean_env(home: Path, *, windows: bool = sys.platform == "win32") -> dict[str, str]:
     """Only what an interpreter needs: no key, account or Langfuse variable leaks in."""
     keep = ("PATH", "SYSTEMROOT", "TEMP", "TMP", "TMPDIR", "LANG")
-    env = {k: os.environ[k] for k in keep if k in os.environ}
-    return {**env, "HOME": str(home), "USERPROFILE": str(home), "PYTHONDONTWRITEBYTECODE": "1"}
+    env = {k: os.environ[k] for k in (*keep, *(WINDOWS_KEEP if windows else ())) if k in os.environ}
+    env |= {"HOME": str(home), "USERPROFILE": str(home), "PYTHONDONTWRITEBYTECODE": "1"}
+    if windows:  # the per-user folders, inside the empty home as on a fresh account
+        env |= {"APPDATA": str(home / "AppData" / "Roaming")}
+        env |= {"LOCALAPPDATA": str(home / "AppData" / "Local")}
+    return env
 
 
 def _cli(argv: list[str], cwd: Path, script: str = NO_NETWORK) -> subprocess.CompletedProcess:
@@ -77,3 +86,49 @@ def test_the_offline_harness_refuses_a_connection(tmp_path):
     )
     p = _cli([], tmp_path, script=connect)
     assert p.returncode != 0 and "network is off" in p.stderr
+
+
+# Windows CI: the Snowflake connector cannot even be imported without a platform config folder
+# ("Unable to determine platform config directory"). Simulated on every OS: importing it
+# fails, and the no-key commands still run, because none of them loads it.
+NO_SNOWFLAKE = (
+    """
+import importlib.abc, sys
+
+class _NoSnowflake(importlib.abc.MetaPathFinder):
+    def find_spec(self, name, path=None, target=None):
+        if name == "snowflake.connector" or name.startswith("snowflake.connector."):
+            raise RuntimeError("Unable to determine platform config directory (simulated)")
+        return None
+
+sys.meta_path.insert(0, _NoSnowflake())
+"""
+    + NO_NETWORK
+)
+
+
+def test_no_key_onboarding_never_loads_the_snowflake_connector(tmp_path):
+    for argv in ONBOARDING[:4]:  # PRIVACY.md's no-network commands
+        p = _cli(argv, tmp_path, script=NO_SNOWFLAKE)
+        assert p.returncode == 0, (argv, p.stdout, p.stderr)
+    p = _cli(
+        [],
+        tmp_path,
+        script=NO_SNOWFLAKE.replace(
+            "from agentic_analytics.cli import main",
+            "import snowflake.connector\nfrom agentic_analytics.cli import main",
+        ),
+    )
+    assert p.returncode != 0 and "simulated" in p.stderr  # the simulation bites
+
+
+def test_the_clean_environment_keeps_the_windows_session_folders(tmp_path, monkeypatch):
+    monkeypatch.setenv("WINDIR", "C:\\Windows")
+    monkeypatch.setenv("OPENAI_API_KEY", "not-a-key")
+    env = _clean_env(tmp_path, windows=True)
+    assert env["WINDIR"] == "C:\\Windows" and env["USERPROFILE"] == str(tmp_path)
+    assert env["APPDATA"].startswith(str(tmp_path)) and env["LOCALAPPDATA"].startswith(
+        str(tmp_path)
+    )
+    assert "OPENAI_API_KEY" not in env
+    assert "APPDATA" not in _clean_env(tmp_path, windows=False)

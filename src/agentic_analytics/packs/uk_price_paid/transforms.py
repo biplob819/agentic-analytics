@@ -295,8 +295,12 @@ def apply_row(raw: Sequence[str]) -> dict[str, object]:
 
 def write_files(pack_dir: Path | None = None) -> None:  # pragma: no cover - maintainer helper
     root = pack_dir or Path(__file__).resolve().parent
-    (root / "load" / "clickhouse.sql").write_text(render_clickhouse_sql(), encoding="utf-8")
-    (root / "load" / "snowflake.sql").write_text(render_snowflake_sql(), encoding="utf-8")
+    (root / "load" / "clickhouse.sql").write_text(
+        render_clickhouse_sql(), encoding="utf-8", newline="\n"
+    )
+    (root / "load" / "snowflake.sql").write_text(
+        render_snowflake_sql(), encoding="utf-8", newline="\n"
+    )
 
 
 if __name__ == "__main__":  # pragma: no cover

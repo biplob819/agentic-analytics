@@ -104,11 +104,13 @@ def self_test() -> int:
     failures = 0
     with tempfile.TemporaryDirectory() as tmp:
         bad = Path(tmp) / "leak.py"
-        bad.write_text(f'KEY = "{fake_ant}"\nOTHER = "{fake_oai}"\n', encoding="utf-8")
+        bad.write_text(
+            f'KEY = "{fake_ant}"\nOTHER = "{fake_oai}"\n', encoding="utf-8", newline="\n"
+        )
         allowed = Path(tmp) / "doc.md"
-        allowed.write_text(f"example: {fake_ant}  # {ALLOW}\n", encoding="utf-8")
+        allowed.write_text(f"example: {fake_ant}  # {ALLOW}\n", encoding="utf-8", newline="\n")
         clean = Path(tmp) / "clean.py"
-        clean.write_text('KEY = os.environ["ANTHROPIC_API_KEY"]\n', encoding="utf-8")
+        clean.write_text('KEY = os.environ["ANTHROPIC_API_KEY"]\n', encoding="utf-8", newline="\n")
         checks = [
             ("detects leaked keys", len(scan([bad])) == 2),
             ("honours allow marker", scan([allowed]) == []),

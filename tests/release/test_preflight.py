@@ -143,8 +143,14 @@ def test_a_real_build_carries_the_pack_and_leaves_planning_out(tmp_path):
         "docs/decisions.md",
         "docs/graph/",
         "docs/lessons.md",
+        "scripts/node_converge.py",
+        "scripts/node_start.py",
+        "scripts/status.py",
+        "scripts/verify_graph_eligibility.py",
     ):
         assert not [n for n in names if n.startswith(kept_out)], kept_out
+    for kept_in in ("scripts/secret_scan.py", "scripts/harness_lib.py"):  # the scan needs both
+        assert kept_in in names, kept_in
     assert "src/agentic_analytics/packs/uk_price_paid/pack.yaml" in names
 
 

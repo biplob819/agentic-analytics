@@ -156,7 +156,9 @@ def write_snapshot_record(info: SnapshotInfo | Mapping[str, Any], out_dir: Path)
     day = dt.datetime.fromisoformat(str(record["downloaded_at"])).date()
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"snapshot-{day.isoformat()}.json"
-    path.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
+    )
     return path
 
 

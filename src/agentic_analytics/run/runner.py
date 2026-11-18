@@ -872,7 +872,7 @@ def _with_trace(
 def write_latest(results_dir: Path, run_id: str) -> None:
     p = results_dir / "latest"
     tmp = results_dir / ".latest.tmp"
-    tmp.write_text(run_id + "\n", encoding="utf-8")
+    tmp.write_text(run_id + "\n", encoding="utf-8", newline="\n")
     os.replace(tmp, p)
 
 
@@ -894,7 +894,11 @@ def resolve_run(results_dir: Path, spec: str) -> Path:
 
 def _write_json(path: Path, data: Any) -> None:
     tmp = path.with_name(f".{path.name}.tmp")
-    tmp.write_text(json.dumps(data, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    tmp.write_text(
+        json.dumps(data, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     os.replace(tmp, path)
 
 
@@ -1595,7 +1599,9 @@ def reconcile_run(
     rates = rates if rates is not None else credit_rates()
     summary = summarise(updated, questions, manifest, aggregate_rates(rates))
     tmp = run_dir / ".records.jsonl.tmp"
-    tmp.write_text("".join(r.model_dump_json() + "\n" for r in updated), encoding="utf-8")
+    tmp.write_text(
+        "".join(r.model_dump_json() + "\n" for r in updated), encoding="utf-8", newline="\n"
+    )
     os.replace(tmp, run_dir / "records.jsonl")
     write_summary(run_dir / "summary.json", summary)
     write_run_metrics(

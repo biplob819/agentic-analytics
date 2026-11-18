@@ -36,5 +36,11 @@ under those providers' own terms. Nothing is sent anywhere else. `init`, `pack c
 
 Delete any of these at any time; the cache rebuilds as needed (at the cost of the calls).
 
+The only other programs it starts are `clickhousectl` (account setup, above) and `git`, which
+reads the local checkout's commit and status to stamp runs and measurements with their code
+version, and never contacts a remote.
+
 `tests/release/test_community.py` checks this statement against the code: only the modules
-behind the destinations above may import networking or provider libraries.
+behind the destinations above may import networking or provider libraries (by any spelling,
+aliased or loaded by name) or open a connection, and only the listed modules may start a
+process, none of them a network tool.

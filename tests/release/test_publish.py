@@ -279,6 +279,24 @@ def test_from_record_renders_the_committed_record_without_traces(tmp_path, capsy
     ]
 
 
+def test_from_record_writes_the_same_bytes_under_windows_line_breaks(tmp_path, monkeypatch):
+    """Windows CI: `Path.write_text` with no `newline` writes each \\n as \\r\\n there. Simulated
+    here, the site's summary.json is still byte-identical to the committed record."""
+    real = Path.write_text
+
+    def windows_write_text(self, data, encoding=None, errors=None, newline=None):
+        if newline is None:
+            data = data.replace("\n", "\r\n")
+        return real(self, data, encoding=encoding, errors=errors, newline="\n")
+
+    monkeypatch.setattr(Path, "write_text", windows_write_text)
+    root = _record_root(tmp_path)
+    assert publish_results.main(["--from-record", "--root", str(root)]) == 0
+    record = ROOT / "docs" / "results" / "summary.json"
+    assert (root / "site" / "summary.json").read_bytes() == record.read_bytes()
+    assert b"\r\n" not in (root / "site" / "index.html").read_bytes()
+
+
 def test_from_record_refuses_the_example_unfinished_runs_and_leaks(tmp_path, capsys, monkeypatch):
     unfinished = _record_root(tmp_path / "u", finished_at=None)
     assert publish_results.main(["--from-record", "--root", str(unfinished)]) == 2

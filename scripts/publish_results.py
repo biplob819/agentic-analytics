@@ -47,8 +47,12 @@ def _example_run(scratch: Path) -> Path:
     run = scratch / "example-synthetic"
     (run / "traces").mkdir(parents=True, exist_ok=True)
     for name in ("summary.json", "records.jsonl", "questions.jsonl"):
-        (run / name).write_text(src.joinpath(name).read_text(encoding="utf-8"), encoding="utf-8")
-    (run / "run.json").write_text('{"pack_source": "uk_price_paid"}\n', encoding="utf-8")
+        (run / name).write_text(
+            src.joinpath(name).read_text(encoding="utf-8"), encoding="utf-8", newline="\n"
+        )
+    (run / "run.json").write_text(
+        '{"pack_source": "uk_price_paid"}\n', encoding="utf-8", newline="\n"
+    )
     for t in sorted(src.joinpath("traces").iterdir(), key=lambda t: t.name):
         if t.name.endswith(".json"):
             (run / "traces" / t.name).write_bytes(t.read_bytes())
@@ -81,7 +85,7 @@ def _credit_pack_region(summary, manifest: dict):
 
 def _write_scanned_site(site: Path, summary_text: str) -> None:
     """Add summary.json to the rendered site and secret-scan it; remove it on any hit."""
-    (site / "summary.json").write_text(summary_text, encoding="utf-8")
+    (site / "summary.json").write_text(summary_text, encoding="utf-8", newline="\n")
     leaks = scan_site(site)
     if leaks:
         shutil.rmtree(site)  # never leave a deployable site holding a key
@@ -171,7 +175,9 @@ def publish(run_dir: Path, root: Path, *, allow_example: bool = False) -> str:
     for name in ("summary.json", "run.json"):
         src = run_dir / name
         if src.is_file():
-            (record / name).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+            (record / name).write_text(
+                src.read_text(encoding="utf-8"), encoding="utf-8", newline="\n"
+            )
     changed = update_readme(
         root / "README.md",
         summary,
