@@ -6,3 +6,7 @@
 # An uncaught exception shows a generic message, never its text or traceback (which can quote a
 # URL, a path or a provider message); the page already shows errors in its own words (D-96).
 showErrorDetails = "none"
+
+[browser]
+# No usage statistics are sent to Streamlit (PRIVACY.md: no telemetry, OSS-06).
+gatherUsageStats = false

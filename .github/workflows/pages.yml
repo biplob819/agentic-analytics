@@ -1,8 +1,13 @@
 name: pages
 
-# REL-02: deploy site/ (written by scripts/publish_results.py from a finished run) to GitHub
-# Pages, the fallback host named in REL-02 (D-46). Run by hand only until the first real run
-# is published; it refuses an empty site and the SYNTHETIC example.
+# REL-02, REL-05: build site/ in the workflow from the committed published-run record
+# (docs/results/summary.json and run.json; OWNER D-111) and deploy it to GitHub Pages, the
+# fallback host named in REL-02 (D-46). Nothing large is committed: the dashboard is rendered
+# here with the bundled pack's credit and the stamped region, and has no per-answer records or
+# traces. Run by hand only; it refuses an empty site and the SYNTHETIC example, and secret-scans
+# the site before upload. Two jobs (D-114): `build` renders, checks and uploads with the
+# repository's read-only token and no environment; `deploy` alone holds the Pages grants and
+# runs only the pinned deploy action, with no checkout and no `run:` step.
 on:
   workflow_dispatch:
 
@@ -14,17 +19,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      contents: read
-      pages: write
-      id-token: write   # proves to Pages that this run may deploy; no stored token
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          python-version: "3.12"
+      - name: Render the dashboard from the committed record
+        run: uv run --locked --no-dev python scripts/publish_results.py --from-record
       - name: Refuse an empty site or the synthetic example
         run: |
           [ -f site/index.html ] || { echo "site/index.html is missing" >&2; exit 1; }
@@ -35,9 +38,19 @@ jobs:
           fi
       - name: Secret-scan the site, traces included
         run: python3 scripts/secret_scan.py site
-      - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write   # proves to Pages that this run may deploy; no stored token
+    steps:
       - id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5

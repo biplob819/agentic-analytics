@@ -386,9 +386,17 @@ def image_problems(readme: str) -> list[str]:
     return problems
 
 
+def test_readme_says_the_public_dashboard_has_no_traces():
+    """OWNER D-111: the Pages dashboard is built from the committed record alone."""
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "no per-answer records or traces" in text
+    assert "builds the dashboard from the committed published-run record" in text
+
+
 def test_readme_links_resolve_and_name_every_document():
     """REL-03 and OWNER D-60: the decision log, data card and case study (the "how I built it"
-    note) are linked, with the other key documents; every repository link resolves."""
+    note) are linked, with the other key documents, the B3.3 guides and community files
+    (OSS-04, OSS-05, OSS-06); every repository link resolves."""
     from urllib.parse import unquote
 
     text = (ROOT / "README.md").read_text(encoding="utf-8")
@@ -406,6 +414,18 @@ def test_readme_links_resolve_and_name_every_document():
         "docs/measurements/baseline-2026-11-17.json",
         "docs/measurements/fixruns-2026-11-17.json",
         "LICENSE",
+        # B3.3: the guides (OSS-04) and the community and privacy files (OSS-05, OSS-06)
+        "docs/quickstart.md",
+        "docs/reproduce-the-uk-benchmark.md",
+        "docs/writing-a-dataset-pack.md",
+        "docs/adding-questions.md",
+        "docs/cost.md",
+        "docs/versioning.md",
+        "CONTRIBUTING.md",
+        "SECURITY.md",
+        "PRIVACY.md",
+        "CODE_OF_CONDUCT.md",
+        "docs/walkthrough.md",
     ):
         assert need in targets, need
     for url in (
@@ -445,7 +465,10 @@ def test_readme_images_exist_have_alt_text_and_stay_small():
         "demo-passcode.png",
         "cli.png",
         "cli-doctor.png",
+        "walkthrough.gif",  # embedded after the headline block, linked to its shot list
     } <= names
+    gif = "docs/assets/walkthrough.gif)](https://github.com/biplob819/agentic-analytics/blob/main/docs/walkthrough.md)"
+    assert gif in text and text.index(END) < text.index(gif)  # outside the generated block
 
 
 PASSCODE_ALT = re.compile(r'(docs/assets/demo-passcode\.png") alt="[^"]*"')

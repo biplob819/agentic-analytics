@@ -10,7 +10,7 @@ Claude (MCP), GPT (MCP) and Cortex Analyst each answered 100 questions from the 
 
 [![Walkthrough: the headline chart, the dashboard, the uplift from each fix, accuracy by category, the safety probes, the CLI, the demo's saved answers and passcode mode, and the case study](https://raw.githubusercontent.com/biplob819/agentic-analytics/main/docs/assets/walkthrough.gif)](https://github.com/biplob819/agentic-analytics/blob/main/docs/walkthrough.md)
 
-[Case study](https://github.com/biplob819/agentic-analytics/blob/main/docs/case-study.md) · [Results](#results) · [Screenshots](#screenshots) · [Step-by-step guide](#step-by-step-guide) · [Decision log](https://github.com/biplob819/agentic-analytics/blob/main/docs/decisions.md) · [Measurements](https://github.com/biplob819/agentic-analytics/tree/main/docs/measurements) · [EvalKit](https://github.com/biplob819/evalkit)
+[Quickstart](https://github.com/biplob819/agentic-analytics/blob/main/docs/quickstart.md) · [Case study](https://github.com/biplob819/agentic-analytics/blob/main/docs/case-study.md) · [Results](#results) · [Screenshots](#screenshots) · [Step-by-step guide](#step-by-step-guide) · [Decision log](https://github.com/biplob819/agentic-analytics/blob/main/docs/decisions.md) · [Measurements](https://github.com/biplob819/agentic-analytics/tree/main/docs/measurements) · [EvalKit](https://github.com/biplob819/evalkit)
 
 ## What it is
 
@@ -23,13 +23,13 @@ Every question has gold SQL for both engines, and the two results must agree bef
 
 ## Status
 
-Built and measured. The baseline and the fix runs are done and scored; the baseline was hand-checked by the builder and the fix runs were checked by an independent verifier. The headline, the results tables and the charts are generated from the committed [published run summary](https://github.com/biplob819/agentic-analytics/blob/main/docs/results/summary.json), and each bullet below cites the record it comes from. Still to come, all in the release node (B3.3):
+Built and measured. The baseline and the fix runs are done and scored; the baseline was hand-checked by the builder and the fix runs were checked by an independent verifier. The headline, the results tables and the charts are generated from the committed [published run summary](https://github.com/biplob819/agentic-analytics/blob/main/docs/results/summary.json), and each bullet below cites the record it comes from. Still to come in the release node (B3.3), and one item after it:
 
 - **Not on PyPI yet.** Install from a clone (below) until v0.1.0 is published.
-- **The results dashboard is not deployed yet.** The Pages workflow is ready and runs by hand; the screenshot below is the dashboard as it will be published.
+- **The results dashboard is not deployed yet.** The Pages workflow is ready and runs by hand: it builds the dashboard from the committed published-run record, so the public page has every figure but no per-answer records or traces (its failure explorer is empty; the full dashboard comes from `agentic-analytics report` on a run folder).
 - **The hosted demo is built but not deployed.** It replays saved answers by default; the live, passcode-gated mode waits for the deploy and its latency check (DEM-15).
 - **Monitoring runs by hand.** The 12-question smoke run with its accuracy gate is a hand-run workflow; its schedule stays off until the owner turns it on (OWNER D-103).
-- **Run history and drift** come from EvalKit's run ledger once EvalKit v0.4.0 ships it (MON-07).
+- **Run history, trend and drift wait for EvalKit v0.4.0 (v0.1.1).** v0.1.0 ships on EvalKit 0.3.0; the trend page and drift flags come from EvalKit's run ledger in the release after it (MON-07, OWNER D-115).
 
 Live build status: `uv run python scripts/status.py`.
 
@@ -162,7 +162,7 @@ agentic-analytics pack check --pack path/to/my_pack
 agentic-analytics run --pack path/to/my_pack --dry-run
 ```
 
-`uk_price_paid` is the bundled reference pack; its files are a worked example of every part.
+`uk_price_paid` is the bundled reference pack; its files are a worked example of every part. The guides walk through [writing a dataset pack](https://github.com/biplob819/agentic-analytics/blob/main/docs/writing-a-dataset-pack.md) and [adding questions](https://github.com/biplob819/agentic-analytics/blob/main/docs/adding-questions.md); [reproducing the UK benchmark](https://github.com/biplob819/agentic-analytics/blob/main/docs/reproduce-the-uk-benchmark.md) lists every step and record behind the published numbers.
 
 ## How scoring works
 
@@ -176,10 +176,13 @@ agentic-analytics run --pack path/to/my_pack --dry-run
 
 ## Cost, privacy and security
 
-Model calls cost money on your keys; warehouse time and Cortex Analyst messages draw on your warehouse credits. Every run prints its estimate first, stops at `--max-cost`, and appends its spend to a ledger. There is no telemetry: data goes only to the model providers and warehouses you configure. Keys stay in your `.env`, and agents reach the data only through read-only roles.
+Model calls cost money on your keys; warehouse time and Cortex Analyst messages draw on your warehouse credits. Every run prints its estimate first, stops at `--max-cost`, and appends its spend to a ledger. There is no telemetry: data goes only to the model providers and warehouses you configure. Keys stay in your `.env`, and agents reach the data only through read-only roles. Details: [controlling cost](https://github.com/biplob819/agentic-analytics/blob/main/docs/cost.md), the [privacy statement](https://github.com/biplob819/agentic-analytics/blob/main/PRIVACY.md) (every destination, checked against the code) and the [security policy](https://github.com/biplob819/agentic-analytics/blob/main/SECURITY.md) (key handling, the read-only layers, private vulnerability reporting).
 
 ## Documents and links
 
+- Guides: [quickstart](https://github.com/biplob819/agentic-analytics/blob/main/docs/quickstart.md), [reproducing the UK benchmark](https://github.com/biplob819/agentic-analytics/blob/main/docs/reproduce-the-uk-benchmark.md), [writing a dataset pack](https://github.com/biplob819/agentic-analytics/blob/main/docs/writing-a-dataset-pack.md), [adding questions](https://github.com/biplob819/agentic-analytics/blob/main/docs/adding-questions.md), [controlling cost](https://github.com/biplob819/agentic-analytics/blob/main/docs/cost.md), [versioning](https://github.com/biplob819/agentic-analytics/blob/main/docs/versioning.md)
+- Contributing: [CONTRIBUTING](https://github.com/biplob819/agentic-analytics/blob/main/CONTRIBUTING.md), [SECURITY](https://github.com/biplob819/agentic-analytics/blob/main/SECURITY.md), [PRIVACY](https://github.com/biplob819/agentic-analytics/blob/main/PRIVACY.md), [code of conduct](https://github.com/biplob819/agentic-analytics/blob/main/CODE_OF_CONDUCT.md)
+- Walkthrough: the [walkthrough GIF](https://github.com/biplob819/agentic-analytics/blob/main/docs/assets/walkthrough.gif) of ten screens from committed outputs, and its [shot list](https://github.com/biplob819/agentic-analytics/blob/main/docs/walkthrough.md)
 - How it was built and why: [case study](https://github.com/biplob819/agentic-analytics/blob/main/docs/case-study.md), [decision log](https://github.com/biplob819/agentic-analytics/blob/main/docs/decisions.md), [lessons](https://github.com/biplob819/agentic-analytics/blob/main/docs/lessons.md)
 - Product and design: [PRD](https://github.com/biplob819/agentic-analytics/blob/main/Agentic%20Analytics%20PRD.md), [Tech Spec](https://github.com/biplob819/agentic-analytics/blob/main/Agentic%20Analytics%20Tech%20Spec.md), [architecture](https://github.com/biplob819/agentic-analytics/blob/main/docs/assets/architecture.svg), [data flow](https://github.com/biplob819/agentic-analytics/blob/main/docs/assets/dataflow.svg)
 - Data: [data card](https://github.com/biplob819/agentic-analytics/blob/main/DATA_CARD.md), [HM Land Registry Price Paid Data](https://www.gov.uk/government/statistical-data-sets/price-paid-data-downloads), [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/)

@@ -234,3 +234,81 @@ def test_publish_writes_the_record_the_region_and_the_models(repo, tmp_path):
     readme = (repo / "README.md").read_text(encoding="utf-8")
     block = readme.split(RESULTS_START, 1)[1].split(RESULTS_END, 1)[0]
     assert "Thailand" in block and "`m-claude`" in block and "r-20261201-stamp" in block
+
+
+# --- OWNER D-111: the Pages job renders site/ from the committed record alone ---------------
+
+
+def _record_root(tmp_path: Path, **update) -> Path:
+    """A scratch repository holding a copy of the committed published-run record."""
+    root = tmp_path / "repo"
+    (root / "docs" / "results").mkdir(parents=True)
+    for name in ("summary.json", "run.json"):
+        shutil.copyfile(ROOT / "docs" / "results" / name, root / "docs" / "results" / name)
+    if update:
+        path = root / "docs" / "results" / "summary.json"
+        summary = json.loads(path.read_text(encoding="utf-8"))
+        summary.update(update)
+        path.write_text(json.dumps(summary), encoding="utf-8")
+    return root
+
+
+def test_from_record_renders_the_committed_record_without_traces(tmp_path, capsys):
+    root = _record_root(tmp_path)
+    assert publish_results.main(["--from-record", "--root", str(root)]) == 0
+    assert "no per-answer records or traces" in capsys.readouterr().out
+    site = root / "site"
+    assert sorted(p.name for p in site.iterdir()) == [
+        "index.html",
+        "summary.json",
+        "summary.vl.json",
+    ]
+    html = (site / "index.html").read_text(encoding="utf-8")
+    assert "SYNTHETIC EXAMPLE" not in html and "Open Government Licence v3.0." in html
+    assert "Thailand" in html  # the stamped region reaches the OWNER D-62 caveat
+    assert "No records were passed to the report" in html  # the empty failure explorer
+    record = ROOT / "docs" / "results" / "summary.json"
+    assert (site / "summary.json").read_bytes() == record.read_bytes()
+    # nothing outside site/ is written: no figures, README or record changes
+    assert sorted(p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()) == [
+        "docs/results/run.json",
+        "docs/results/summary.json",
+        "site/index.html",
+        "site/summary.json",
+        "site/summary.vl.json",
+    ]
+
+
+def test_from_record_refuses_the_example_unfinished_runs_and_leaks(tmp_path, capsys, monkeypatch):
+    unfinished = _record_root(tmp_path / "u", finished_at=None)
+    assert publish_results.main(["--from-record", "--root", str(unfinished)]) == 2
+    assert "has not finished" in capsys.readouterr().err
+    example = _record_root(tmp_path / "e", run_id="example-synthetic")
+    assert publish_results.main(["--from-record", "--root", str(example)]) == 2
+    assert "SYNTHETIC example" in capsys.readouterr().err
+    # a key that reaches the rendered page (here planted by the renderer) removes the site
+    import agentic_analytics.report as report
+
+    planted = "sk-ant-" + "a1B2c3D4" * 4
+    real = report.render_report
+
+    def leaky(summary, records, out, **kw):
+        path = real(summary, records, out, **kw)
+        (Path(out) / "leak.txt").write_text(planted, encoding="utf-8")
+        return path
+
+    monkeypatch.setattr(report, "render_report", leaky)
+    leak = _record_root(tmp_path / "k")
+    assert publish_results.main(["--from-record", "--root", str(leak)]) == 2
+    err = capsys.readouterr().err
+    assert "secret scan" in err and "leak.txt" in err and planted not in err
+    for root in (unfinished, example, leak):
+        assert not (root / "site").exists()
+    assert publish_results.main(["--from-record", "--root", str(tmp_path / "missing")]) == 2
+
+
+def test_from_record_takes_no_run_folder_or_example(tmp_path):
+    with pytest.raises(SystemExit):
+        publish_results.main(["--from-record", str(tmp_path)])
+    with pytest.raises(SystemExit):
+        publish_results.main(["--from-record", "--example", "--root", str(tmp_path)])

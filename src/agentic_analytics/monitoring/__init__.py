@@ -16,7 +16,7 @@
 
 The scheduled smoke workflow is `.github/workflows/monitor.yml` (MON-01; its weekly schedule is
 off until the release, OWNER D-103). Run history, the trend page and drift flags wait
-for EvalKit's ledger (B5.7, v0.4.0): MON-07 in B3.3 (OWNER D-98).
+for EvalKit's ledger (B5.7, v0.4.0): MON-07 in V5.1, v0.1.1 (OWNER D-98, OWNER D-115).
 
 The modules are imported by name, not from here: `probes` pulls in the MCP client and
 `aggregate` imports `efficiency`, so this package stays empty to keep imports light.

@@ -90,7 +90,8 @@ def test_the_streamlit_config_hides_error_details_and_holds_no_secret():
     path = ROOT / ".streamlit" / "config.toml"
     config = tomllib.loads(path.read_text(encoding="utf-8"))
     assert config["client"]["showErrorDetails"] == "none"  # Streamlit 1.67's spelling of false
-    assert set(config) == {"client"}
+    assert set(config) == {"client", "browser"}
+    assert config["browser"] == {"gatherUsageStats": False}  # no telemetry (PRIVACY.md, OSS-06)
     assert ".streamlit/secrets.toml" in (ROOT / ".gitignore").read_text(encoding="utf-8")
 
 

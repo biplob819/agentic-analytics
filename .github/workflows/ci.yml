@@ -15,11 +15,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        python: ["3.11", "3.12"]
+        os: [ubuntu-latest, macos-latest, windows-latest]   # OSS-02, D-45 (supersedes D-26)
+        python: ["3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
         with:
           python-version: ${{ matrix.python }}
       - run: uv sync --locked
@@ -30,3 +30,4 @@ jobs:
       - run: uv run python scripts/secret_scan.py
       - run: uv run python scripts/verify_graph_eligibility.py
       - run: uv build
+      - run: uv run --no-project python scripts/release_preflight.py wheel dist

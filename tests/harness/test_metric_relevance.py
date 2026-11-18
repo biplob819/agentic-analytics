@@ -51,7 +51,7 @@ def test_every_summary_metric_names_its_question_and_trace() -> None:
 
 
 def test_relevance_rows_name_real_metrics() -> None:
-    planned = {"drift"}  # B3.3 MON-07, waits for EvalKit B5.7 in v0.4.0 (D-76, OWNER D-98)
+    planned = {"drift"}  # V5.1 MON-07, waits for EvalKit B5.7 in v0.4.0 (OWNER D-98, D-115)
     fields = set(BackendSummary.model_fields) | set(RunSummary.model_fields)
     efficiency = {n for n, src in SOURCES.items() if src == "efficiency"}
     assert set(relevance_rows()) - fields - efficiency == planned

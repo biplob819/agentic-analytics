@@ -61,7 +61,8 @@ def test_catalog_row_with_unknown_node_fails():
 
 
 @pytest.mark.parametrize(
-    "node_id", ["W0.1", "N1.6", "Q2.1", "A2.3", "S2.1", "M2.1", "R3.2", "F3.1", "B3.2", "D4.2"]
+    "node_id",
+    ["W0.1", "N1.6", "Q2.1", "A2.3", "S2.1", "M2.1", "R3.2", "F3.1", "B3.2", "D4.2", "V5.1"],
 )
 def test_every_wave_letter_parses(node_id):
     assert node_id in parse_graph(f"| **{node_id}** | T | \u2014 |\n")
@@ -88,8 +89,8 @@ def test_unknown_status_rejected():
 
 def test_live_graph_is_eligible_and_complete():
     nodes, caps = load_graph(), load_catalog()
-    assert len(nodes) == 25  # N1.7 added by OWNER D-55, M4.1 by OWNER D-74
-    assert len(caps) == 158  # SET D-55, DEM-06..15 D-56..60/D-93, MON D-98, REL-05 OWNER D-107
+    assert len(nodes) == 26  # N1.7 OWNER D-55, M4.1 OWNER D-74, V5.1 OWNER D-115
+    assert len(caps) == 160  # SET D-55, DEM D-56..60/D-93, MON D-98/D-115, REL-05 D-107
     assert find_cycle(nodes) is None
     assert eligibility_problems(nodes, caps) == []
     assert all(any(c.node == n for c in caps) for n in nodes), "every node has capability rows"

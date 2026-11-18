@@ -21,6 +21,9 @@ build/
 keys/
 /data/
 
+# built by the pages workflow from docs/results/ (OWNER D-111); never committed
+/site/
+
 # personal notes, not for the public repo
 Portfolio notes.md
 

@@ -1,11 +1,37 @@
 [project]
 name = "agentic-analytics"
 version = "0.0.1"
-description = "How often agentic analytics gets the answer right: a 100-question UK house-price benchmark across a ClickHouse MCP agent (Claude, GPT) and Snowflake Cortex Analyst."
-readme = "README.md"
+description = "A benchmark harness for text-to-SQL agents: scores analytics agents against gold SQL over dataset packs, without an LLM judge, with a bundled UK house-price pack."
+readme = { file = "README.md", content-type = "text/markdown" }
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Biplob Chakraborty" }]
+keywords = [
+    "text-to-sql",
+    "benchmark",
+    "evaluation",
+    "llm",
+    "agents",
+    "analytics",
+    "clickhouse",
+    "snowflake",
+    "mcp",
+]
+# No "License ::" classifier: `license = "MIT"` (PEP 639) supersedes it, and PyPI refuses an
+# upload that carries both a License-Expression and a license classifier.
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 requires-python = ">=3.11"
 dependencies = [
     "pydantic>=2.7",
@@ -20,6 +46,7 @@ dependencies = [
     "snowflake-connector-python>=3.12",
     "cryptography>=43",
     "pyjwt>=2.9",
+    "httpx2>=2.16",
 ]
 
 [project.optional-dependencies]
@@ -32,6 +59,10 @@ demo = [
 
 [project.urls]
 Homepage = "https://github.com/biplob819/agentic-analytics"
+Repository = "https://github.com/biplob819/agentic-analytics"
+Documentation = "https://github.com/biplob819/agentic-analytics/tree/main/docs"
+Issues = "https://github.com/biplob819/agentic-analytics/issues"
+Changelog = "https://github.com/biplob819/agentic-analytics/blob/main/changelog.md"
 
 [project.scripts]
 agentic-analytics = "agentic_analytics.cli:main"
@@ -50,11 +81,29 @@ dev = [
 requires = ["hatchling>=1.26"]
 build-backend = "hatchling.build"
 
-[tool.hatch.metadata]
-allow-direct-references = true
-
 [tool.hatch.build.targets.wheel]
 packages = ["src/agentic_analytics"]
+
+[tool.hatch.build.targets.sdist]
+# build-harness and planning material stays in the repository, not the published sdist
+exclude = [
+    "/specs",
+    "/site",
+    "/results",
+    "/docs/measurements",
+    "/.harness",
+    "/.github",
+    "/Agentic Analytics PRD.md",
+    "/Agentic Analytics Tech Spec.md",
+    "/Portfolio notes.md",
+    "/portfolio.yml",
+    "/docs/assets/walkthrough.gif",
+    # the build record and its tests stay in the repository: the tests read files excluded above
+    "/tests",
+    "/docs/decisions.md",
+    "/docs/graph",
+    "/docs/lessons.md",
+]
 
 [tool.ruff]
 line-length = 100

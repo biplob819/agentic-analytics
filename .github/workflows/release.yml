@@ -1,0 +1,129 @@
+name: release
+
+# OSS-01, OSS-07 (OWNER D-27): a v* tag publishes agentic-analytics to PyPI by trusted
+# publishing. No token is stored anywhere; PyPI trusts this repository, this workflow file and
+# the `pypi` environment, which the owner registers as a trusted publisher on PyPI first.
+# Four jobs, least privilege (D-116): `checks` and `build` run the repository's code with the
+# read-only token; `build` smokes the built wheel with no keys before it uploads `dist/`;
+# `publish` alone holds `id-token: write` and runs no repository code (download the artifact,
+# set up uv, `uv publish`); `smoke` installs the published version on three OSes.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    # Nothing is published from a commit whose checks fail.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          version: "0.11.21"   # pinned uv, no cache: the release builds from a known tool
+          enable-cache: false
+          python-version: "3.12"
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run pyright
+      - run: uv run pytest -q -m "not live"
+      - run: uv run python scripts/secret_scan.py
+
+  build:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          version: "0.11.21"   # pinned uv, no cache: the release builds from a known tool
+          enable-cache: false
+          python-version: "3.12"
+      - name: Check the tag matches the package version
+        run: |
+          version=$(uv run --no-project python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          if [ "v$version" != "${GITHUB_REF_NAME}" ]; then
+            echo "tag ${GITHUB_REF_NAME} does not match pyproject version v$version" >&2
+            exit 1
+          fi
+      - name: Refuse direct references (PyPI rejects them; D-47)
+        run: uv run --no-project python scripts/release_preflight.py pyproject
+      - run: uv build
+      - name: The wheel carries the dataset pack and the example
+        run: uv run --no-project python scripts/release_preflight.py wheel dist
+      - name: Install the built wheel and run it with no keys, before anything is uploaded
+        run: |
+          uv venv "$RUNNER_TEMP/wheel"
+          uv pip install --python "$RUNNER_TEMP/wheel/bin/python" dist/*.whl
+          bin="$RUNNER_TEMP/wheel/bin"
+          mkdir "$RUNNER_TEMP/onboarding"
+          cd "$RUNNER_TEMP/onboarding"
+          env -i HOME="$PWD" PATH=/usr/bin:/bin "$bin/agentic-analytics" --version
+          env -i HOME="$PWD" PATH=/usr/bin:/bin "$bin/aa" --version
+          env -i HOME="$PWD" PATH=/usr/bin:/bin "$bin/agentic-analytics" init
+          env -i HOME="$PWD" PATH=/usr/bin:/bin "$bin/agentic-analytics" pack check
+          env -i HOME="$PWD" PATH=/usr/bin:/bin "$bin/agentic-analytics" report --example --out example
+          [ -f example/index.html ] || { echo "report --example wrote no page" >&2; exit 1; }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # PyPI trusted publishing; no stored token
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: dist
+          path: dist/
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          version: "0.11.21"   # pinned uv, no cache: the release builds from a known tool
+          enable-cache: false
+      - run: uv publish --trusted-publishing always dist/*
+
+  smoke:
+    # OSS-02, OSS-07: install the version just published, on every OS, and run it with no keys.
+    needs: publish
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6.8.0
+        with:
+          version: "0.11.21"   # pinned uv, no cache: the release builds from a known tool
+          enable-cache: false
+      - name: Install the published package (PyPI can take a minute to serve it)
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            uvx --refresh --from "agentic-analytics==$v" agentic-analytics --version && exit 0
+            sleep 30
+          done
+          exit 1
+      - name: The short alias and the no-key onboarding commands
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          uvx --from "agentic-analytics==$v" aa --version
+          mkdir onboarding
+          cd onboarding
+          uvx --from "agentic-analytics==$v" agentic-analytics init
+          [ -f run.yaml ] || { echo "init wrote no run.yaml" >&2; exit 1; }
+          [ -f .env.example ] || { echo "init wrote no .env.example" >&2; exit 1; }
+          uvx --from "agentic-analytics==$v" agentic-analytics pack check
+          uvx --from "agentic-analytics==$v" agentic-analytics report --example --out example
+          [ -f example/index.html ] || { echo "report --example wrote no page" >&2; exit 1; }

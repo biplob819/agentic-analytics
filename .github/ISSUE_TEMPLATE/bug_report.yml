@@ -1,0 +1,35 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. **Never paste API keys, passwords, private keys, `.env` contents or private data.**
+        Security problems go to private vulnerability reporting (see SECURITY.md), not here.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: The command you ran, and the pack and run.yaml if relevant.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `agentic-analytics doctor --json`
+      description: It shows which variables are set (names only, never values) and whether the engines answer.
+      render: json
+  - type: input
+    id: version
+    attributes:
+      label: Version (`agentic-analytics --version`) and operating system
+    validations:
+      required: true

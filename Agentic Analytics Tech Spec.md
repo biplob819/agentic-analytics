@@ -655,9 +655,9 @@ agentic-analytics/
 
 Status vocabulary: `not-started | spec | building | green`. Changelog lines read `[TYPE] [NODE] — summary`.
 
-### 12.2 Build graph: 25 nodes in five waves
+### 12.2 Build graph: 26 nodes in six waves
 
-**Must scope: 22 nodes,** W0.1 to B3.3, with N1.7 (OWNER D-55). **Should scope (US7): 2 nodes,** D4.1 and D4.2. Since OWNER D-93, B3.3 depends on D4.2 (its DEM-15 measures the deployed page), so the release waits on both Should nodes. The whole graph is built in one pass (OWNER D-20). B3.3 publishes v0.1.0 to PyPI (OWNER D-27). **Monitoring (OWNER D-74): 1 node,** M4.1, added after the owner asked how the evals are monitored and improved.
+**Must scope: 22 nodes,** W0.1 to B3.3, with N1.7 (OWNER D-55). **Should scope (US7): 2 nodes,** D4.1 and D4.2. Since OWNER D-93, B3.3 depends on D4.2 (its DEM-15 measures the deployed page), so the release waits on both Should nodes. The whole graph is built in one pass (OWNER D-20). B3.3 publishes v0.1.0 to PyPI (OWNER D-27). **Monitoring (OWNER D-74): 1 node,** M4.1, added after the owner asked how the evals are monitored and improved. **Post-release (OWNER D-115): 1 node,** V5.1, v0.1.1 on EvalKit v0.4.0: v0.1.0 ships on `evalkit-harness==0.3.0`, and the EvalKit v0.4.0 work (MON-07..09) follows the release.
 
 | Node | Title | Depends on | Deliverable (what exists when it is green) | Stories |
 | --- | --- | --- | --- | --- |
@@ -682,12 +682,13 @@ Status vocabulary: `not-started | spec | building | green`. Changelog lines read
 | **F3.2** | Fix runs and uplift | F3.1, R3.2 | Fix runs, uplift table, hand-labelled failure taxonomy | US2, US4 |
 | **B3.1** | Dashboard | M2.1, A2.3 | Static dashboard: category × backend, uplift, cost, clarification, failure explorer | US1–US5 |
 | **B3.2** | README, deploy and write-up figures | B3.1, F3.2, M4.1 | README headline, Pages publishing (the deploy itself is REL-05 in B3.3, OWNER D-107), decision log, data card, figures for the write-up | US6 |
-| **B3.3** | Open-source release v0.1.0 | B3.2, D4.2 | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0, the hosted demo deployed with its live p95 (DEM-15, D-93), run history and drift from EvalKit's ledger once v0.4.0 ships it (MON-07, OWNER D-98), the results dashboard deployed on GitHub Pages (REL-05, OWNER D-107) | US6, US7, US8 |
+| **B3.3** | Open-source release v0.1.0 | B3.2, D4.2 | PyPI `agentic-analytics` by trusted publishing, onboarding (`init`, `report --example`, single-engine mode), docs, community files, CI matrix, tag v0.1.0, the hosted demo deployed with its live p95 (DEM-15, D-93), the results dashboard deployed on GitHub Pages (REL-05, OWNER D-107); released on EvalKit 0.3.0, with run history and drift moved to V5.1 (OWNER D-115) | US6, US7, US8 |
 | **D4.1** | `ask()` and guard | A2.3, R3.1 | `ask()`, replay cache, live path behind EvalKit's guard, warm-up | US7 |
 | **D4.2** | Demo page | D4.1, B3.1 | Streamlit app from this repo (D-57), packaged for deploy, with the p95 tool (the deployed live p95 is DEM-15 in B3.3, D-93) | US7 |
-| **M4.1** | Monitoring and EvalKit reuse | R3.2, B3.1 | Scheduled smoke gated by `evalkit gate`, run pairs through `evalkit compare` (history and drift are MON-07 in B3.3, OWNER D-98), metrics-summary export, `attack_outcome` probe scoring, step efficiency, upstreamed scorers with parity tests (OWNER D-74, D-75) | US1, US5 |
+| **M4.1** | Monitoring and EvalKit reuse | R3.2, B3.1 | Scheduled smoke gated by `evalkit gate`, run pairs through `evalkit compare` (history and drift are MON-07 in V5.1, OWNER D-98, OWNER D-115), metrics-summary export, `attack_outcome` probe scoring, step efficiency, upstreamed scorers with parity tests (OWNER D-74, D-75) | US1, US5 |
+| **V5.1** | v0.1.1 on EvalKit v0.4.0 | B3.3 | Post-release (OWNER D-115): `evalkit-harness==0.4.0`; run history, trend and drift from EvalKit's ledger (MON-07, moved from B3.3); shape equivalences from EvalKit B5.15 (MON-08); clustered clarification intervals (MON-09) | US1, US5 |
 
-Waves: **W0** harness → **N1** foundations → **Q2/A2/S2/M2** benchmark, backends, scoring → **R3/F3/B3** runs, fixes, reporting → **D4/M4** demo and monitoring.
+Waves: **W0** harness → **N1** foundations → **Q2/A2/S2/M2** benchmark, backends, scoring → **R3/F3/B3** runs, fixes, reporting → **D4/M4** demo and monitoring → **V5** post-release on EvalKit v0.4.0.
 
 ### 12.3 Node map, levels and build order
 
@@ -737,6 +738,7 @@ graph LR
   R32 --> M41[M4.1 Monitoring + EvalKit reuse]
   B31 --> M41
   M41 --> B32
+  B33 --> V51[V5.1 v0.1.1 on EvalKit v0.4.0]
 ```
 
 **Dependency levels.** A node can start once every node it depends on, all in earlier levels, is green.
@@ -755,6 +757,7 @@ graph LR
 | 9 | F3.2, D4.2, M4.1 |
 | 10 | B3.2 |
 | 11 | B3.3 |
+| 12 | V5.1 |
 
 **Critical path (12 nodes):** W0.1 → N1.1 → N1.2 → N1.3 → N1.4 → A2.2 → A2.3 → R3.1 → R3.2 → F3.2 → B3.2 → B3.3.
 
@@ -789,6 +792,7 @@ graph LR
 | 23 | D4.2 | before B3.3, which measures its deployed page (DEM-15, OWNER D-93) |
 | 24 | B3.3 | v0.1.0 on PyPI; Must scope complete |
 | 25 | N1.7 | added by OWNER D-55; can run any time after N1.2 |
+| 26 | V5.1 | post-release (OWNER D-115): v0.1.1 once EvalKit v0.4.0 ships |
 
 ### 12.4 Capability catalog
 
@@ -1034,7 +1038,6 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 | OSS-06 | Privacy statement: no telemetry; data goes only to the providers and warehouses the user configures | D-27 |
 | OSS-07 | Tag v0.1.0, semver policy, install test against the published package | D-27 |
 | DEM-15 | Deployed on Streamlit Community Cloud with secrets in the host store; live page-mode p95 under 30 s over 20 owner-budget asks, no timed-out or errored panel | NFR2, D-93 |
-| MON-07 | Run history and drift through EvalKit: every run's metrics-1 export goes into EvalKit's run ledger (B5.7 LED-01, LED-02); the dashboard's trend page shows accuracy with intervals, cost per correct and p95 latency across runs from `evalkit history`, and a run outside its alarm band is flagged (moved from M4.1 MON-02: EvalKit B5.7 ships in v0.4.0, which B3.3 already waits for) | OWNER D-74, OWNER D-75, US1, OWNER D-98 |
 | REL-05 | Results dashboard deployed on GitHub Pages from the hand-run pages workflow, from the committed published run, traces pass the secret scan (moved from B3.2 REL-02) | Deliverables, OWNER D-107 |
 
 **D4.1 `ask()` and guard**
@@ -1071,11 +1074,19 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 | Cap | Capability | Trace |
 | --- | --- | --- |
 | MON-01 | Scheduled smoke: a GitHub Actions workflow runs `agentic-analytics smoke` on manual dispatch (its weekly schedule is written but off until the release, OWNER D-103), from the `monitoring` environment's secrets, under a $2 cap per run, never on pull requests or forks; it gates the run with `evalkit gate` (EvalKit B5.3) on per-backend accuracy floors (`monitoring/gates.yaml`), whose exit code nothing swallows; the spend-ledger line the run appended is shown in the job summary (CI never commits the ledger back), and the run's metrics-1 folder, the gate verdict and that spend line are uploaded as a workflow artifact, so `evalkit compare` can compare two CI runs | OWNER D-74, OWNER D-75, NFR1, OWNER D-103, D-102 |
-| MON-02 | Run pairs compared with `evalkit compare` (EvalKit B5.6) on their metrics-1 exports, paired on shared questions through the per-case sidecar (`metrics/cases.jsonl`), a regression flagged after Holm; run history, the trend page and drift flags are MON-07 (B3.3, OWNER D-98) | OWNER D-74, OWNER D-75, US1, OWNER D-98 |
+| MON-02 | Run pairs compared with `evalkit compare` (EvalKit B5.6) on their metrics-1 exports, paired on shared questions through the per-case sidecar (`metrics/cases.jsonl`), a regression flagged after Holm; run history, the trend page and drift flags are MON-07 (V5.1, OWNER D-98, OWNER D-115) | OWNER D-74, OWNER D-75, US1, OWNER D-98 |
 | MON-03 | Probe verdicts: S2.1's verdict is the reported one; EvalKit `scorers.attack_outcome` (markers as canaries, the MCP allow-list as allowed tools) is a cross-check, with a parity test against S2.1's verdicts on every recorded probe answer | OWNER D-74, D-2, D-99 |
 | MON-04 | Step efficiency: tool calls used against the question's minimum, per backend, from the recorded steps (EvalKit's agent-trajectory `min_steps` idea); cost per success and trial agreement are not repeated, since `cost_per_correct_usd` and `trial_agreement` already answer them (§6.3) | OWNER D-74, OWNER D-75, US5 |
 | MON-05 | Metrics-summary export: `summary.json` is also written in EvalKit's frozen metrics-1 format (B5.3; `metrics/metrics.json` with the per-case sidecar `metrics/cases.jsonl`; each §6.3 metric with its interval, unit and `n`, its trace in §6.3) with EvalKit's per-model efficiency block where it applies (tokens in/out/reasoning/cached per case, cache-hit share, cost per case, cost per correct, latency p50/p95/p99, error rate, system cost, labels mode and price date; retry rate and eval overhead cost are left out, since retries are not recorded per call and there is no LLM judge, D-101; EvalKit D-67), the input to `evalkit gate`, `compare`, the ledger and EvalKit's cross-project index (B5.5) | OWNER D-75, EvalKit D-62, EvalKit D-67, D-101 |
 | MON-06 | Upstreamed scorers: the answer-from-rows check runs from EvalKit (`scorers.unsupported_numbers`), its local copy removed after a parity test proving identical scores on every recorded answer; the clarification verdict and rates (bootstrap over questions) stay this project's reported figures, with EvalKit's `clarification_rates` as a tested cross-check until EvalKit offers a per-question interval | OWNER D-75, D-2, OWNER D-100 |
+
+**V5.1 v0.1.1 on EvalKit v0.4.0**
+
+| Cap | Capability | Trace |
+| --- | --- | --- |
+| MON-07 | Run history and drift through EvalKit: every run's metrics-1 export goes into EvalKit's run ledger (B5.7 LED-01, LED-02); the dashboard's trend page shows accuracy with intervals, cost per correct and p95 latency across runs from `evalkit history`, and a run outside its alarm band is flagged (moved from M4.1 MON-02 by OWNER D-98, then from B3.3 to V5.1 by OWNER D-115: EvalKit B5.7 ships in v0.4.0, after v0.1.0) | OWNER D-74, OWNER D-75, US1, OWNER D-98, OWNER D-115 |
+| MON-08 | Shape equivalences from EvalKit B5.15 replace scoring/tolerant.py; rescoring every stored run changes 0 verdicts (D-91, D-92) | D-91, D-92, OWNER D-115 |
+| MON-09 | Clarification intervals from EvalKit's clustered clarification_rates (OWNER D-100); point rates unchanged | OWNER D-100, OWNER D-115 |
 
 ### 12.5 Node lifecycle
 

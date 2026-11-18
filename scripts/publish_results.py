@@ -11,6 +11,13 @@ generated blocks (headline, results) between their markers. Every number comes f
 summary.json; nothing is typed by hand. The Pages workflow (.github/workflows/pages.yml, run by
 hand) deploys site/.
 
+    uv run python scripts/publish_results.py --from-record
+
+renders site/ from the committed record alone (docs/results/summary.json and run.json, OWNER
+D-111): the dashboard with the bundled pack's credit and the stamped region, but no per-answer
+records or traces, so its failure explorer is empty. The Pages workflow runs this, so nothing
+large is committed; it writes nothing outside site/.
+
 It refuses an unfinished run and the bundled SYNTHETIC example (also when renamed: its
 fingerprint, `example-` model snapshots and placeholder hashes give it away), and removes site/
 again if the secret scan flags anything in it, exported traces included. `--example --root DIR`
@@ -20,6 +27,7 @@ renders the example into a scratch copy of the repository, for previews and test
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import sys
@@ -54,14 +62,70 @@ def scan_site(site: Path) -> list[str]:
     return [hit.replace(str(site) + os.sep, "", 1) for hit in scan(expand([site]))]
 
 
+def _credit_pack_region(summary, manifest: dict):
+    """The licence credit, the bundled pack (only at the summary's exact version) and the
+    stamped Snowflake region that words the OWNER D-62 Cortex latency caveat."""
+    from agentic_analytics.packs import PackError, load_pack
+    from agentic_analytics.report import resolve_credit
+    from agentic_analytics.run.runner import stamped_region
+
+    try:
+        pack = load_pack(manifest.get("pack_source") or summary.pack.partition("@")[0]).manifest
+    except (PackError, OSError):
+        pack = None
+    if pack is not None and pack.ref != summary.pack:
+        pack = None  # never credit a different version of the data
+    credit, pack = resolve_credit(summary, pack, None)
+    return credit, pack, stamped_region(manifest)
+
+
+def _write_scanned_site(site: Path, summary_text: str) -> None:
+    """Add summary.json to the rendered site and secret-scan it; remove it on any hit."""
+    (site / "summary.json").write_text(summary_text, encoding="utf-8")
+    leaks = scan_site(site)
+    if leaks:
+        shutil.rmtree(site)  # never leave a deployable site holding a key
+        raise SystemExit(
+            "refusing to publish: the secret scan flagged the site (removed):\n  "
+            + "\n  ".join(leaks)
+        )
+
+
+def publish_from_record(root: Path) -> str:
+    """OWNER D-111: render `root/site/` from the committed record `root/docs/results/` only."""
+    from agentic_analytics.report import render_report
+    from agentic_analytics.report.render import looks_synthetic
+    from agentic_analytics.schemas import RunSummary
+
+    record = root / RECORD
+    summary_text = (record / "summary.json").read_text(encoding="utf-8")
+    summary = RunSummary.model_validate_json(summary_text)
+    manifest = json.loads((record / "run.json").read_text(encoding="utf-8"))
+    if not isinstance(manifest, dict):
+        raise SystemExit(f"refusing to publish: {RECORD}/run.json is not an object")
+    if summary.finished_at is None:
+        raise SystemExit(f"refusing to publish {summary.run_id}: the run has not finished")
+    if looks_synthetic(summary):
+        raise SystemExit("refusing to publish the SYNTHETIC example as results")
+    _credit, pack, region = _credit_pack_region(summary, manifest)
+    site = root / SITE
+    if site.exists():
+        shutil.rmtree(site)
+    render_report(summary, None, site, pack=pack, snowflake_region=region)
+    _write_scanned_site(site, summary_text)
+    return (
+        f"rendered {SITE}/index.html from {RECORD}/ ({summary.run_id}); "
+        "no per-answer records or traces"
+    )
+
+
 def publish(run_dir: Path, root: Path, *, allow_example: bool = False) -> str:
     """Publish `run_dir` into the repository at `root`; return a one-line summary."""
-    from agentic_analytics.packs import PackError, load_pack
-    from agentic_analytics.report import render_report, resolve_credit
+    from agentic_analytics.report import render_report
     from agentic_analytics.report.figures import writeup_figures
     from agentic_analytics.report.readme import update_readme
     from agentic_analytics.report.render import looks_synthetic
-    from agentic_analytics.run.runner import load_run, stamped_region
+    from agentic_analytics.run.runner import load_run
     from agentic_analytics.schemas import RunSummary
 
     summary = RunSummary.model_validate_json((run_dir / "summary.json").read_text("utf-8"))
@@ -71,14 +135,7 @@ def publish(run_dir: Path, root: Path, *, allow_example: bool = False) -> str:
     # a renamed copy of the example is still the example: fingerprint, snapshots, hashes
     if looks_synthetic(summary, records) and not allow_example:
         raise SystemExit("refusing to publish the SYNTHETIC example as results")
-    try:
-        pack = load_pack(manifest.get("pack_source") or summary.pack.partition("@")[0]).manifest
-    except (PackError, OSError):
-        pack = None
-    if pack is not None and pack.ref != summary.pack:
-        pack = None  # never credit a different version of the data
-    credit, pack = resolve_credit(summary, pack, None)
-    region = stamped_region(manifest)  # words the OWNER D-62 Cortex latency caveat
+    credit, pack, region = _credit_pack_region(summary, manifest)
     config = manifest.get("config")
     models = config.get("models") if isinstance(config, dict) else None
 
@@ -94,21 +151,12 @@ def publish(run_dir: Path, root: Path, *, allow_example: bool = False) -> str:
         example=allow_example,
         snowflake_region=region,
     )
-    (site / "summary.json").write_text(
-        (run_dir / "summary.json").read_text(encoding="utf-8"), encoding="utf-8"
-    )
     traces = run_dir / "traces"
     if traces.is_dir():
         (site / "traces").mkdir(exist_ok=True)
         for t in sorted(traces.glob("*.json")):
             shutil.copyfile(t, site / "traces" / t.name)
-    leaks = scan_site(site)
-    if leaks:
-        shutil.rmtree(site)  # never leave a deployable site holding a key
-        raise SystemExit(
-            "refusing to publish: the secret scan flagged the site (removed):\n  "
-            + "\n  ".join(leaks)
-        )
+    _write_scanned_site(site, (run_dir / "summary.json").read_text(encoding="utf-8"))
 
     assets = root / ASSETS
     assets.mkdir(parents=True, exist_ok=True)
@@ -148,12 +196,19 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="publish the bundled SYNTHETIC example into --root (never this repository)",
     )
+    ap.add_argument(
+        "--from-record",
+        action="store_true",
+        help="render site/ from the committed docs/results/ record only (OWNER D-111)",
+    )
     args = ap.parse_args(argv)
     root = (args.root or ROOT).resolve()
-    if args.example == (args.run_dir is not None):
-        ap.error("give a run folder or --example, not both")
+    if sum([args.example, args.from_record, args.run_dir is not None]) != 1:
+        ap.error("give exactly one of a run folder, --example or --from-record")
     try:
-        if args.example:
+        if args.from_record:
+            print(publish_from_record(root))
+        elif args.example:
             if args.root is None or root == ROOT.resolve():
                 ap.error("--example needs --root pointing at a scratch copy, not this repository")
             print(publish(_example_run(root / ".example-run"), root, allow_example=True))
