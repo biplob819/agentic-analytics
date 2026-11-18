@@ -18,8 +18,21 @@ import socket, sys
 def _refuse(*args, **kwargs):
     raise OSError("onboarding test: network is off")
 
-socket.socket.connect = _refuse
-socket.socket.connect_ex = _refuse
+# Loopback stays open: on Windows `socket.socketpair()` (which asyncio's event loop uses for its
+# wake-up pipe) is built by connecting to a listener on 127.0.0.1. Every other address is refused.
+_LOOPBACK = {"127.0.0.1", "::1"}
+_connect, _connect_ex = socket.socket.connect, socket.socket.connect_ex
+
+def _loopback_only(real):
+    def connect(self, address, *args, **kwargs):
+        host = address[0] if isinstance(address, tuple) and address else None
+        if host in _LOOPBACK:
+            return real(self, address, *args, **kwargs)
+        return _refuse()
+    return connect
+
+socket.socket.connect = _loopback_only(_connect)
+socket.socket.connect_ex = _loopback_only(_connect_ex)
 socket.create_connection = _refuse
 socket.getaddrinfo = _refuse
 from agentic_analytics.cli import main
@@ -132,3 +145,18 @@ def test_the_clean_environment_keeps_the_windows_session_folders(tmp_path, monke
     )
     assert "OPENAI_API_KEY" not in env
     assert "APPDATA" not in _clean_env(tmp_path, windows=False)
+
+
+@pytest.mark.safety
+def test_the_offline_harness_allows_only_loopback(tmp_path):
+    """The guard keeps loopback open (asyncio's socketpair on Windows) and nothing else."""
+    probe = NO_NETWORK.replace(
+        "from agentic_analytics.cli import main\nsys.exit(main(sys.argv[1:]))",
+        "a, b = socket.socketpair(); a.close(); b.close()\n"
+        "import asyncio; asyncio.run(asyncio.sleep(0))\n"
+        "s = socket.socket()\n"
+        "try:\n    s.connect(('93.184.216.34', 443))\nexcept OSError as e:\n    print(e)\n",
+    )
+    p = _cli([], tmp_path, probe)
+    assert p.returncode == 0, p.stderr
+    assert "network is off" in p.stdout
