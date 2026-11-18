@@ -1,7 +1,7 @@
 """MON-02 (the part EvalKit v0.3.0 ships): two runs are compared with `evalkit compare` (EvalKit
 B5.6) on their metrics-1 exports, paired on shared questions through the per-case sidecar.
-Run history, the trend page and drift flags wait for EvalKit's ledger (B5.7, v0.4.0; MON-07 in
-V5.1, OWNER D-115)."""
+Run history, the trend page and drift flags come from EvalKit's ledger (B5.7, v0.4.0): MON-07
+in V5.1, `tests/monitoring/test_history.py`."""
 
 from __future__ import annotations
 

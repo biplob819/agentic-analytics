@@ -330,3 +330,25 @@ def test_from_record_takes_no_run_folder_or_example(tmp_path):
         publish_results.main(["--from-record", str(tmp_path)])
     with pytest.raises(SystemExit):
         publish_results.main(["--from-record", "--example", "--root", str(tmp_path)])
+
+
+def test_publish_writes_the_trend_page_from_the_committed_ledger(repo, tmp_path):
+    """V5.1 MON-07: with a run ledger in the repository, both publish modes write EvalKit's
+    trend page beside the dashboard and link it; with none, neither page nor link."""
+    run = _run_dir(tmp_path, run_id="r-20261201-trend")
+    assert publish_results.main([str(run), "--root", str(repo)]) == 0
+    assert not (repo / "site" / "trend.html").exists()
+    assert 'href="trend.html"' not in (repo / "site" / "index.html").read_text("utf-8")
+    ledger = repo / publish_results.HISTORY
+    ledger.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(ROOT / publish_results.HISTORY, ledger)
+    (repo / "monitoring").mkdir()
+    shutil.copyfile(ROOT / publish_results.GATES, repo / publish_results.GATES)
+    assert publish_results.main([str(run), "--root", str(repo)]) == 0
+    trend = (repo / "site" / "trend.html").read_text("utf-8")
+    assert "Run history" in trend and "<svg" in trend
+    html = (repo / "site" / "index.html").read_text("utf-8")
+    assert '<a href="trend.html">Run history and drift</a>' in html
+    assert publish_results.main(["--from-record", "--root", str(repo)]) == 0
+    assert (repo / "site" / "trend.html").read_text("utf-8") == trend
+    assert 'href="trend.html"' in (repo / "site" / "index.html").read_text("utf-8")

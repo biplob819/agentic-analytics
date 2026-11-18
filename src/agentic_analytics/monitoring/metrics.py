@@ -54,8 +54,10 @@ from evalkit.stats import percentile_ms
 
 from agentic_analytics.aggregate import (
     Rates,
+    clarification_ci_method,
     correct_strict,
     group_trials,
+    kept_ci_method,
     latency_ms,
     records_cost_usd,
 )
@@ -212,9 +214,13 @@ def to_metrics(
             metrics.append(_plain("equivalence_passes", "count", count, {**lab, "rule": rule}))
         n_amb = sum(questions[q].expected == "clarify" for q in by_q)
         n_ans = sum(questions[q].expected == "answer" for q in by_q)
+        # MON-09, D-119: EvalKit's method, from the call that drew the summary's intervals
+        clustered = kept_ci_method(b, n_resamples, seed) or clarification_ci_method(
+            by_q, questions, n_resamples, seed
+        )
         if n_amb:
             metrics.append(
-                _share("clarification_rate", b.clarification_rate, n_amb, over_questions, lab)
+                _share("clarification_rate", b.clarification_rate, n_amb, clustered, lab)
             )
         if n_ans:
             metrics.append(
@@ -222,7 +228,7 @@ def to_metrics(
                     "false_clarification_rate",
                     b.false_clarification_rate,
                     n_ans,
-                    over_questions,
+                    clustered,
                     lab,
                 )
             )

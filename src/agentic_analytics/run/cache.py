@@ -227,7 +227,19 @@ class AnswerCache:
     def __contains__(self, key: object) -> bool:
         return isinstance(key, str) and self.get(key) is not None
 
-    def put(self, key: str, value: AskResult, parts: KeyParts | None = None) -> Path:
+    def scope(self, key: str) -> str | None:
+        """The history scope of the run that asked this answer (V5.1 MON-07, D-125), or None
+        for an entry written before scopes were stored, or a miss."""
+        try:
+            data = json.loads(self.path(key).read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, ValueError):
+            return None
+        s = data.get("scope") if isinstance(data, dict) else None
+        return s if isinstance(s, str) else None
+
+    def put(
+        self, key: str, value: AskResult, parts: KeyParts | None = None, *, scope: str | None = None
+    ) -> Path:
         if value.transient:
             raise ValueError("transport and timeout failures are never cached (resume retries)")
         p = self.path(key)
@@ -238,6 +250,8 @@ class AnswerCache:
             "parts": parts.as_dict() if parts is not None else None,
             "value": value.to_json(),
         }
+        if scope is not None:  # outside the key: the same answer, whoever asked it
+            entry["scope"] = scope
         text = json.dumps(entry, sort_keys=True, indent=1, ensure_ascii=False, allow_nan=False)
         fd, tmp = tempfile.mkstemp(dir=p.parent, prefix=f".{key[:8]}.", suffix=".tmp")
         try:

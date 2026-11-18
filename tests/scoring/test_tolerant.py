@@ -605,3 +605,46 @@ def test_evalkit_stricter_empty_and_pivot_rules():
         tolerant_match(ex(("2022", "2023", "unknown"), ((5, 3, 0),)), years, q("Sales by year?"))
         == ()
     )
+
+
+# -- V5.1 MON-08: the adapter over EvalKit's equivalences (D-120, OWNER D-118) ---------------
+
+
+def test_an_uncovered_count_stays_exact_beside_a_rescued_percent_by_name():
+    """The verifier's case: names match, the fraction would be rescued, but a sales count 0.1%
+    off is not within an exact column's tolerance, so nothing is rescued (EvalKit's single
+    tolerance would have let it through)."""
+    gold = rs(("sales", "new_build_pct"), ((861782, 11.3892),))
+    item = q(PCT_TEXT, tolerance=PCT)
+    assert tolerant_match(ex(("sales", "new_build_pct"), ((861782, 0.113892),)), gold, item) == (
+        "percent_scale",
+    )
+    off = ex(("sales", "new_build_pct"), ((862644, 0.113892),))  # +0.1%
+    assert tolerant_match(off, gold, item) == ()
+    as_float = ex(("sales", "new_build_pct"), ((861782.4, 0.113892),))
+    assert tolerant_match(as_float, gold, item) == ()
+
+
+def test_pivot_compares_an_uncovered_value_column_exactly():
+    tol = Tolerance(rel=0.005, abs=0.01, columns=("median_price",))  # sales not covered
+    near = ex(("freehold", "leasehold", "unknown"), ((651962, 209830, 0),))  # 10 off, 0.005%
+    assert tolerant_match(near, TENURE, q(TENURE_Q, tolerance=tol)) == ()
+    exact = ex(("freehold", "leasehold", "unknown"), ((651962, 209820, 0),))
+    assert tolerant_match(exact, TENURE, q(TENURE_Q, tolerance=tol)) == ("pivot",)
+    covered = Tolerance(rel=0.005, abs=0.01, columns=("sales",))
+    assert tolerant_match(near, TENURE, q(TENURE_Q, tolerance=covered)) == ("pivot",)
+
+
+def test_zeros_under_property_type_columns_are_not_a_no_data_check():
+    """OWNER D-118: the fix runs' GPT + descriptions q-020 trial 1. EvalKit 0.4.0's empty_check
+    takes a zero only in a count-named column; property-type labels are not one."""
+    item = q(EMPTY_Q, expects_empty=True)
+    shape = ex(
+        ("earliest_sale_date", "detached", "semi_detached", "terraced", "flat", "other"),
+        (("1995-01-01", 0, 0, 0, 0, 0),),
+    )
+    assert tolerant_match(shape, EMPTY, item) == ()
+    s = score(item, shape, EMPTY)
+    assert s.correct is False and s.correct_strict is False and s.equivalences == ()
+    counted = ex(("earliest_sale_date", "sales_in_1994"), (("1995-01-01", 0),))
+    assert tolerant_match(counted, EMPTY, item) == ("empty_check",)

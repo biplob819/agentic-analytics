@@ -516,7 +516,7 @@ Every metric the benchmark reports answers a question a reader of this project h
 | `total_cost_usd` | What did the run cost? | US5 |
 | `total_credits` | How many warehouse credits did it use? | US5 |
 | `step_efficiency` (M4.1) | How many tool calls beyond the minimum does an agent spend per answer (a cost and latency driver)? | US5, US7 |
-| `drift` (B3.3, MON-07) | Did a later run move outside the baseline's band? | US1, OWNER D-74, OWNER D-98 |
+| `drift` (V5.1, MON-07) | Did a later run move outside the alarm band of its own history (median ± 2 and ± 3 spreads over the last 20 comparable runs of the same scope and cost status, one point per newly asked set of answers, from EvalKit's run ledger)? | US1, OWNER D-74, OWNER D-98, D-121 |
 | `tokens_in_per_case` (M4.1, metrics-1) | How many prompt tokens does an answer cost, the driver of model spend? | US5, D-101 |
 | `tokens_out_per_case` (M4.1, metrics-1) | How many output tokens does an answer cost? | US5, D-101 |
 | `tokens_reasoning_per_case` (M4.1, metrics-1) | How much of the output is hidden reasoning, billed but not shown? | US5, D-101 |
@@ -1084,9 +1084,9 @@ Each row becomes one line in `docs/graph/catalog.tsv` with status `not-started`.
 
 | Cap | Capability | Trace |
 | --- | --- | --- |
-| MON-07 | Run history and drift through EvalKit: every run's metrics-1 export goes into EvalKit's run ledger (B5.7 LED-01, LED-02); the dashboard's trend page shows accuracy with intervals, cost per correct and p95 latency across runs from `evalkit history`, and a run outside its alarm band is flagged (moved from M4.1 MON-02 by OWNER D-98, then from B3.3 to V5.1 by OWNER D-115: EvalKit B5.7 ships in v0.4.0, after v0.1.0) | OWNER D-74, OWNER D-75, US1, OWNER D-98, OWNER D-115 |
-| MON-08 | Shape equivalences from EvalKit B5.15 replace scoring/tolerant.py; rescoring every stored run changes 0 verdicts (D-91, D-92) | D-91, D-92, OWNER D-115 |
-| MON-09 | Clarification intervals from EvalKit's clustered clarification_rates (OWNER D-100); point rates unchanged | OWNER D-100, OWNER D-115 |
+| MON-07 | Run history and drift through EvalKit: every run's metrics-1 export goes into EvalKit's run ledger (B5.7 LED-01, LED-02); the dashboard's trend page shows accuracy with intervals, cost per correct and p95 latency across runs from `evalkit history`, and a run outside its alarm band is flagged (moved from M4.1 MON-02 by OWNER D-98, then from B3.3 to V5.1 by OWNER D-115: EvalKit B5.7 ships in v0.4.0, after v0.1.0) | OWNER D-74, OWNER D-75, US1, OWNER D-98, OWNER D-115, D-121 |
+| MON-08 | Shape equivalences from EvalKit B5.15 replace scoring/tolerant.py; rescoring every stored run changes 1 verdict, recorded (D-91, D-92, OWNER D-118) | D-91, D-92, OWNER D-115, OWNER D-118 |
+| MON-09 | Clarification intervals from EvalKit's clustered clarification_rates (OWNER D-100); point rates unchanged | OWNER D-100, OWNER D-115, D-119 |
 
 ### 12.5 Node lifecycle
 

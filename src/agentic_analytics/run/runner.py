@@ -216,6 +216,10 @@ class RunOptions:
     cache_dir: Path = Path(".cache")
     measurements_dir: Path = Path("docs/measurements")
     ledger_path: Path | None = Path("docs/measurements/spend-ledger.jsonl")
+    # V5.1 MON-07: EvalKit's run ledger the finished run's metrics-1 export is appended to (the
+    # CLI passes docs/measurements/runs.jsonl); None records no history
+    history_path: Path | None = None
+    history_gates: Path | None = None  # monitoring/gates.yaml: a gated metric alarms one way
     engines: tuple[Engine, ...] | None = None  # configured engines; default: the backends' engines
     semantic_text: str | None = None  # default: the pack's semantic.yaml, if any
     kind: RunKind = "run"
@@ -961,6 +965,59 @@ def write_run_metrics(
     )
 
 
+def _config(backend: str, fixes: Sequence[str]) -> tuple[str, str]:
+    from agentic_analytics.monitoring.history import config_label
+
+    return config_label(backend, fixes)
+
+
+def scope_of(kind: str) -> str:
+    from agentic_analytics.monitoring.history import scope_of as of
+
+    return of(kind)
+
+
+def record_history(
+    ledger: Path,
+    run_dir: Path,
+    *,
+    scope: Any,
+    new_configs: Any,
+    all_configs: Any,
+    cost_status: Any,
+    note: str,
+    gates: Path | None = None,
+    costs_only: bool = False,
+) -> dict[str, Any]:
+    """V5.1 MON-07: write the run's ledger view (`history/metrics.json`: its new
+    configurations, labelled by scope and cost status) and append it to EvalKit's run ledger;
+    never raises (what to log: recorded, alarms, warns, the flagged rows, or why not)."""
+    from agentic_analytics.monitoring.history import record_quietly, write_ledger_view
+
+    try:
+        view = write_ledger_view(
+            run_dir,
+            scope=scope,
+            new_configs=[tuple(c) for c in new_configs],
+            all_configs=[tuple(c) for c in all_configs],
+            cost_status=cost_status,
+            costs_only=costs_only,
+        )
+    except (OSError, ValueError) as exc:
+        return {"recorded": False, "ledger": str(ledger), "error": str(exc)}
+    return record_quietly(ledger, view, note=note, gates=gates)
+
+
+def history_line(history: Mapping[str, Any]) -> str:
+    if not history.get("recorded"):
+        why = history.get("error") or history.get("reason")
+        return f"run history not recorded: {why}"
+    return (
+        f"run history: recorded in {history['ledger']}; drift {history['alarms']} alarm(s), "
+        f"{history['warns']} warn(s), {history['learning']} row(s) still learning"
+    )
+
+
 def run_benchmark(
     cfg: RunConfig,
     pack: Pack,
@@ -1354,7 +1411,7 @@ async def _execute(
         res = dataclasses.replace(res, fix_hash=record_fix_hash)
         actual = res.cost_usd  # model cash; Cortex is paid in credits (cost_usd 0)
         if not res.transient:  # transport failures and timeouts are retried on resume
-            cache.put(job.key, res, job.parts)
+            cache.put(job.key, res, job.parts, scope=scope_of(options.kind))
         fresh[job.key] = res
         if job.backend in MCP_BACKENDS:
             turns_by_backend.setdefault(job.backend, []).append((res.turns, dict(res.tokens)))
@@ -1484,6 +1541,36 @@ async def _execute(
         write_summary(run_dir / "summary.json", summary)
         prices = options.prices if options.prices is not None else model_prices()
         write_run_metrics(run_dir, summary, records, qmap, manifest, aggregate_rates(rates), prices)
+        if options.history_path is not None:
+            # V5.1 MON-07 (D-121, D-125): a band point per configuration, unless one of its
+            # answers came from the cache as asked by a run of this same scope (a resume, a
+            # retry rerun, a second full run), or by a run that stored no scope: then that
+            # answer may already be in another point of this scope, and the configuration adds
+            # none (a stated under-count, never a double-count). A configuration this run
+            # asked no answer of adds none either (a rescore, a run served from the cache).
+            # Answers a smoke run asked count again in a full run: scopes never share a band.
+            here = scope_of(options.kind)
+            configs = {_config(j.backend, j.fixes) for j in jobs}
+            reused = {
+                _config(j.backend, j.fixes)
+                for j in jobs
+                if j.key not in fresh and cache.scope(j.key) in (None, here)
+            }
+            asked = {_config(j.backend, j.fixes) for j in jobs if j.key in fresh}
+            new = sorted((configs & asked) - reused)  # at least one answer asked here
+            manifest["history"] = {"scope": scope_of(options.kind), "new_configs": new}
+            history = record_history(
+                Path(options.history_path),
+                run_dir,
+                scope=scope_of(options.kind),
+                new_configs=new,
+                all_configs={_config(j.backend, j.fixes) for j in jobs},
+                cost_status="estimated",
+                note=options.kind,
+                gates=options.history_gates,
+            )
+            writer.log("history", **history)
+            _say(options, history_line(history))
         if options.render:
             from agentic_analytics.report import render_report
 
@@ -1584,11 +1671,18 @@ def allocate_credits(records: Sequence[Record], credits: Mapping[str, float]) ->
 
 
 def reconcile_run(
-    run_dir: Path, credits_data: Any, *, rates: Any = None, render: bool = True
+    run_dir: Path,
+    credits_data: Any,
+    *,
+    rates: Any = None,
+    render: bool = True,
+    history_path: Path | None = None,
+    history_gates: Path | None = None,
 ) -> RunSummary:
     """Stub of BAS-03: the operator supplies each engine's metered credits for the run (after
     the usage-view lag); records get `warehouse_credits_alloc`, the summary is rebuilt and its
-    `cost_status` becomes `reconciled`."""
+    `cost_status` becomes `reconciled`. With `history_path` the reconciled metrics-1 export is
+    appended to EvalKit's run ledger (V5.1 MON-07, note `reconcile`)."""
     credits = _credits(credits_data)
     manifest, records, questions = load_run(run_dir)
     if not records:
@@ -1609,6 +1703,34 @@ def reconcile_run(
     )
     manifest["reconciled_credits"] = credits
     _write_json(run_dir / "run.json", manifest)
+    if history_path is not None and manifest.get("history_reconciled"):
+        # D-125: a run's reconciled costs are recorded once; a second reconcile (corrected
+        # credits) updates the run folder but adds no second cost point for the same answers
+        line = {"at": utc_now().isoformat(), "event": "history", "recorded": False,
+                "reason": "reconciled costs already recorded for this run"}  # fmt: skip
+        with (run_dir / "run.log").open("a", encoding="utf-8", newline="\n") as log:
+            log.write(json.dumps(line, sort_keys=True, default=str) + "\n")
+    elif history_path is not None:
+        # V5.1 MON-07: only the reconciled costs of the run's new configurations
+        plan = manifest.get("history") or {}
+        every = sorted({_config(r.backend, r.fixes) for r in updated})
+        history = record_history(
+            Path(history_path),
+            run_dir,
+            scope=plan.get("scope") or scope_of(str(manifest.get("kind", "run"))),
+            new_configs=plan.get("new_configs", every),
+            all_configs=every,
+            cost_status="reconciled",
+            note="reconcile",
+            gates=history_gates,
+            costs_only=True,
+        )
+        if history.get("recorded"):
+            manifest["history_reconciled"] = True
+            _write_json(run_dir / "run.json", manifest)
+        line = {"at": utc_now().isoformat(), "event": "history", **history}
+        with (run_dir / "run.log").open("a", encoding="utf-8", newline="\n") as log:
+            log.write(json.dumps(line, sort_keys=True, default=str) + "\n")
     if render:
         from agentic_analytics.report import render_report
 

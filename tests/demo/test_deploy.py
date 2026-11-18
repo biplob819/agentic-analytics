@@ -191,7 +191,7 @@ def test_demo_requirements_pin_the_core_and_demo_extra_to_uv_lock():
             "pandas", "numpy", "narwhals"} <= listed  # fmt: skip
     assert len(listed) > 50  # the whole resolved set, not only the direct dependencies
     assert "TODO" not in text and "git+" not in text  # EvalKit from PyPI (D-97)
-    assert "evalkit-harness==0.3.0" in text.splitlines()
+    assert "evalkit-harness==0.4.0" in text.splitlines()  # D-120
 
 
 def test_demo_requirements_are_what_uv_export_prints():
@@ -221,8 +221,8 @@ def test_demo_requirements_are_what_uv_export_prints():
         (lambda t: t.replace("pyjwt==2.15.1", "pyjwt>=2.9"), "pyjwt is not pinned with =="),
         (lambda t: t.replace("psycopg-binary==3.3.9", "#"), "psycopg-binary==3.3.9 missing"),
         (
-            lambda t: t.replace("evalkit-harness==0.3.0", "evalkit-harness==0.2.0"),
-            "evalkit-harness==0.2.0 but",
+            lambda t: t.replace("evalkit-harness==0.4.0", "evalkit-harness==0.3.0"),
+            "evalkit-harness==0.3.0 but",
         ),
         (lambda t: t + "rich==13.9.4\n", "rich is not in the locked core + demo set"),
         (lambda t: t + "mcp==2.3.0\n", "a package is listed twice"),

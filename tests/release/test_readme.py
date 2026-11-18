@@ -286,16 +286,19 @@ def _near(a: dict, b: dict) -> bool:
 
 
 def test_committed_summary_equals_the_measurement_records(published):
-    """The published summary is the fix-run rescore with the baseline's metered credits: its
-    figures equal baseline-2026-11-17.json and fixruns-2026-11-17.json to the records' rounding."""
+    """The published summary (v0.1.1) is the fix-run rescore on EvalKit 0.4.0 with the
+    baseline's metered credits: its figures equal baseline-2026-11-17.json and
+    fixruns-evalkit-0.4-2026-11-18.json to the records' rounding (OWNER D-118, D-119)."""
     summary, manifest = published
     base = json.loads((MEASURE / "baseline-2026-11-17.json").read_text(encoding="utf-8"))
-    fix = json.loads((MEASURE / "fixruns-2026-11-17.json").read_text(encoding="utf-8"))
+    fix = json.loads((MEASURE / "fixruns-evalkit-0.4-2026-11-18.json").read_text(encoding="utf-8"))
     assert summary.run_id == fix["rescored_run_id"] and summary.cost_status == "reconciled"
     assert summary.gold_check_id == base["gold_check_id"] == fix["gold_check_id"]
     assert summary.as_of.isoformat() == base["as_of"]
     assert manifest["fix_hash"] == base["fix_hash"] == fix["fix_hash"]
+    assert manifest["rescored_offline"]["evalkit"] == "0.4.0"
     assert dict(summary.total_credits) == base["reconciled"]["total_credits"]
+    assert len(fix["per_config"]) == len(summary.backends)
     for b in summary.backends:
         key = f"{b.backend}/{'+'.join(b.fixes) or 'baseline'}"
         rec = fix["per_config"][key]
@@ -304,6 +307,8 @@ def test_committed_summary_equals_the_measurement_records(published):
         assert _near(b.accuracy_strict.model_dump(), rec["accuracy_strict"]), key
         assert _near(b.clarification_rate.model_dump(), rec["clarification_rate"]), key
         assert b.latency_p95_ms == rec["latency_p95_ms"], key
+        assert dict(b.equivalence_passes) == rec["equivalence_passes"], key
+        assert abs((b.cost_per_correct_usd or 0) - rec["cost_per_correct_usd"]) < 5e-7, key
         if not b.fixes:
             brec = base["per_backend"][b.backend]
             assert _near(b.accuracy.model_dump(), brec["accuracy"]), key
@@ -315,6 +320,48 @@ def test_committed_summary_equals_the_measurement_records(published):
         rec = ups[(u.backend, u.fix)]
         assert _near(u.delta_points.model_dump(), rec["delta_points"])
         assert u.separated == rec["separated"]
+
+
+def test_v0_1_1_moves_only_what_owner_d118_and_d119_name():
+    """Against v0.1.0's record (fixruns-2026-11-17.json): the baseline headline and every
+    accuracy but GPT + descriptions are unchanged; GPT + descriptions loses one trial of q-020
+    (OWNER D-118); clarification points never move, two intervals widen (D-119)."""
+    old = json.loads((MEASURE / "fixruns-2026-11-17.json").read_text(encoding="utf-8"))
+    new = json.loads((MEASURE / "fixruns-evalkit-0.4-2026-11-18.json").read_text(encoding="utf-8"))
+    assert set(old["per_config"]) == set(new["per_config"])
+    moved = {
+        k
+        for k in new["per_config"]
+        if new["per_config"][k]["accuracy"] != old["per_config"][k]["accuracy"]
+    }
+    assert moved == {"gpt_mcp/descriptions"}
+    for k, rec in new["per_config"].items():
+        was = old["per_config"][k]
+        assert rec["accuracy_strict"] == was["accuracy_strict"], k
+        assert rec["clarification_rate"]["point"] == was["clarification_rate"]["point"], k
+        assert rec["false_clarification_rate"] == was["false_clarification_rate"], k
+        if k.endswith("/baseline"):
+            assert rec["accuracy"] == was["accuracy"], k  # the headline does not move
+    g, w = new["per_config"]["gpt_mcp/descriptions"], old["per_config"]["gpt_mcp/descriptions"]
+    assert abs(w["accuracy"]["point"] - g["accuracy"]["point"] - 1 / 300) < 1e-4
+    assert w["equivalence_passes"]["empty_check"] - g["equivalence_passes"]["empty_check"] == 1
+    ups = {(u["backend"], u["fix"]): u for u in new["uplifts"]}
+    was_ups = {(u["backend"], u["fix"]): u for u in old["uplifts"]}
+    assert {k for k in ups if ups[k] != was_ups[k]} == {("gpt_mcp", "descriptions")}
+    assert ups[("gpt_mcp", "descriptions")]["delta_points"]["point"] == -5.0
+    widened = {
+        k
+        for k in new["per_config"]
+        if new["per_config"][k]["clarification_rate"] != old["per_config"][k]["clarification_rate"]
+    }
+    assert widened == {"claude_mcp/baseline", "gpt_mcp/descriptions"}
+    (c,) = new["changed_verdicts"]
+    assert (c["question_id"], c["backend"], c["fixes"], c["trial"]) == (
+        "q-020",
+        "gpt_mcp",
+        "descriptions",
+        1,
+    )
 
 
 def test_readme_headline_shows_the_recorded_baseline(published):
@@ -413,6 +460,7 @@ def test_readme_links_resolve_and_name_every_document():
         "docs/results/summary.json",
         "docs/measurements/baseline-2026-11-17.json",
         "docs/measurements/fixruns-2026-11-17.json",
+        "docs/measurements/fixruns-evalkit-0.4-2026-11-18.json",
         "LICENSE",
         # B3.3: the guides (OSS-04) and the community and privacy files (OSS-05, OSS-06)
         "docs/quickstart.md",

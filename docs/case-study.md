@@ -50,5 +50,5 @@ never scored against an answer that depends on which warehouse computed it.
 were hashed before any baseline run and each was run on its own against the same baseline, with
 a Holm correction across them.
 *Trade-off:* no tuning between runs, and three runs instead of one. In exchange, the
-gains are honest, including the unwelcome ones: descriptions cost GPT 4.7 points, and examples
+gains are honest, including the unwelcome ones: descriptions cost GPT 5.0 points, and examples
 made Claude easier to steer with an injected instruction.

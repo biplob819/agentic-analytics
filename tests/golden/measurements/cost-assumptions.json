@@ -1,0 +1,16 @@
+{
+  "claude_mcp": {
+    "cached_share": 0.4999,
+    "output_tokens_per_turn": 163,
+    "prompt_tokens_per_turn": 2306,
+    "reasoning_tokens_per_turn": 0,
+    "turns": 1.75
+  },
+  "gpt_mcp": {
+    "cached_share": 0.4999,
+    "output_tokens_per_turn": 170,
+    "prompt_tokens_per_turn": 2065,
+    "reasoning_tokens_per_turn": 0,
+    "turns": 1.833
+  }
+}

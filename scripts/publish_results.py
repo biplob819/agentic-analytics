@@ -6,7 +6,9 @@
 Renders the run's dashboard into site/ (index.html, summary.vl.json, summary.json and the
 exported traces), copies the run's summary.json and run.json into docs/results/ (the committed
 record every README number is regenerated from), draws the write-up figures into docs/assets/
-(headline.svg, categories.svg and, when fixes ran, uplift.svg) and regenerates the README's
+(headline.svg, categories.svg and, when fixes ran, uplift.svg), writes the run-history trend
+page site/trend.html from the committed run ledger docs/measurements/runs.jsonl (V5.1 MON-07,
+linked from the dashboard), and regenerates the README's
 generated blocks (headline, results) between their markers. Every number comes from the run's
 summary.json; nothing is typed by hand. The Pages workflow (.github/workflows/pages.yml, run by
 hand) deploys site/.
@@ -37,6 +39,23 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = "site"
 ASSETS = "docs/assets"
 RECORD = "docs/results"  # the published run's summary.json and run.json, committed
+HISTORY = "docs/measurements/runs.jsonl"  # EvalKit's run ledger (V5.1 MON-07), committed
+TREND = "trend.html"  # the run-history trend page written beside the dashboard
+GATES = "monitoring/gates.yaml"
+
+
+def _trend(root: Path, site: Path) -> str | None:
+    """V5.1 MON-07: EvalKit's trend page from the committed run ledger into site/trend.html
+    (accuracy with intervals, cost per correct, p95 latency; alarm bands and flags); the link
+    the dashboard shows, or None when there is no ledger."""
+    from agentic_analytics.monitoring.history import trend_page
+
+    ledger = root / HISTORY
+    if not ledger.is_file():
+        return None
+    gates = root / GATES
+    trend_page(ledger, site / TREND, gates=gates if gates.is_file() else None)
+    return TREND
 
 
 def _example_run(scratch: Path) -> Path:
@@ -115,7 +134,9 @@ def publish_from_record(root: Path) -> str:
     site = root / SITE
     if site.exists():
         shutil.rmtree(site)
-    render_report(summary, None, site, pack=pack, snowflake_region=region)
+    site.mkdir(parents=True)
+    trend = _trend(root, site)
+    render_report(summary, None, site, pack=pack, snowflake_region=region, trend_href=trend)
     _write_scanned_site(site, summary_text)
     return (
         f"rendered {SITE}/index.html from {RECORD}/ ({summary.run_id}); "
@@ -146,6 +167,8 @@ def publish(run_dir: Path, root: Path, *, allow_example: bool = False) -> str:
     site = root / SITE
     if site.exists():
         shutil.rmtree(site)  # generated output only: stale traces must not linger
+    site.mkdir(parents=True)
+    trend = None if allow_example else _trend(root, site)
     render_report(
         summary,
         records,
@@ -154,6 +177,7 @@ def publish(run_dir: Path, root: Path, *, allow_example: bool = False) -> str:
         pack=pack,
         example=allow_example,
         snowflake_region=region,
+        trend_href=trend,
     )
     traces = run_dir / "traces"
     if traces.is_dir():

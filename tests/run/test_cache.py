@@ -221,3 +221,16 @@ def test_an_entry_from_before_the_timings_reads_as_a_miss(tmp_path):
     del entry["value"]["ask_wall_ms"], entry["value"]["analyst_latency_ms"]
     p.write_text(json.dumps(entry), encoding="utf-8")
     assert cache.get(key) is None
+
+
+def test_the_asking_runs_scope_is_stored_outside_the_key(tmp_path):
+    """D-125: the entry keeps the history scope of the run that asked it; the key and the
+    cached value are unchanged by it, and an entry without one reads as None."""
+    cache = AnswerCache(tmp_path)
+    key = cache_key(PARTS)
+    assert cache.scope(key) is None  # a miss
+    cache.put(key, result(), PARTS)
+    assert cache.scope(key) is None and cache.get(key) == result()  # written with no scope
+    cache.put(key, result(), PARTS, scope="smoke")
+    assert cache.scope(key) == "smoke" and cache.get(key) == result()
+    assert cache_key(PARTS) == key

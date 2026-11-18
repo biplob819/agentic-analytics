@@ -134,6 +134,11 @@ def build_parser() -> argparse.ArgumentParser:
                 "--credits", required=True, help='JSON file of metered credits: {"snowflake": 0.4}'
             )
             p.add_argument("--results", default="results", help="results folder")
+            p.add_argument(
+                "--measurements",
+                default="docs/measurements",
+                help="the run ledger runs.jsonl lives here (default: docs/measurements)",
+            )
         elif name == "demo-cache":
             _demo_cache_args(p)
         elif name == "load":
@@ -406,6 +411,8 @@ def _run_or_smoke(ns: argparse.Namespace, *, smoke: bool) -> int:
         cache_dir=Path(ns.cache),
         measurements_dir=measurements,
         ledger_path=measurements / "spend-ledger.jsonl",
+        history_path=measurements / "runs.jsonl",  # V5.1 MON-07: EvalKit's run ledger
+        history_gates=_gates_file(measurements / "runs.jsonl"),
         engines=None if configured is None else tuple(configured),
         kind="smoke" if smoke else ("rescore" if rescore else "run"),
         dry_run=ns.dry_run,
@@ -471,6 +478,14 @@ def cmd_report(ns: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _gates_file(ledger: Path) -> Path | None:
+    """V5.1 MON-07: the project's monitoring/gates.yaml (beside the ledger's docs/), so a gated
+    accuracy alarms only downward in the run history."""
+    from agentic_analytics.monitoring.history import default_gates
+
+    return default_gates(ledger)
+
+
 def cmd_reconcile(ns: argparse.Namespace) -> int:
     from agentic_analytics.run.config import RunConfigError
     from agentic_analytics.run.runner import reconcile_run, resolve_run
@@ -478,7 +493,10 @@ def cmd_reconcile(ns: argparse.Namespace) -> int:
     try:
         run_dir = resolve_run(Path(ns.results), ns.run)
         data = json.loads(Path(ns.credits).read_text(encoding="utf-8"))
-        summary = reconcile_run(run_dir, data)
+        history = Path(ns.measurements) / "runs.jsonl"  # V5.1 MON-07
+        summary = reconcile_run(
+            run_dir, data, history_path=history, history_gates=_gates_file(history)
+        )
     except (RunConfigError, OSError, ValueError) as exc:
         return _error(ns.json, f"cannot reconcile: {exc}")
     msg = (

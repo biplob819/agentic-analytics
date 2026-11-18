@@ -6,6 +6,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
 ROOT = Path(__file__).resolve().parents[2]
 MEAS = ROOT / "docs/measurements"
 FIXES = ("descriptions", "examples", "self_check")
@@ -21,11 +23,23 @@ TAXONOMY = {
 }
 
 
-def fixruns() -> dict:
-    return json.loads((MEAS / "fixruns-2026-11-17.json").read_text(encoding="utf-8"))
+# v0.1.0's record and v0.1.1's (the same answers rescored on EvalKit 0.4.0, OWNER D-118):
+# every check below holds for both
+RECORDS = ("fixruns-2026-11-17.json", "fixruns-evalkit-0.4-2026-11-18.json")
 
 
-def test_each_fix_runs_alone_on_the_mcp_agents_and_cortex_only_at_baseline() -> None:
+@pytest.fixture(params=RECORDS)
+def record_name(request: pytest.FixtureRequest) -> str:
+    return request.param
+
+
+@pytest.fixture
+def fixruns(record_name: str):
+    data = json.loads((MEAS / record_name).read_text(encoding="utf-8"))
+    return lambda: data
+
+
+def test_each_fix_runs_alone_on_the_mcp_agents_and_cortex_only_at_baseline(fixruns) -> None:
     r = fixruns()
     configs = set(r["per_config"])
     sets = ("baseline", *FIXES, "+".join(FIXES))  # each fix alone, then all together (§7)
@@ -36,7 +50,7 @@ def test_each_fix_runs_alone_on_the_mcp_agents_and_cortex_only_at_baseline() -> 
     assert r["fix_hash"] == frozen["fix_hash"]
 
 
-def test_uplifts_cover_every_fix_and_agree_with_the_accuracies() -> None:
+def test_uplifts_cover_every_fix_and_agree_with_the_accuracies(fixruns) -> None:
     r = fixruns()
     ups = {(u["backend"], u["fix"]): u for u in r["uplifts"]}
     assert set(ups) == {(b, f) for b in MCP for f in (*FIXES, "all")}
@@ -52,7 +66,7 @@ def test_uplifts_cover_every_fix_and_agree_with_the_accuracies() -> None:
         assert c["accuracy_strict"]["point"] <= c["accuracy"]["point"]
 
 
-def test_fix_run_spend_is_in_the_ledger() -> None:
+def test_fix_run_spend_is_in_the_ledger(fixruns) -> None:
     r = fixruns()
     rows = [
         json.loads(x)
@@ -66,7 +80,7 @@ def test_fix_run_spend_is_in_the_ledger() -> None:
     assert not any(x["credits"] for x in lines)  # the MCP agents only: no Cortex messages
 
 
-def test_the_self_check_caveat_and_uplift_sources_are_stated() -> None:
+def test_the_self_check_caveat_and_uplift_sources_are_stated(fixruns) -> None:
     r = fixruns()
     assert "never fired" in r["self_check_note"]
     for key, src in r["uplift_sources"].items():
@@ -90,7 +104,7 @@ def test_thirty_baseline_failures_are_hand_labelled() -> None:
     assert min(counts.values()) >= 6
 
 
-def test_separation_follows_holm_step_down_per_backend() -> None:
+def test_separation_follows_holm_step_down_per_backend(fixruns) -> None:
     """§6.2 / D-34: per backend, sort p ascending; reject while p <= 0.05 / (m - rank); a fix
     is separated only if Holm rejects it and its interval excludes zero."""
     r = fixruns()

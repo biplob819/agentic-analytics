@@ -8,7 +8,7 @@
     "code_version": "0000000",
     "snapshot": "5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e5e",
     "config_hash": "67b124c104f52eed7f53828f9e01a299f13db13fde487cb06fc754fb690f4bcf",
-    "evalkit": "0.3.0"
+    "evalkit": "0.4.0"
   },
   "metrics": [
     {
@@ -212,7 +212,7 @@
       "n": 2,
       "ci_low": 1.0,
       "ci_high": 1.0,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "claude_mcp",
         "fixes": "none"
@@ -225,7 +225,7 @@
       "n": 10,
       "ci_low": 0.0,
       "ci_high": 0.3,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "claude_mcp",
         "fixes": "none"
@@ -655,7 +655,7 @@
       "n": 2,
       "ci_low": 1.0,
       "ci_high": 1.0,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "claude_mcp",
         "fixes": "examples"
@@ -668,7 +668,7 @@
       "n": 10,
       "ci_low": 0.0,
       "ci_high": 0.3,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "claude_mcp",
         "fixes": "examples"
@@ -1098,7 +1098,7 @@
       "n": 2,
       "ci_low": 0.0,
       "ci_high": 1.0,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "gpt_mcp",
         "fixes": "none"
@@ -1111,7 +1111,7 @@
       "n": 10,
       "ci_low": 0.0,
       "ci_high": 0.0,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "gpt_mcp",
         "fixes": "none"
@@ -1552,7 +1552,7 @@
       "n": 2,
       "ci_low": 0.0,
       "ci_high": 1.0,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "gpt_mcp",
         "fixes": "examples"
@@ -1565,7 +1565,7 @@
       "n": 10,
       "ci_low": 0.0,
       "ci_high": 0.0,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "gpt_mcp",
         "fixes": "examples"
@@ -2006,7 +2006,7 @@
       "n": 2,
       "ci_low": 1.0,
       "ci_high": 1.0,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "cortex_analyst",
         "fixes": "none"
@@ -2019,7 +2019,7 @@
       "n": 10,
       "ci_low": 0.0,
       "ci_high": 0.0,
-      "ci_method": "percentile bootstrap over questions, 2000 resamples, seed 7",
+      "ci_method": "two-level cluster bootstrap (questions, then answers within each question), percentile, 2000 resamples, seed 7",
       "labels": {
         "model": "cortex_analyst",
         "fixes": "none"

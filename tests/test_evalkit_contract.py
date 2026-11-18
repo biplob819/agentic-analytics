@@ -16,7 +16,20 @@ USED = {
         "attack_outcome",
         "ScoreResult",
         "unsupported_numbers",  # MON-06: the answer-from-rows check
-        "clarification_rates",  # MON-06: the clarification cross-check
+        "clarification_rates",  # MON-06, MON-09: the clustered clarification intervals
+        "ClarificationRates",  # MON-09: `ci_method` names the interval in metrics-1
+    ],
+    # MON-07: the run ledger, history, bands and trend page (EvalKit B5.7, v0.4.0)
+    "evalkit.ledger": [
+        "RUNS_PATH",
+        "LedgerError",
+        "RunCheck",
+        "History",
+        "record_run",
+        "check_run",
+        "history",
+        "history_html",
+        "verify_ledger",
     ],
     # MON-05, MON-01, MON-02: metrics-1 export, `evalkit gate`, `evalkit compare`
     "evalkit.metrics": [
@@ -143,16 +156,62 @@ def test_upstreamed_scorer_contract():
 
 
 @pytest.mark.contract
-def test_evalkit_is_the_v0_3_0_release():
-    """D-97: the pin is the PyPI release 0.3.0 (tag v0.3.0, commit 4ddfef5), the first with
-    gate, compare and the upstreamed scorers; the parity measurement names its version."""
+def test_sql_match_equivalences_contract():
+    """MON-08 relies on these: keyword-only `question=` and `equivalences=`, the four rule names,
+    strict first, and `details` with `correct_strict`, the rules that rescued and
+    `strict_reason` on a rescue; with no rule named the result is the strict one."""
+    from evalkit.schemas import ResultSet
+    from evalkit.scorers import sql_match
+
+    params = inspect.signature(sql_match).parameters
+    for name in ("question", "equivalences"):
+        assert params[name].kind is inspect.Parameter.KEYWORD_ONLY
+    gold = ResultSet(columns=("town", "new_build_pct"), rows=(("LEEDS", 8.17),))
+    frac = ResultSet(columns=("town", "new_build_pct"), rows=(("LEEDS", 0.0817),))
+    text = "What percentage of Leeds sales were new builds?"
+    assert sql_match(frac, gold, rel_tol=0.005, abs_tol=0.01).details.get("correct_strict") is None
+    rules = ("percent_scale", "pivot", "empty_check", "period_number")
+    res = sql_match(frac, gold, rel_tol=0.005, abs_tol=0.01, question=text, equivalences=rules)
+    assert res.value == 1.0 and res.details["correct_strict"] is False
+    assert list(res.details["equivalences"]) == ["percent_scale"] and "strict_reason" in res.details
+    same = sql_match(gold, gold, question=text, equivalences=("percent_scale",))
+    assert same.details["correct_strict"] is True and not same.details["equivalences"]
+    with pytest.raises(ValueError):
+        sql_match(frac, gold, equivalences=("fuzzy",))
+
+
+@pytest.mark.contract
+def test_clustered_clarification_contract():
+    """MON-09 relies on these: `cluster=` (a question id per answer), `seed=`, `n_resamples=`,
+    the cluster bootstrap's `method` and `ci_method`, and exact Clopper-Pearson with one answer
+    per question; the points are means of per-question rates."""
+    from evalkit.scorers import clarification_rates
+
+    exp = [True] * 6 + [False] * 6
+    asked = [True, True, False, True, False, False] + [False] * 5 + [True]
+    ids = ["a", "a", "a", "b", "b", "b", "c", "c", "c", "d", "d", "d"]
+    r = clarification_rates(exp, asked, cluster=ids, seed=0, n_resamples=200)
+    assert r.method == "cluster-bootstrap" and r.seed == 0 and r.n_resamples == 200
+    assert r.ask_rate is not None and r.ask_rate.point == 0.5
+    assert r.false_clarification_rate is not None
+    assert abs(r.false_clarification_rate.point - 1 / 6) < 1e-12
+    assert "cluster bootstrap" in r.ci_method and "200 resamples, seed 0" in r.ci_method
+    once = clarification_rates([True, False], [True, False], cluster=["a", "b"])
+    assert once.method == "clopper-pearson" and once.ci_method == "clopper-pearson"
+
+
+@pytest.mark.contract
+def test_evalkit_is_the_v0_4_0_release():
+    """D-120: the pin is the PyPI release 0.4.0 (tag v0.4.0, commit f9cbc8e), the first with
+    the shape equivalences covered (B5.15), clustered clarification intervals (B5.13) and the
+    run ledger (B5.7); the parity measurement names its version."""
     import evalkit
 
-    assert evalkit.__version__ == "0.3.0"
+    assert evalkit.__version__ == "0.4.0"
     deps = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
         "dependencies"
     ]
-    assert "evalkit-harness==0.3.0" in deps
+    assert "evalkit-harness==0.4.0" in deps
 
 
 def test_evalkit_pin_is_exact():

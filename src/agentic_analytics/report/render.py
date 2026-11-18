@@ -887,11 +887,13 @@ def render_html(
     attribution: str | None = None,
     example: bool = False,
     snowflake_region: str | None = None,
+    trend_href: str | None = None,
 ) -> str:
     """The dashboard page as a string; a pure function of its arguments.
 
     A copy of the bundled example is stamped SYNTHETIC whatever `example` says.
-    `snowflake_region` (the run stamp's, R3.1) words the OWNER D-62 Cortex latency caveat."""
+    `snowflake_region` (the run stamp's, R3.1) words the OWNER D-62 Cortex latency caveat.
+    `trend_href` links the run-history trend page written beside it (V5.1 MON-07)."""
     example = example or looks_synthetic(summary, records, placeholder_hashes=False)
     credit, src_pack = resolve_credit(summary, pack, attribution)
     qs = dict(questions or {})
@@ -916,6 +918,7 @@ def render_html(
         header=_header(summary, credit, example),
         sections=sections,
         footer=_footer(credit, src_pack),
+        trend_href=trend_href,
     )
 
 
@@ -1102,6 +1105,7 @@ def render_report(
     attribution: str | None = None,
     example: bool = False,
     snowflake_region: str | None = None,
+    trend_href: str | None = None,
 ) -> Path:
     """DSH-01: write `index.html` and `summary.vl.json` into `out_dir`; return the HTML path.
 
@@ -1123,6 +1127,7 @@ def render_report(
         attribution=attribution,
         example=example,
         snowflake_region=snowflake_region,
+        trend_href=trend_href,
     )
     specs = json.dumps(
         vega_lite_specs(summary, example=example),

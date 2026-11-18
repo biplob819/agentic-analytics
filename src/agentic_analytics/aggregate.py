@@ -7,8 +7,11 @@ whole summary is reproducible from its inputs and seed.
 - Accuracy (overall and by category) uses a two-level bootstrap: resample questions with the
   shared matrix, then resample trials within each drawn question (AGG-01, AGG-02). The headline
   is tolerant of the OWNER D-81 shape equivalences; the strict score is reported beside it.
-- Rates, pass^k and uplifts are computed per question from all of its trials and bootstrapped
-  over questions only (EK L-36): trials are never resampled before an any() or all().
+- pass^k and uplifts are computed per question from all of its trials and bootstrapped over
+  questions only (EK L-36): trials are never resampled before an any() or all().
+- The clarification and false-clarification rates (a mean of trial-level verdicts, no any()
+  or all()) take EvalKit's clustered `clarification_rates` (V5.1 MON-09, OWNER D-100, D-119):
+  questions from the same seeded matrix, then answers within each drawn question.
 - Float totals use `math.fsum` (EK L-27); money inputs are checked finite and non-negative
   (EK L-12).
 - Step efficiency (M4.1 MON-04) is per MCP configuration, from the recorded steps of its
@@ -28,6 +31,8 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Literal
 
+from evalkit.scorers import ClarificationRates as EkClarificationRates
+from evalkit.scorers import clarification_rates as ek_clarification_rates
 from evalkit.stats import Resamples, holm, interval, interval_from, paired, percentile_ms
 
 from agentic_analytics.monitoring.efficiency import step_efficiency
@@ -242,23 +247,69 @@ def equivalence_passes(records: Iterable[Record]) -> dict[str, int]:
 # AGG-04
 
 
-def _question_rate(by_q: ByQuestion, ids: list[str], attr: str, boot: Bootstrap) -> Interval:
-    if not ids:
-        return ZERO
-    return interval([_share(by_q[q], attr) for q in ids], boot.matrix(len(ids)))
+def evalkit_clarification(
+    by_q: ByQuestion, questions: Mapping[str, Question], boot: Bootstrap
+) -> EkClarificationRates:
+    """EvalKit's clustered clarification rates (V5.1 MON-09, OWNER D-100, D-119): every
+    ambiguous and answer-expected question's trials, clustered by question id, seeded by the
+    run's seed with its resample count. EvalKit draws questions from the same seeded matrix
+    (`Resamples(n, n_resamples, seed)`, questions in id order), then answers within each drawn
+    question; with one trial per question there is no clustering and the intervals are exact
+    Clopper-Pearson."""
+    expected: list[bool] = []
+    asked: list[bool] = []
+    cluster: list[str] = []
+    for q in sorted(by_q):
+        if questions[q].expected not in ("clarify", "answer"):
+            continue
+        for r in by_q[q]:
+            expected.append(questions[q].expected == "clarify")
+            asked.append(r.scores.clarified)
+            cluster.append(q)
+    return ek_clarification_rates(
+        expected, asked, cluster=cluster, seed=boot.seed, n_resamples=boot.n_resamples
+    )
+
+
+def clarification_ci_method(
+    by_q: ByQuestion, questions: Mapping[str, Question], n_resamples: int, seed: int
+) -> str:
+    """The metrics-1 `ci_method` of `evalkit_clarification`'s intervals, read from EvalKit's own
+    result (`ClarificationRates.ci_method`). `backend_summary` keeps it from the call that drew
+    the intervals (`kept_ci_method`); this draws again only for a summary it did not build."""
+    return evalkit_clarification(by_q, questions, Bootstrap(n_resamples, seed)).ci_method
+
+
+# V5.1 MON-09: `ci_method` of the clarification intervals `backend_summary` drew, keyed by
+# what determines them (configuration, both intervals, resamples, seed), so the metrics-1
+# export reads it instead of drawing the bootstrap again; bounded, values only
+_CI_METHODS: dict[tuple[object, ...], str] = {}
+_CI_METHODS_MAX = 256
+
+
+def _ci_key(b: BackendSummary, n_resamples: int, seed: int) -> tuple[object, ...]:
+    c, f = b.clarification_rate, b.false_clarification_rate
+    return (b.backend, b.fixes, c.point, c.lo, c.hi, f.point, f.lo, f.hi, n_resamples, seed)
+
+
+def kept_ci_method(b: BackendSummary, n_resamples: int, seed: int) -> str | None:
+    return _CI_METHODS.get(_ci_key(b, n_resamples, seed))
 
 
 def clarification_rates(
     by_q: ByQuestion, questions: Mapping[str, Question], boot: Bootstrap
 ) -> tuple[Interval, Interval]:
     """AGG-04: (clarification rate on ambiguous questions, false-clarification rate on
-    answer-expected questions). Each question's rate is its share of trials; the interval is
-    over questions. A kind with no questions gives a zero-width 0."""
-    ambiguous = [q for q in by_q if questions[q].expected == "clarify"]
-    answer = [q for q in by_q if questions[q].expected == "answer"]
+    answer-expected questions). Each question's rate is its share of trials and the point is
+    their mean; the interval is EvalKit's two-level cluster bootstrap (`evalkit_clarification`,
+    MON-09, D-119). A kind with no questions gives a zero-width 0."""
+    return _rates(evalkit_clarification(by_q, questions, boot))
+
+
+def _rates(ek: EkClarificationRates) -> tuple[Interval, Interval]:
     return (
-        _question_rate(by_q, ambiguous, "clarified", boot),
-        _question_rate(by_q, answer, "false_clarification", boot),
+        ZERO if ek.ask_rate is None else ek.ask_rate,
+        ZERO if ek.false_clarification_rate is None else ek.false_clarification_rate,
     )
 
 
@@ -496,9 +547,10 @@ def backend_summary(
     flat = [r for t in by_q.values() for r in t]
     label = f"{backend}:{'+'.join(fixes)}"
     d81 = scored_under_d81(r for r in flat if r.question_id in questions)
-    clar, false_clar = clarification_rates(by_q, questions, boot)
+    ek = evalkit_clarification(by_q, questions, boot)  # MON-09: one call, its method kept
+    clar, false_clar = _rates(ek)
     lat = [latency_ms(r) for r in flat]
-    return BackendSummary(
+    out = BackendSummary(
         backend=backend,
         fixes=fixes,
         trials=max(len(t) for t in by_q.values()),
@@ -520,6 +572,10 @@ def backend_summary(
         latency_p95_ms=percentile_ms(lat, 0.95),
         step_efficiency=step_efficiency(flat, questions),
     )
+    if len(_CI_METHODS) >= _CI_METHODS_MAX:
+        _CI_METHODS.clear()
+    _CI_METHODS[_ci_key(out, boot.n_resamples, boot.seed)] = ek.ci_method
+    return out
 
 
 def build_summary(

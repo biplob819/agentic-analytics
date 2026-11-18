@@ -1,6 +1,6 @@
 [project]
 name = "agentic-analytics"
-version = "0.1.0"
+version = "0.1.1"
 description = "A benchmark harness for text-to-SQL agents: scores analytics agents against gold SQL over dataset packs, without an LLM judge, with a bundled UK house-price pack."
 readme = { file = "README.md", content-type = "text/markdown" }
 license = "MIT"
@@ -38,8 +38,8 @@ dependencies = [
     "pyyaml>=6",
     "anthropic>=2.8",
     "openai>=3.51",
-    # D-2, D-97: exact pin on the PyPI release (tag v0.3.0, commit 4ddfef5)
-    "evalkit-harness==0.3.0",
+    # D-2, D-97, D-120: exact pin on the PyPI release (tag v0.4.0, commit f9cbc8e)
+    "evalkit-harness==0.4.0",
     "mcp>=1.10",
     "sqlglot>=26",
     "clickhouse-connect>=0.8",

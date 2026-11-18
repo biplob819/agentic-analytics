@@ -4,7 +4,8 @@ name: monitor
 # `agentic-analytics smoke` (12 questions x 3 backends, one trial) under a $2 model-spend cap,
 # from the `monitoring` environment's secrets (read-only warehouse credentials and the two model
 # keys; never an admin credential), and fails when `evalkit gate` finds a backend's accuracy
-# below its floor in monitoring/gates.yaml.
+# below its floor in monitoring/gates.yaml, or `evalkit history check` finds a metric outside its
+# alarm band in the committed run history (V5.1 MON-07).
 #
 # THE SCHEDULE IS DISABLED. Every scheduled run spends money (up to $2 of model calls plus
 # Snowflake trial credits), and the owner must approve recurring spend before it starts
@@ -46,6 +47,12 @@ jobs:
       - name: Ledger length before the run
         shell: bash
         run: wc -l < docs/measurements/spend-ledger.jsonl > "$RUNNER_TEMP/ledger-before"
+      # V5.1 MON-07: the committed run history before the run; the smoke run appends its own
+      # line to docs/measurements/runs.jsonl (never committed back), and the drift check judges
+      # the run against the history before it
+      - name: Run history before the run
+        shell: bash
+        run: cp docs/measurements/runs.jsonl "$RUNNER_TEMP/runs-before.jsonl"
       - name: Smoke run under the $2 cap
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -71,6 +78,18 @@ jobs:
           uv run evalkit gate "results/$(cat results/latest)/metrics/metrics.json"
           --config monitoring/gates.yaml --out gate.json
           | tee -a "$GITHUB_STEP_SUMMARY"
+      # V5.1 MON-07: drift. `evalkit history check` (EvalKit B5.7) judges the run's ledger view
+      # (history/metrics.json: its new configurations, labelled scope=smoke, costs
+      # cost_status=estimated) against its alarm bands from the committed history (median +-
+      # 2 / 3 spreads, from 5 comparable smoke runs; fewer is `learning`, never flagged); a
+      # gated accuracy alarms only downward. Exit 1 on an alarm, 2 on an unreadable ledger or
+      # view; nothing swallows it.
+      - name: evalkit history check
+        shell: bash
+        run: >-
+          uv run evalkit history check "results/$(cat results/latest)/history/metrics.json"
+          --ledger "$RUNNER_TEMP/runs-before.jsonl" --gates monitoring/gates.yaml
+          | tee -a "$GITHUB_STEP_SUMMARY"
       # The spend-ledger line(s) this run appended: shown in the job summary and kept in the
       # artifact. CI never commits the ledger back (the workflow can only read the repository).
       - name: Spend line
@@ -80,6 +99,22 @@ jobs:
           tail -n "+$(( $(cat "$RUNNER_TEMP/ledger-before") + 1 ))"
           docs/measurements/spend-ledger.jsonl
           | tee spend-line.jsonl >> "$GITHUB_STEP_SUMMARY"
+      # The run-history line(s) this run appended, as for the spend line, and the trend page
+      # over the history with this run (EvalKit's page for accuracy with intervals, cost per
+      # correct and p95 latency, bands and flags: the dashboard's trend.html), both in the
+      # artifact (MON-07)
+      - name: History line
+        if: always()
+        shell: bash
+        run: >-
+          tail -n "+$(( $(wc -l < "$RUNNER_TEMP/runs-before.jsonl") + 1 ))"
+          docs/measurements/runs.jsonl > history-line.jsonl
+      - name: Trend page
+        if: always()
+        shell: bash
+        run: >-
+          uv run python -m agentic_analytics.monitoring.history
+          --ledger docs/measurements/runs.jsonl --gates monitoring/gates.yaml --out trend.html
       # The run's metrics-1 export (a folder `evalkit compare` reads), the gate verdict and the
       # spend line, so two CI runs can be compared after downloading their artifacts:
       #   evalkit compare monitor-<old>/metrics monitor-<new>/metrics
@@ -91,7 +126,7 @@ jobs:
           if [ -f results/latest ]; then
             cp -R "results/$(cat results/latest)/metrics" monitor-artifact/metrics
           fi
-          for f in gate.json spend-line.jsonl; do
+          for f in gate.json spend-line.jsonl history-line.jsonl trend.html; do
             if [ -f "$f" ]; then cp "$f" monitor-artifact/; fi
           done
       - name: Upload the artifact

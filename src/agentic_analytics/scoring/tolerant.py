@@ -1,86 +1,74 @@
-"""Tolerant result match (OWNER D-81, Tech Spec §6.1).
+"""Tolerant result match through EvalKit's shape equivalences (OWNER D-81; V5.1 MON-08, D-120).
 
 The headline score accepts four shapes of a right answer that the strict, pre-registered match
-(`result.py`) rejects. Each is a pre-normalisation of the predicted rows, tried only after the
-strict match failed, and the normalised rows must then pass the strict match unchanged: same
-column mapping, same per-column tolerance, same row count. Every backend gets the same rules.
-Only answer-expected questions are eligible; clarify-expected questions and probes never are.
+(`result.py`) rejects: `percent_scale`, `pivot`, `empty_check` and `period_number`. The rules
+themselves are EvalKit's (`evalkit.scorers.sql_match(..., question=, equivalences=)`, B5.15,
+lifted from this module and made stricter, D-91/D-92); this module is the thin adapter that
+keeps this project's pre-registered conditions around them:
 
-1. **percent_scale.** The question asks for a percentage (its text says "percent",
-   "percentage", "per cent" or "%"), and a gold column is a percent-unit column: covered by
-   the question's tolerance with D-51's percent-unit `abs` (at least 0.01) and named as a
-   percentage (``pct``, ``percent`` or ``points`` in its name). A predicted numeric column is
-   multiplied by 100 when, so scaled, its values fit such a gold column within that tolerance
-   and, unscaled, they do not (0.0817 for 8.17).
-2. **pivot.** The gold is long: two columns, one all-text label column and one all-numeric
-   value column, at least one row, distinct labels. The prediction is one wide row whose
-   column names are the gold's labels (case-insensitive; spaces, ``-`` and ``_`` are the same
-   separator). Every gold label must be a predicted column; any other predicted column must
-   hold a numeric zero (a label the gold's GROUP BY omitted, e.g. ``unknown = 0``). The row is
-   unpivoted into the gold's two columns.
-3. **empty_check.** On an `expects_empty` question with an empty gold, a single predicted row
-   counts as no rows when it has at least one numeric cell, every numeric cell (numbers, and
-   text that is a plain number) is zero, and every other cell is text or null (the dates of a
-   no-data check: ``earliest_sale_date, latest_sale_date, sales_in_1994 = 0``).
-4. **period_number.** A predicted column of dates that are all month starts
-   (``YYYY-MM-01``, optionally with a midnight time) in one calendar year becomes the month
-   number (1-12) when the question names months and the gold has a column of month numbers,
-   or the quarter number (1-4) when every date is a quarter start, the question names quarters
-   and the gold has a column of quarter numbers. Dates over two or more years never convert:
-   their month numbers would merge different periods. Text period labels count too (OWNER
-   D-89): quarter labels (``2023 Q1``, ``Q1 2023``, ``2023-Q1``, ``Q1``) become quarter numbers
-   and month labels (``2023-03``, ``March 2023``, ``Mar 2023``) month numbers, under the same
-   conditions; a quarter label never becomes a month number.
+- **Eligibility.** Only answer-expected questions, with gold, whose answer executed without an
+  error or truncation, and only after the strict match failed (`score.py`). Clarify-expected
+  questions and probes are never rescued.
+- **Which rules a question may use.** `empty_check` only on an `expects_empty` question (what
+  EvalKit's "naming empty_check" stands for); `percent_scale` only when the question's
+  tolerance is a percent-unit one (D-51: `abs` at least 0.01); `pivot` and `period_number`
+  always. EvalKit reads the question text for the rest (a percentage asked for, months or
+  quarters named, the years named, fiscal periods).
+- **Per-column exactness.** `Tolerance.columns` names the gold columns the tolerance covers;
+  every other number must match exactly, as in the strict match. EvalKit takes one tolerance
+  per call, so an uncovered column is handed over as exact-match text (`result.canonical`) on
+  both sides, except a column of small integers (|v| < 1/rel), which tolerance cannot tell
+  from an exact match and which EvalKit's period rule must read as numbers (month 1-12,
+  quarter 1-4); a predicted number there that is not such an integer becomes text too, so it
+  can only fail. pivot's gold has one value column: it gets the question's tolerance when
+  covered, else an exact one (`rel_tol=0`, `abs_tol=0`).
+- **Column mapping.** The strict match maps predicted onto gold columns by name, else by
+  values (`result.py`). The column rules convert values before they can match, so the mapping
+  is tried over the columns that *could* match once converted (same text cells and as many
+  numbers, or no numbers at all for a period column; the same name first), each assignment
+  handed to EvalKit as a predicted table in the gold's column names and order, so EvalKit
+  compares it by name. pivot and empty_check read the predicted column names, so they get the
+  predicted table as it is.
 
-percent_scale and period_number act on columns and may apply together (a monthly percentage
-change returned as month dates and fractions); pivot and empty_check reshape the whole result
-and apply alone.
+The first rescue wins, in EvalKit's order (empty_check, pivot, percent_scale, period_number,
+percent_scale with period_number). Rescoring every stored run through this adapter changes one
+verdict, accepted by OWNER D-118 (the fix runs' GPT + descriptions q-020 trial 1: EvalKit's
+empty_check takes a no-data zero only in a count-named column), and no other
+(`docs/measurements/evalkit-0.4-parity-2026-11-18.json`).
 """
 
 from __future__ import annotations
 
-import re
-from collections.abc import Iterator, Sequence
+import math
+from collections.abc import Callable, Collection, Iterator
 from typing import Any
 
+from evalkit.scorers import ScoreResult, sql_match
+
 from agentic_analytics.schemas import Equivalence, Execution, Question, ResultSet, Tolerance
-from agentic_analytics.scoring.result import _Column, _is_num, match_rows
+from agentic_analytics.scoring.result import (
+    MAX_ASSIGNMENTS,
+    _by_name,
+    _Column,
+    _is_num,
+    canonical,
+)
 
 PERCENT_ABS = 0.01  # D-51: a percent-unit column's absolute tolerance
-PERCENT_SCALE = 100
-_ASKS_PERCENT = re.compile(r"\bper\s?cent(?:age)?s?\b|%", re.IGNORECASE)
-_NOT_PERCENT = re.compile(
-    r"\bnot\s+(?:as\s+|in\s+)?(?:a\s+)?(?:%|per\s?cent(?:age)?s?\b)", re.IGNORECASE
-)
-_PERCENT_TOKENS = frozenset({"pct", "percent", "percentage"})
-_NEGATION = re.compile(
-    r"\b(?:not|no|never|without|avoid|avoiding|rather\s+than|instead\s+of|don'?t|doesn'?t)\b",
-    re.IGNORECASE,
-)
-_CLAUSE = re.compile(r"[,;:.?!()]")
-_PERCENTAGE_POINTS = re.compile(r"\bpercentage[\s-]points?\b", re.IGNORECASE)
-_FISCAL = re.compile(r"\bFY\s?\d{2,4}\b", re.IGNORECASE)
-_NOT_A_PERIOD = frozenset(
-    {"day", "week", "count", "n", "num", "number", "total", "sum", "avg", "average"}
-)
-_NOT_A_COUNT = frozenset({"total", "grand", "year", "q", "quarter", "month", "day", "id", "rank"})
-_TOKEN = re.compile(r"[a-z]+|\d+", re.ASCII)
-_COUNT_UNSAFE = frozenset({"avg", "average", "mean", "median", "price", "amount", "value", "sum"})
-_TOTAL_NAMES = frozenset({"total", "sum", "all", "overall", "grand_total", "count", "n"})
-_ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}(?:[T ][\d:.]+(?:Z|[+-]\d{2}:?\d{2})?)?", re.ASCII)
-_YEAR = re.compile(r"\b(19\d{2}|20\d{2})\b", re.ASCII)
-_NAMES_MONTHS = re.compile(r"\bmonths?\b", re.IGNORECASE)
-_NAMES_QUARTERS = re.compile(r"\bquarters?\b", re.IGNORECASE)
-_PERIOD_START = re.compile(
-    r"(\d{4})-(\d{2})-01(?:[T ]00:00(?::00(?:\.0+)?)?(?:Z|[+-]00:?00)?)?", re.ASCII
-)
-_PLAIN_NUMBER = re.compile(r"\s*[-+]?\d+(?:\.\d+)?\s*", re.ASCII)
-_SEPARATORS = re.compile(r"[\s_-]+")
-QUARTER_STARTS = frozenset({1, 4, 7, 10})
-_MONTH_COLUMN = frozenset({"month"})
-_QUARTER_COLUMN = frozenset({"quarter", "qtr"})
+WHOLE_TABLE: tuple[Equivalence, ...] = ("empty_check", "pivot")
+PER_COLUMN: tuple[Equivalence, ...] = ("percent_scale", "period_number")
 
-Variant = tuple[tuple[Equivalence, ...], ResultSet]
+
+def equivalences_for(question: Question) -> tuple[Equivalence, ...]:
+    """The EvalKit equivalences this question may be rescued by (its pre-registered terms)."""
+    names: list[Equivalence] = []
+    if question.expects_empty:
+        names.append("empty_check")
+    names.append("pivot")
+    if question.tolerance.abs >= PERCENT_ABS:
+        names.append("percent_scale")
+    names.append("period_number")
+    return tuple(names)
 
 
 def tolerant_match(
@@ -94,309 +82,167 @@ def tolerant_match(
         return ()
     if execution.error is not None or execution.result is None or execution.truncated:
         return ()
-    for rules, predicted in variants(execution.result, gold, question):
-        ok, _ = match_rows(predicted, gold, tolerance=question.tolerance, ordered=question.ordered)
-        if ok:
+    names = equivalences_for(question)
+    predicted, tol = execution.result, question.tolerance
+    whole: list[Equivalence] = [n for n in WHOLE_TABLE if n in names]
+    rel, abs_ = _pivot_tolerance(gold, tol)
+    target = ResultSet(columns=gold.columns, rows=gold.rows, ordered=question.ordered)
+    rules = _rescue(predicted, target, rel, abs_, question.text, whole)
+    if rules:
+        return rules
+    per_column: list[Equivalence] = [n for n in PER_COLUMN if n in names]
+    for mapped, encoded in _mapped_tables(predicted, gold, tol, question.ordered):
+        rules = _rescue(mapped, encoded, tol.rel, tol.abs, question.text, per_column)
+        if rules:
             return rules
     return ()
 
 
-def variants(predicted: ResultSet, gold: ResultSet, question: Question) -> Iterator[Variant]:
-    """Each normalised form of `predicted` with the rules that made it, in the order tried."""
-    if (empty := empty_check(predicted, gold, question)) is not None:
-        yield ("empty_check",), empty
-    if (long := pivot(predicted, gold)) is not None:
-        yield ("pivot",), long
-    scaled = percent_columns(predicted, gold, question)
-    periods = period_columns(predicted, gold, question)
-    if scaled:
-        yield ("percent_scale",), _replace(predicted, scaled)
-    for period in periods:
-        yield ("period_number",), _replace(predicted, period)
-    if scaled:
-        for period in periods:
-            yield ("percent_scale", "period_number"), _replace(predicted, {**scaled, **period})
-
-
-def _replace(rs: ResultSet, columns: dict[int, list[Any]]) -> ResultSet:
-    rows = tuple(
-        tuple(columns[i][k] if i in columns else v for i, v in enumerate(row))
-        for k, row in enumerate(rs.rows)
+def _rescue(
+    predicted: ResultSet,
+    gold: ResultSet,
+    rel: float,
+    abs_: float,
+    text: str,
+    names: Collection[Equivalence],
+) -> tuple[Equivalence, ...]:
+    """EvalKit's rules that rescue `predicted`, or () (also when EvalKit's own strict match
+    passes: the strict verdict is `result.py`'s, so that is not a rescue)."""
+    res: ScoreResult = sql_match(
+        predicted,
+        gold,
+        rel_tol=rel,
+        abs_tol=abs_,
+        allow_extra_columns=True,
+        question=text,
+        equivalences=names,
     )
-    return ResultSet(columns=rs.columns, rows=rows)
+    if res.value != 1.0 or res.details.get("correct_strict") is not False:
+        return ()
+    return tuple(res.details["equivalences"])
 
 
-def _column(rs: ResultSet, i: int) -> list[Any]:
-    return [row[i] for row in rs.rows]
+def _covered(gold: ResultSet, tol: Tolerance) -> list[bool]:
+    names = None if tol.columns is None else {c.casefold() for c in tol.columns}
+    return [names is None or c.casefold() in names for c in gold.columns]
 
 
-# 1. percent_scale
+def _pivot_tolerance(gold: ResultSet, tol: Tolerance) -> tuple[float, float]:
+    """pivot compares one value column: the question's tolerance when it covers every numeric
+    gold column, else an exact match (rel 0, abs 0)."""
+    covered = _covered(gold, tol)
+    numeric = [j for j in range(len(gold.columns)) if any(_is_num(r[j]) for r in gold.rows)]
+    if all(covered[j] for j in numeric):
+        return tol.rel, tol.abs
+    return 0.0, 0.0
 
 
-def _tokens(name: str) -> set[str]:
-    return set(_TOKEN.findall(name.casefold()))
+def _small(v: Any, bound: float) -> bool:
+    return _is_num(v) and math.isfinite(float(v)) and float(v).is_integer() and abs(v) < bound
 
 
-def _is_percent_name(name: str) -> bool:
-    """A percent column by name: a pct/percent/percentage token, or a percentage-point change
-    (``change_points``). "percentile" and ``loyalty_points`` are not (D-91)."""
-    t = _tokens(name)
-    if any(len(x) == 2 and x.isdigit() for x in t) or re.search(r"(?:^|_)p\d{2}$", name.casefold()):
-        return False  # EvalKit B5.15: pct95 / p99 are percentiles; a 4-digit year suffix is not
-    return bool(t & _PERCENT_TOKENS) or {"points", "change"} <= t
+def _small_integers(values: list[Any], bound: float) -> bool:
+    return bool(values) and all(_small(v, bound) for v in values)
 
 
-def _asks_percent(text: str) -> bool:
-    """The question asks for a percentage: a clause names one and holds no negation word
-    ("not counting refunds, what percentage" asks; "do not give a percentage" does not)."""
-    return any(
-        _ASKS_PERCENT.search(clause) and not _NEGATION.search(clause)
-        for clause in _CLAUSE.split(text)
-    )
+def _keep(v: Any) -> Any:
+    return v
 
 
-def _gold_percent_columns(gold: ResultSet, question: Question) -> list[int]:
-    tol = question.tolerance
-    asks = _asks_percent(question.text) and not _NOT_PERCENT.search(question.text)
-    if tol.abs < PERCENT_ABS or not asks:
-        return []
-    points_ok = bool(_PERCENTAGE_POINTS.search(question.text))
-    covered = None if tol.columns is None else {c.casefold() for c in tol.columns}
-    return [
-        j
-        for j, name in enumerate(gold.columns)
-        if (covered is None or name.casefold() in covered)
-        and _is_percent_name(name)
-        and (
-            points_ok
-            or not {"points", "change"} <= _tokens(name)
-            or _tokens(name) & _PERCENT_TOKENS
-        )
-    ]
+def _encoders(
+    gold: ResultSet, tol: Tolerance
+) -> tuple[list[Callable[[Any], Any]], list[Callable[[Any], Any]]]:
+    """(gold cell encoder, predicted cell encoder) per gold column (the module docstring)."""
+    bound = math.inf if tol.rel == 0 else 1 / tol.rel
+    covered = _covered(gold, tol)
 
+    def as_small(v: Any) -> Any:
+        return canonical(v) if _is_num(v) and not _small(v, bound) else v
 
-def percent_columns(
-    predicted: ResultSet, gold: ResultSet, question: Question
-) -> dict[int, list[Any]]:
-    """{predicted column: its values ×100} for each fraction column that fits a gold percent
-    column only once scaled; {} when the rule does not apply."""
-    targets = [_Column(_column(gold, j)) for j in _gold_percent_columns(gold, question)]
-    if not targets:
-        return {}
-    tol: Tolerance = question.tolerance
-    out: dict[int, list[Any]] = {}
-    for i in range(len(predicted.columns)):
-        values = _column(predicted, i)
-        if not any(_is_num(v) for v in values):
-            continue
-        scaled = [v * PERCENT_SCALE if _is_num(v) else v for v in values]
-        before, after = _Column(values), _Column(scaled)
-        if any(after.fits(g, tol) and not before.fits(g, tol) for g in targets):
-            out[i] = scaled
-    return out
-
-
-# 2. pivot
-
-
-def _label_key(text: str) -> str:
-    return _SEPARATORS.sub("_", text.strip().casefold())
-
-
-def pivot(predicted: ResultSet, gold: ResultSet) -> ResultSet | None:
-    """The one wide predicted row unpivoted into the gold's long shape, or None."""
-    if len(gold.columns) != 2 or not gold.rows or len(predicted.rows) != 1:
-        return None
-    text = [all(isinstance(r[j], str) for r in gold.rows) for j in (0, 1)]
-    nums = [all(_is_num(r[j]) for r in gold.rows) for j in (0, 1)]
-    if text[0] and nums[1]:
-        label_col = 0
-    elif text[1] and nums[0]:
-        label_col = 1
-    else:
-        return None
-    labels: dict[str, str] = {}
-    for r in gold.rows:
-        labels.setdefault(_label_key(r[label_col]), r[label_col])
-    if len(labels) != len(gold.rows):
-        return None
-    keys = [_label_key(c) for c in predicted.columns]
-    if len(set(keys)) != len(keys) or not set(labels) <= set(keys):
-        return None
-    (row,) = predicted.rows
-    long: list[tuple[Any, Any]] = []
-    for key, cell in zip(keys, row, strict=True):
-        if key in labels:
-            pair = (labels[key], cell) if label_col == 0 else (cell, labels[key])
-            long.append(pair)
-        elif (
-            key in _TOTAL_NAMES
-            or (key == "unknown" and any(_label_key(x)[:1].isdigit() for x in labels))
-            or not (_is_num(cell) and cell == 0)
-        ):
-            return None  # an extra label must be one the gold omitted, so zero; never a total
-    return ResultSet(columns=gold.columns, rows=tuple(long))
-
-
-# 3. empty_check
-
-
-def _numeric(cell: Any) -> float | None:
-    if _is_num(cell):
-        return float(cell)
-    if isinstance(cell, str) and _PLAIN_NUMBER.fullmatch(cell):
-        return float(cell)
-    return None
-
-
-def empty_check(predicted: ResultSet, gold: ResultSet, question: Question) -> ResultSet | None:
-    """No rows, in the gold's columns, when the one predicted row is a no-data check."""
-    if not question.expects_empty or gold.rows or len(predicted.rows) != 1:
-        return None
-    (row,) = predicted.rows
-    counts = [n for n in (_numeric(c) for c in row) if n is not None]
-    if not counts or any(n != 0 for n in counts):
-        return None
-    if any(_numeric(c) is None and not (c is None or isinstance(c, str)) for c in row):
-        return None  # booleans and nested values are not a no-data check
-    for name, cell in zip(predicted.columns, row, strict=True):
-        if _numeric(cell) is not None:
-            # D-91: a zero count, not a zero measure (avg_price = 0.0)
-            # a measure anywhere in the name, or a column that IS a year/quarter/total/id
-            # (its leading word), is not a zero count; "sales_in_requested_year" is one
-            lead = _TOKEN.findall(name.casefold())[:1]
-            unsafe = _tokens(name) & _COUNT_UNSAFE or set(lead) & _NOT_A_COUNT
-            if (_is_num(cell) and not float(cell).is_integer()) or unsafe:
-                return None
-        elif isinstance(cell, str) and not _ISO_DATE.fullmatch(cell.strip()):
-            return None  # D-91: only the dates of a no-data check, never an error message
-    return ResultSet(columns=gold.columns, rows=())
-
-
-# 4. period_number
-
-
-_QUARTER_LABEL = (
-    re.compile(r"(\d{4})[\s-]*Q([1-4])", re.IGNORECASE),
-    re.compile(r"Q([1-4])[\s-]*(\d{4})", re.IGNORECASE),
-    re.compile(r"Q([1-4])", re.IGNORECASE),
-)
-_MONTH_NAMES = {
-    m: i
-    for i, names in enumerate(
-        (
-            ("january", "jan"), ("february", "feb"), ("march", "mar"), ("april", "apr"),
-            ("may",), ("june", "jun"), ("july", "jul"), ("august", "aug"),
-            ("september", "sep", "sept"), ("october", "oct"), ("november", "nov"),
-            ("december", "dec"),
-        ),
-        start=1,
-    )
-    for m in names
-}  # fmt: skip
-_MONTH_LABEL = (
-    re.compile(r"(\d{4})-(\d{2})"),
-    re.compile(r"([A-Za-z]+)\.?\s+(\d{4})"),
-    re.compile(r"(\d{4})\s+([A-Za-z]+)"),
-)
-
-
-def _period_cell(v: Any) -> tuple[int | None, int, bool] | None:
-    """(year or None, first month of the period, is a quarter label) for one period cell."""
-    if not isinstance(v, str):
-        return None
-    text = v.strip()
-    m = _PERIOD_START.fullmatch(text)
-    if m is not None:
-        month = int(m.group(2))
-        return (int(m.group(1)), month, False) if 1 <= month <= 12 else None
-    q = _QUARTER_LABEL[0].fullmatch(text)
-    if q is not None:
-        return int(q.group(1)), 3 * int(q.group(2)) - 2, True
-    q = _QUARTER_LABEL[1].fullmatch(text)
-    if q is not None:
-        return int(q.group(2)), 3 * int(q.group(1)) - 2, True
-    q = _QUARTER_LABEL[2].fullmatch(text)
-    if q is not None:
-        return None, 3 * int(q.group(1)) - 2, True
-    m = _MONTH_LABEL[0].fullmatch(text)
-    if m is not None:
-        month = int(m.group(2))
-        return (int(m.group(1)), month, False) if 1 <= month <= 12 else None
-    for pat, year_at, name_at in ((_MONTH_LABEL[1], 2, 1), (_MONTH_LABEL[2], 1, 2)):
-        m = pat.fullmatch(text)
-        if m is not None and m.group(name_at).casefold() in _MONTH_NAMES:
-            return int(m.group(year_at)), _MONTH_NAMES[m.group(name_at).casefold()], False
-    return None
-
-
-def _period_starts(values: Sequence[Any]) -> list[tuple[int | None, int, bool] | None] | None:
-    """(year, first month, quarter label?) per cell when every non-null cell is a period start
-    (a month-start date or a text period label, OWNER D-89), else None."""
-    out: list[tuple[int | None, int, bool] | None] = []
-    for v in values:
-        if v is None:
-            out.append(None)
-            continue
-        cell = _period_cell(v)
-        if cell is None:
-            return None
-        out.append(cell)
-    return out if any(p is not None for p in out) else None
-
-
-def _has_numbers(gold: ResultSet, top: int, names: frozenset[str]) -> bool:
-    """A gold period column (named month or quarter, D-91) whose cells are integers in 1..top."""
+    g_enc: list[Callable[[Any], Any]] = []
+    p_enc: list[Callable[[Any], Any]] = []
     for j in range(len(gold.columns)):
-        t = _tokens(gold.columns[j])
-        if not t & names or t & _NOT_A_PERIOD:
-            continue
-        cells = _column(gold, j)
-        if cells and all(_is_num(v) and float(v).is_integer() and 1 <= v <= top for v in cells):
-            return True
-    return False
+        if covered[j]:
+            g_enc.append(_keep)
+            p_enc.append(_keep)
+        elif tol.abs < 1 and _small_integers([r[j] for r in gold.rows], bound):
+            g_enc.append(_keep)
+            p_enc.append(as_small)
+        else:
+            g_enc.append(canonical)
+            p_enc.append(canonical)
+    return g_enc, p_enc
 
 
-def period_columns(
-    predicted: ResultSet, gold: ResultSet, question: Question
-) -> list[dict[int, list[Any]]]:
-    """The month-number and quarter-number readings of the predicted date columns that apply."""
-    if not gold.rows:
-        return []
-    dates: dict[int, list[tuple[int | None, int, bool] | None]] = {}
-    for i in range(len(predicted.columns)):
-        starts = _period_starts(_column(predicted, i))
-        # one calendar year: the cells' stated years (a bare "Q1" states none) are a single year
-        if starts is not None and len({p[0] for p in starts if p is not None and p[0]}) <= 1:
-            dates[i] = starts
-    # D-91: when the question names years, the dates' stated year must be one of them
-    if _FISCAL.search(question.text):
-        return []  # fiscal periods are not calendar months or quarters (EvalKit B5.15)
-    named_years = {int(y) for y in _YEAR.findall(question.text)}
-    if named_years:
-        dates = {
-            i: s
-            for i, s in dates.items()
-            if all(p is None or p[0] is None or p[0] in named_years for p in s)
-        }
-    if not dates:
-        return []
-    out: list[dict[int, list[Any]]] = []
-    no_quarter_labels = not any(p is not None and p[2] for s in dates.values() for p in s)
-    if (
-        _NAMES_MONTHS.search(question.text)
-        and _has_numbers(gold, 12, _MONTH_COLUMN)
-        and no_quarter_labels
-    ):
-        out.append({i: [None if p is None else p[1] for p in s] for i, s in dates.items()})
-    quarter_starts = all(p is None or p[1] in QUARTER_STARTS for s in dates.values() for p in s)
-    if (
-        quarter_starts
-        and _NAMES_QUARTERS.search(question.text)
-        and _has_numbers(gold, 4, _QUARTER_COLUMN)
-    ):
-        quarters = {
-            i: [None if p is None else (p[1] - 1) // 3 + 1 for p in s] for i, s in dates.items()
-        }
-        out.append(quarters)
+def _scaled(p: _Column, g: _Column) -> bool:
+    """The same text cells and as many numbers: a fraction that may fit once scaled."""
+    return p.others == g.others and len(p.sorted_nums) == len(g.sorted_nums)
+
+
+def _periods(p: _Column, g: _Column) -> bool:
+    """No numbers beside an all-numeric gold column: period starts that may become month or
+    quarter numbers."""
+    return not p.sorted_nums and bool(g.sorted_nums) and not g.others
+
+
+def _assignments(predicted: ResultSet, gold: ResultSet, tol: Tolerance) -> list[list[int]]:
+    """Column assignments to try: by name when every gold name is predicted; else each gold
+    column takes a predicted column that fits it as the strict match would (its tolerance when
+    covered, exactly when not), or that a column rule could convert into it (a scaled
+    fraction for a covered column, period starts for a covered or small-integer column).
+    Strict fits come first, then the same name."""
+    named = _by_name(predicted, gold)
+    if named is not None:
+        return [named]
+    pcols = [c.casefold() for c in predicted.columns]
+    gcols = [c.casefold() for c in gold.columns]
+    pprof = [_Column([r[i] for r in predicted.rows]) for i in range(len(pcols))]
+    gprof = [_Column([r[j] for r in gold.rows]) for j in range(len(gcols))]
+    covered = _covered(gold, tol)
+    bound = math.inf if tol.rel == 0 else 1 / tol.rel
+    cands: list[list[int]] = []
+    for j, g in enumerate(gprof):
+        small = _small_integers([r[j] for r in gold.rows], bound)
+        fit: list[tuple[bool, bool, int]] = []
+        for i, p in enumerate(pprof):
+            strict = p.fits(g, tol if covered[j] else None)
+            convert = (covered[j] and (_scaled(p, g) or _periods(p, g))) or (
+                small and _periods(p, g)
+            )
+            if strict or convert:
+                fit.append((not strict, pcols[i] != gcols[j], i))
+        cands.append([i for *_, i in sorted(fit)])
+    out: list[list[int]] = []
+
+    def walk(j: int, used: list[int]) -> None:
+        if len(out) >= MAX_ASSIGNMENTS:
+            return
+        if j == len(gcols):
+            out.append(list(used))
+            return
+        for i in cands[j]:
+            if i not in used:
+                used.append(i)
+                walk(j + 1, used)
+                used.pop()
+
+    walk(0, [])
     return out
+
+
+def _mapped_tables(
+    predicted: ResultSet, gold: ResultSet, tol: Tolerance, ordered: bool
+) -> Iterator[tuple[ResultSet, ResultSet]]:
+    """(predicted in the gold's column names and order, the encoded gold) per column
+    assignment, each cell encoded for per-column exactness."""
+    if len(predicted.rows) != len(gold.rows) or not gold.rows:
+        return
+    g_enc, p_enc = _encoders(gold, tol)
+    target = ResultSet(
+        columns=gold.columns,
+        rows=tuple(tuple(g_enc[j](v) for j, v in enumerate(r)) for r in gold.rows),
+        ordered=ordered,
+    )
+    for order in _assignments(predicted, gold, tol):
+        rows = tuple(tuple(p_enc[j](r[i]) for j, i in enumerate(order)) for r in predicted.rows)
+        yield ResultSet(columns=gold.columns, rows=rows), target

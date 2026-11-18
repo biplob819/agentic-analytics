@@ -112,7 +112,7 @@
       "clarification_rate": {
         "point": 0.020833333333333332,
         "lo": 0.0,
-        "hi": 0.0625
+        "hi": 0.08333333333333333
       },
       "false_clarification_rate": {
         "point": 0.0,
@@ -246,8 +246,8 @@
       ],
       "clarification_rate": {
         "point": 0.4375,
-        "lo": 0.20833333333333334,
-        "hi": 0.6666666666666666
+        "lo": 0.20833333333333331,
+        "hi": 0.6666666666666667
       },
       "false_clarification_rate": {
         "point": 0.0,
@@ -821,9 +821,9 @@
       ],
       "trials": 3,
       "accuracy": {
-        "point": 0.9233333333333333,
-        "lo": 0.87,
-        "hi": 0.9666666666666667
+        "point": 0.92,
+        "lo": 0.8666666666666667,
+        "hi": 0.9633333333333333
       },
       "accuracy_strict": {
         "point": 0.8866666666666667,
@@ -831,7 +831,7 @@
         "hi": 0.94
       },
       "equivalence_passes": {
-        "empty_check": 4,
+        "empty_check": 3,
         "period_number": 3,
         "pivot": 4
       },
@@ -840,8 +840,8 @@
           "category": "aggregation",
           "n": 17,
           "accuracy": {
-            "point": 0.9411764705882353,
-            "lo": 0.8235294117647058,
+            "point": 0.9215686274509803,
+            "lo": 0.7843137254901961,
             "hi": 1.0
           },
           "accuracy_strict": {
@@ -923,8 +923,8 @@
       ],
       "clarification_rate": {
         "point": 0.7083333333333334,
-        "lo": 0.5,
-        "hi": 0.8958333333333334
+        "lo": 0.4791666666666667,
+        "hi": 0.8963541666666591
       },
       "false_clarification_rate": {
         "point": 0.0,
@@ -940,7 +940,7 @@
       "answer_from_rows_violations": 0,
       "policy_violations": 0,
       "errors": {},
-      "cost_per_correct_usd": 0.005946857039711191,
+      "cost_per_correct_usd": 0.005968403623188406,
       "latency_p50_ms": 7464,
       "latency_p95_ms": 13543,
       "step_efficiency": {
@@ -1060,7 +1060,7 @@
       ],
       "clarification_rate": {
         "point": 0.8333333333333334,
-        "lo": 0.6458333333333334,
+        "lo": 0.6458333333333333,
         "hi": 1.0
       },
       "false_clarification_rate": {
@@ -1539,9 +1539,9 @@
       "backend": "gpt_mcp",
       "fix": "descriptions",
       "delta_points": {
-        "point": -4.666666666666668,
-        "lo": -8.333333333333336,
-        "hi": -1.6666666666666672
+        "point": -5.000000000000001,
+        "lo": -9.0,
+        "hi": -2.0000000000000004
       },
       "p_value": 0.00019998000199980003,
       "separated": true

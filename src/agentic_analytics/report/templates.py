@@ -112,8 +112,13 @@ NAV = (
 )
 
 
-def nav() -> str:
+TREND_LABEL = "Run history and drift"  # V5.1 MON-07: EvalKit's trend page beside the dashboard
+
+
+def nav(trend_href: str | None = None) -> str:
     items = "".join(f'<li><a href="#{sid}">{label}</a></li>' for sid, label in NAV)
+    if trend_href is not None:
+        items += f'<li><a href="{trend_href}">{TREND_LABEL}</a></li>'
     return f'<nav aria-label="Sections"><ul>{items}</ul></nav>'
 
 
@@ -124,7 +129,15 @@ def section(sid: str, heading: str, body: str) -> str:
     )
 
 
-def page(*, title: str, header: str, sections: str, footer: str) -> str:
+def page(
+    *, title: str, header: str, sections: str, footer: str, trend_href: str | None = None
+) -> str:
     return PAGE.substitute(
-        title=title, css=CSS, header=header, nav=nav(), sections=sections, footer=footer, js=JS
+        title=title,
+        css=CSS,
+        header=header,
+        nav=nav(trend_href),
+        sections=sections,
+        footer=footer,
+        js=JS,
     )

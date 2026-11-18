@@ -50,11 +50,25 @@ def test_every_summary_metric_names_its_question_and_trace() -> None:
         assert TRACE.search(trace), f"{name}: trace {trace!r} names no story, finding or decision"
 
 
+# V5.1 MON-07 (D-121): `drift` is not a summary field but the run ledger's verdict on every
+# metric of a run, its alarm band from the run's own history (EvalKit B5.7), reported by
+# `evalkit history`, the monitor's drift step and the trend page
+LEDGER_METRICS = {"drift"}
+
+
 def test_relevance_rows_name_real_metrics() -> None:
-    planned = {"drift"}  # V5.1 MON-07, waits for EvalKit B5.7 in v0.4.0 (OWNER D-98, D-115)
     fields = set(BackendSummary.model_fields) | set(RunSummary.model_fields)
     efficiency = {n for n, src in SOURCES.items() if src == "efficiency"}
-    assert set(relevance_rows()) - fields - efficiency == planned
+    assert set(relevance_rows()) - fields - efficiency == LEDGER_METRICS
+
+
+def test_drift_is_the_ledgers_band_verdict() -> None:
+    from agentic_analytics.monitoring.history import FLAGGED, TREND_METRICS
+
+    assert FLAGGED == ("warn", "alarm")
+    question, trace = relevance_rows()["drift"]
+    assert "band" in question and "MON-07" not in trace and "D-121" in trace
+    assert set(TREND_METRICS) <= set(SOURCES)  # the trend page draws exported metrics
 
 
 def test_every_metrics_1_metric_names_its_question_and_trace() -> None:

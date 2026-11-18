@@ -106,16 +106,25 @@ def scores_digest(run_dir: Path) -> str:
     return "".join(json.dumps(r) + "\n" for r in rows)
 
 
-def golden_run(tmp: Path, *, services=None) -> RunOutcome:
-    """Run the golden configuration on the recorded responses into `tmp`."""
+def golden_run(
+    tmp: Path,
+    *,
+    services=None,
+    history_path: Path | None = None,
+    cache_dir: Path | None = None,
+) -> RunOutcome:
+    """Run the golden configuration on the recorded responses into `tmp` (with
+    `history_path`, appending to that run ledger, V5.1 MON-07; with `cache_dir`, answering
+    from that answer cache)."""
     cfg = load_run_config(GOLDEN / "run.yaml")
     rec = json.loads((GOLDEN / "recording.json").read_text(encoding="utf-8"))
     svc = services if services is not None else (lambda: w.services_from_recording(rec, cfg))
     options = RunOptions(
         results_dir=tmp / "results",
-        cache_dir=tmp / ".cache",
+        cache_dir=cache_dir if cache_dir is not None else tmp / ".cache",
         measurements_dir=GOLDEN / "measurements",
         ledger_path=None,
+        history_path=history_path,
         run_id=RUN_ID,
         now=w.fixed_now,
         stopwatch=w.fixed_stopwatch(),

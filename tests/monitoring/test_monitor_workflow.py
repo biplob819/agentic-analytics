@@ -35,6 +35,16 @@ GATE_RUN = (
     'uv run evalkit gate "results/$(cat results/latest)/metrics/metrics.json" '
     f'--config {GATES} --out gate.json | tee -a "$GITHUB_STEP_SUMMARY"'
 )
+# V5.1 MON-07: drift against the committed run history, exactly this command
+LEDGER = "docs/measurements/runs.jsonl"
+HISTORY_RUN = (
+    'uv run evalkit history check "results/$(cat results/latest)/history/metrics.json" '
+    f'--ledger "$RUNNER_TEMP/runs-before.jsonl" --gates {GATES} | tee -a "$GITHUB_STEP_SUMMARY"'
+)
+TREND_RUN = (
+    f"uv run python -m agentic_analytics.monitoring.history --ledger {LEDGER} --gates {GATES} "
+    "--out trend.html"
+)
 ARTIFACT_DIR = "monitor-artifact/"
 UPLOAD = re.compile(r"actions/upload-artifact@[0-9a-f]{40}")
 # GitHub runs `shell: bash` as `bash --noprofile --norc -eo pipefail {0}`, so a failing command
@@ -103,6 +113,7 @@ def problems(text: str) -> list[str]:
     if any(s.get("continue-on-error") not in (None, False) for s in steps[smoke[0] :]):
         out.append("a step from the smoke run onward ignores its failure (continue-on-error)")
     out += _gate_problems(steps, runs, smoke[0])
+    out += _history_problems(data, steps, runs, smoke[0])
     out += _spend_problems(data, steps, runs, smoke[0])
     out += _artifact_problems(data, steps)
     if re.search(r"\bTODO\b", text):
@@ -123,6 +134,40 @@ def _gate_problems(steps: list[dict[str, Any]], runs: list[str], smoke: int) -> 
         out.append("the evalkit gate step can be skipped or ignored")
     if step.get("shell") != PIPEFAIL_SHELL:
         out.append("the evalkit gate step's exit code can be lost in the pipe (no pipefail)")
+    return out
+
+
+def _history_problems(
+    data: dict[str, Any], steps: list[dict[str, Any]], runs: list[str], smoke: int
+) -> list[str]:
+    """MON-07: the history before the run is kept, the drift check runs after the gate as
+    exactly its command under pipefail, and the history line and trend page always run."""
+    before = _named(data, "Run history before the run")
+    if len(before) != 1 or before[0] > smoke:
+        return ["the run history is not kept before the smoke run"]
+    if runs[before[0]] != f'cp {LEDGER} "$RUNNER_TEMP/runs-before.jsonl"':
+        return ["the run history before the run is not the committed ledger"]
+    gate = [i for i, r in enumerate(runs) if "evalkit gate" in r]
+    check = [i for i, r in enumerate(runs) if "evalkit history check" in r]
+    if len(check) != 1 or not gate or check[0] < gate[0]:
+        return ["no single evalkit history check step after the gate"]
+    out = []
+    step = steps[check[0]]
+    if runs[check[0]] != HISTORY_RUN:
+        out.append("the drift step is not exactly the history check piped to the summary")
+    if "if" in step or step.get("continue-on-error") not in (None, False):
+        out.append("the drift step can be skipped or ignored")
+    if step.get("shell") != PIPEFAIL_SHELL:
+        out.append("the drift step's exit code can be lost in the pipe (no pipefail)")
+    line, trend = _named(data, "History line"), _named(data, "Trend page")
+    if len(line) != 1 or len(trend) != 1 or min(line[0], trend[0]) < check[0]:
+        return [*out, "no history line and trend page after the drift check"]
+    if "$RUNNER_TEMP/runs-before.jsonl" not in runs[line[0]] or "tail -n 1 " in runs[line[0]]:
+        out.append("the history line can show a line the run did not append")
+    if runs[trend[0]] != TREND_RUN:
+        out.append("the trend page is not EvalKit's history page of the run ledger")
+    if any(steps[i].get("if") != "always()" for i in (line[0], trend[0])):
+        out.append("the history line or trend page is skipped when the gate fails")
     return out
 
 
@@ -155,6 +200,8 @@ def _artifact_problems(data: dict[str, Any], steps: list[dict[str, Any]]) -> lis
         out.append("the artifact does not hold the run's metrics folder")
     if "gate.json" not in run or "spend-line.jsonl" not in run:
         out.append("the artifact does not hold the gate verdict and the spend line")
+    if "history-line.jsonl" not in run or "trend.html" not in run:
+        out.append("the artifact does not hold the history line and the trend page")
     up = steps[upload[0]]
     if (up.get("with") or {}).get("path") != ARTIFACT_DIR:
         out.append("the artifact uploads something other than the collected folder")
@@ -174,7 +221,11 @@ def test_gates_file_the_workflow_reads_is_checked_in():
 SCHEDULE = '  # schedule:\n  #   - cron: "17 6 * * 1"'
 SMOKE = "        run: uv run agentic-analytics smoke --max-cost 2\n"
 GATE_NAME = "      - name: evalkit gate\n"
-GATE_TEE = '          | tee -a "$GITHUB_STEP_SUMMARY"\n'
+GATE_OUT = "          --config monitoring/gates.yaml --out gate.json\n"
+GATE_TEE = GATE_OUT + '          | tee -a "$GITHUB_STEP_SUMMARY"\n'
+HIST_OUT = '          --ledger "$RUNNER_TEMP/runs-before.jsonl" --gates monitoring/gates.yaml\n'
+HIST_TEE = HIST_OUT + '          | tee -a "$GITHUB_STEP_SUMMARY"\n'
+HIST_NAME = "      - name: evalkit history check\n"
 SECRET = "${{ secrets.OPENAI_API_KEY }}"
 TOP = "permissions:\n  contents: read\n"
 TIMEOUT = "    timeout-minutes: 45\n"
@@ -199,9 +250,30 @@ CP_METRICS = '            cp -R "results/$(cat results/latest)/metrics" monitor-
         (TIMEOUT, TIMEOUT + f"    env:\n      K: {SECRET}\n", "job level"),
         (GATE_TEE, f"          --token {SECRET}\n" + GATE_TEE, "secrets reach"),
         # W4: the gate's exit code swallowed or the step ignored
-        (GATE_TEE, '          | tee -a "$GITHUB_STEP_SUMMARY" || true\n', "not exactly"),
-        (GATE_TEE, '          | tee -a "$GITHUB_STEP_SUMMARY"; true\n', "not exactly"),
-        (GATE_TEE, '          | tee -a "$GITHUB_STEP_SUMMARY"; exit 0\n', "not exactly"),
+        (GATE_TEE, GATE_OUT + '          | tee -a "$GITHUB_STEP_SUMMARY" || true\n', "not exactly"),
+        (GATE_TEE, GATE_OUT + '          | tee -a "$GITHUB_STEP_SUMMARY"; true\n', "not exactly"),
+        (GATE_TEE, GATE_OUT + '          | tee -a "$GITHUB_STEP_SUMMARY"; exit 0\n', "not exactly"),
+        # MON-07: the drift step
+        (HIST_TEE, HIST_OUT + '          | tee -a "$GITHUB_STEP_SUMMARY" || true\n',
+         "drift step is not exactly"),
+        (HIST_TEE, HIST_OUT + '          | tee -a "$GITHUB_STEP_SUMMARY"; exit 0\n',
+         "drift step is not exactly"),
+        ("--gates monitoring/gates.yaml\n          | tee", "\n          | tee",
+         "drift step is not exactly"),
+        (HIST_NAME, HIST_NAME + "        continue-on-error: true\n", "drift step can be skipped"),
+        (HIST_NAME, HIST_NAME + "        if: false\n", "drift step can be skipped"),
+        (HIST_NAME + "        shell: bash\n", HIST_NAME, "drift step's exit code"),
+        ("uv run evalkit history check", "echo evalkit-history-check", "no single evalkit history"),
+        ('run: cp docs/measurements/runs.jsonl "$RUNNER_TEMP/runs-before.jsonl"',
+         'run: cp x.jsonl "$RUNNER_TEMP/runs-before.jsonl"', "not the committed ledger"),
+        ("      - name: Run history before the run\n", "      - name: History\n",
+         "history is not kept"),
+        ('tail -n "+$(( $(wc -l < "$RUNNER_TEMP/runs-before.jsonl") + 1 ))"', "tail -n 1",
+         "history line can show"),
+        ("      - name: Trend page\n        if: always()\n", "      - name: Trend page\n",
+         "skipped when the gate fails"),
+        ("--out trend.html", "--out x.html", "trend page is not"),
+        ("history-line.jsonl trend.html; do", "; do", "history line and the trend page"),
         ("          uv run evalkit gate", "          set +o pipefail; uv run evalkit gate",
          "not exactly"),
         ("--config monitoring/gates.yaml", "--config x.yaml", "not exactly"),
@@ -282,6 +354,48 @@ def _checkout_after_a_run(root: Path, run_id: str) -> Path:
     (root / "gate.json").write_text('{"exit_code": 0}', encoding="utf-8")
     (root / "spend-line.jsonl").write_text(f'{{"run_id": "{run_id}"}}\n', encoding="utf-8")
     return root
+
+
+@NEEDS_BASH
+def test_the_history_line_is_only_what_this_run_appended(tmp_path):
+    ledger = tmp_path / "docs" / "measurements" / "runs.jsonl"
+    ledger.parent.mkdir(parents=True)
+    ledger.write_text('{"run_id": "old-1"}\n{"run_id": "old-2"}\n', encoding="utf-8")
+    env = {"RUNNER_TEMP": str(tmp_path)}
+    _bash(_script("Run history before the run"), tmp_path, env)
+    with ledger.open("a", encoding="utf-8") as fh:  # what the smoke run appends
+        fh.write('{"run_id": "smoke-new"}\n')
+    _bash(_script("History line"), tmp_path, env)
+    assert (tmp_path / "history-line.jsonl").read_text("utf-8") == '{"run_id": "smoke-new"}\n'
+    assert (tmp_path / "runs-before.jsonl").read_text("utf-8").count("\n") == 2
+
+
+def test_the_drift_check_judges_a_run_against_the_committed_history(tmp_path):
+    """What the drift step checks: a smoke run's ledger view (`history/metrics.json`) against
+    the committed ledger; it is banded against the seeded smoke only (scope=smoke), every row
+    still learning (under 5 comparable runs), exit 0."""
+    from evalkit.ledger import check_run
+
+    from agentic_analytics.monitoring import history as hist
+
+    run = tmp_path / "smoke-x"
+    (run / "metrics").mkdir(parents=True)
+    shutil.copyfile(GOLDEN / "metrics" / "metrics.json", run / "metrics" / "metrics.json")
+    configs = [("claude_mcp", "none"), ("gpt_mcp", "none"), ("cortex_analyst", "none")]
+    view = hist.write_ledger_view(
+        run, scope="smoke", new_configs=configs, all_configs=configs, cost_status="estimated"
+    )
+    assert view is not None and view.parent.name == hist.HISTORY_DIR
+    res = check_run(ROOT / LEDGER, view, gates=ROOT / GATES)
+    assert res.exit_code == 0 and res.bands
+    assert {b.status for b in res.bands} <= {"learning", "ok", "improved", "degenerate"}
+    (acc,) = [
+        b
+        for b in res.bands
+        if b.metric == "accuracy"
+        and dict(b.labels) == {"model": "claude_mcp", "fixes": "none", "scope": "smoke"}
+    ]
+    assert acc.n_history == 1  # the seeded smoke, never the full baseline
 
 
 @NEEDS_BASH

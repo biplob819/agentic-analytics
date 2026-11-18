@@ -60,6 +60,13 @@
     "clickhouse": 0.0,
     "snowflake": 0.313194458
   },
+  "rescored_offline": {
+    "decision": "OWNER D-118",
+    "evalkit": "0.4.0",
+    "node": "V5.1",
+    "note": "records rescored with no calls through EvalKit 0.4.0's shape equivalences (MON-08) and summarised with its clustered clarification intervals (MON-09, D-119), then reconciled with the baseline's metered credits",
+    "stored_records_sha256": "fe904b34f541793b1ddc4e2cce25127201598e73210421d3970a680cf549ea45"
+  },
   "run_id": "rescore-20261117T122217Z-6ccebe",
   "schema_version": "1.0",
   "seed": 0,

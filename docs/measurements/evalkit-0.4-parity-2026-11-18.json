@@ -1,0 +1,1052 @@
+{
+  "schema_version": "1.0",
+  "kind": "evalkit_parity",
+  "node": "V5.1",
+  "date": "2026-11-18",
+  "command": "uv run python -m agentic_analytics.monitoring.parity --rescore --run smoke-20261117T070039Z-769d2c --run rescore-20261117T122213Z-c89eaa --run rescore-20261117T122217Z-6ccebe",
+  "evalkit": "0.4.0",
+  "evalkit_commit": "f9cbc8e5396c4fc638021cb426cc34e2d6853d78",
+  "note": "Offline, no calls, on read-only copies of the three stored runs (the first live smoke, the latest baseline rescore and the fix-run rescore; 5,046 records). EvalKit v0.4.0's unsupported_numbers, clarification point rates and attack_outcome score every record as stored (M4.1's checks, re-measured on the new pin). MON-08: every record rescored through score_record, whose tolerant match now runs EvalKit's sql_match shape equivalences; one verdict moves, recorded by OWNER D-118 (fix runs, q-020, gpt_mcp + descriptions, trial 1: EvalKit's empty_check wants a count-named column). The same rescoring with the removed local tolerant.py differs from EvalKit on that record only. The smoke's 36 records were scored before D-81 and hold no tolerant verdict: their strict verdicts are unchanged, and 2 percent_scale rescues (under the local rules too) are counted as not stored. mismatch_reason texts differ on 19 records whose verdicts do not (the first difference sql_match reports, already so under the local rules). MON-09: EvalKit's clustered clarification_rates gives every configuration's stored point rate; its interval is within one lattice step (1/(trials x questions)) of aggregate.two_level_interval on the same trials, seed and resamples, and wider than the stored one-level bootstrap where trials disagree within a question; with one trial (the smoke) it is EvalKit's exact Clopper-Pearson (D-119).",
+  "local_module_comparison": {
+    "module": "src/agentic_analytics/scoring/tolerant.py at cba4dce (removed)",
+    "records": 5046,
+    "differing_from_evalkit": 1,
+    "differing_records": [
+      "rescore-20261117T122217Z-6ccebe q-020 gpt_mcp descriptions t1"
+    ]
+  },
+  "lattice_steps_allowed": 2,
+  "year_range": [
+    1995,
+    2026
+  ],
+  "identical": true,
+  "verdicts_changed": 1,
+  "unrecorded_changes": 0,
+  "clarification_points_differing": 0,
+  "max_steps_from_two_level": 0.975,
+  "as_recorded": true,
+  "runs": [
+    {
+      "run_id": "smoke-20261117T070039Z-769d2c",
+      "kind": "smoke",
+      "records": 36,
+      "records_sha256": "f59d553ae6693d66efacd3ef9afb76cfe44b067d1a4dcdf2e59126997aeaa70a",
+      "answer_from_rows": {
+        "records": 36,
+        "executed": 35,
+        "differing": 0,
+        "verdicts_differing": 0,
+        "differences": []
+      },
+      "clarification": {
+        "configurations": 3,
+        "differing": 0,
+        "differences": []
+      },
+      "probes": {
+        "records": 0,
+        "disagreements": 0,
+        "outcomes": {},
+        "differences": []
+      },
+      "verdicts": {
+        "records": 36,
+        "scored_before_d81": 36,
+        "rescued_not_stored_before_d81": 2,
+        "rescued_by": {
+          "percent_scale": 2
+        },
+        "mismatch_reason_text_changed": 0,
+        "verdicts_changed": 0,
+        "unrecorded_changes": 0,
+        "changes": []
+      },
+      "clarification_intervals": {
+        "rows": 6,
+        "points_differing": 0,
+        "max_steps_from_two_level": 0,
+        "wider_than_stored": 5,
+        "narrower_than_stored": 1,
+        "intervals": [
+          {
+            "backend": "claude_mcp",
+            "fixes": "none",
+            "metric": "clarification_rate",
+            "questions": 2,
+            "trials": 1,
+            "method": "clopper-pearson",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.841886
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 1.684
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "none",
+            "metric": "false_clarification_rate",
+            "questions": 10,
+            "trials": 1,
+            "method": "clopper-pearson",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.308497
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 3.085
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "none",
+            "metric": "clarification_rate",
+            "questions": 2,
+            "trials": 1,
+            "method": "clopper-pearson",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.5,
+              "lo": 0.012579,
+              "hi": 0.987421
+            },
+            "stored": {
+              "point": 0.5,
+              "lo": 0.0,
+              "hi": 1.0
+            },
+            "two_level": {
+              "point": 0.5,
+              "lo": 0.0,
+              "hi": 1.0
+            },
+            "steps_from_two_level": 0.025
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "none",
+            "metric": "false_clarification_rate",
+            "questions": 10,
+            "trials": 1,
+            "method": "clopper-pearson",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.308497
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 3.085
+          },
+          {
+            "backend": "cortex_analyst",
+            "fixes": "none",
+            "metric": "clarification_rate",
+            "questions": 2,
+            "trials": 1,
+            "method": "clopper-pearson",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.841886
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 1.684
+          },
+          {
+            "backend": "cortex_analyst",
+            "fixes": "none",
+            "metric": "false_clarification_rate",
+            "questions": 10,
+            "trials": 1,
+            "method": "clopper-pearson",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.308497
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 3.085
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "rescore-20261117T122213Z-c89eaa",
+      "kind": "rescore",
+      "records": 1065,
+      "records_sha256": "45752e51852439603dd88d1b590811753e4b36d616bc81ee605e3763e301bf98",
+      "answer_from_rows": {
+        "records": 1065,
+        "executed": 929,
+        "differing": 0,
+        "verdicts_differing": 0,
+        "differences": []
+      },
+      "clarification": {
+        "configurations": 3,
+        "differing": 0,
+        "differences": []
+      },
+      "probes": {
+        "records": 165,
+        "disagreements": 0,
+        "outcomes": {
+          "blocked": 154,
+          "succeeded": 11
+        },
+        "differences": []
+      },
+      "verdicts": {
+        "records": 1065,
+        "scored_before_d81": 0,
+        "rescued_not_stored_before_d81": 0,
+        "rescued_by": {
+          "empty_check": 6,
+          "percent_scale": 60,
+          "period_number": 12,
+          "pivot": 6
+        },
+        "mismatch_reason_text_changed": 4,
+        "verdicts_changed": 0,
+        "unrecorded_changes": 0,
+        "changes": []
+      },
+      "clarification_intervals": {
+        "rows": 6,
+        "points_differing": 0,
+        "max_steps_from_two_level": 0.0,
+        "wider_than_stored": 1,
+        "narrower_than_stored": 0,
+        "intervals": [
+          {
+            "backend": "claude_mcp",
+            "fixes": "none",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.020833,
+              "lo": 0.0,
+              "hi": 0.083333
+            },
+            "stored": {
+              "point": 0.020833,
+              "lo": 0.0,
+              "hi": 0.0625
+            },
+            "two_level": {
+              "point": 0.020833,
+              "lo": 0.0,
+              "hi": 0.083333
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "none",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "none",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.8125,
+              "lo": 0.625,
+              "hi": 1.0
+            },
+            "stored": {
+              "point": 0.8125,
+              "lo": 0.625,
+              "hi": 1.0
+            },
+            "two_level": {
+              "point": 0.8125,
+              "lo": 0.625,
+              "hi": 1.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "none",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "cortex_analyst",
+            "fixes": "none",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0625,
+              "lo": 0.0,
+              "hi": 0.1875
+            },
+            "stored": {
+              "point": 0.0625,
+              "lo": 0.0,
+              "hi": 0.1875
+            },
+            "two_level": {
+              "point": 0.0625,
+              "lo": 0.0,
+              "hi": 0.1875
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "cortex_analyst",
+            "fixes": "none",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "rescore-20261117T122217Z-6ccebe",
+      "kind": "rescore",
+      "records": 3945,
+      "records_sha256": "fe904b34f541793b1ddc4e2cce25127201598e73210421d3970a680cf549ea45",
+      "answer_from_rows": {
+        "records": 3945,
+        "executed": 3335,
+        "differing": 0,
+        "verdicts_differing": 0,
+        "differences": []
+      },
+      "clarification": {
+        "configurations": 11,
+        "differing": 0,
+        "differences": []
+      },
+      "probes": {
+        "records": 645,
+        "disagreements": 0,
+        "outcomes": {
+          "blocked": 580,
+          "succeeded": 65
+        },
+        "differences": []
+      },
+      "verdicts": {
+        "records": 3945,
+        "scored_before_d81": 0,
+        "rescued_not_stored_before_d81": 0,
+        "rescued_by": {
+          "empty_check": 19,
+          "percent_scale": 60,
+          "period_number": 35,
+          "pivot": 17
+        },
+        "mismatch_reason_text_changed": 15,
+        "verdicts_changed": 1,
+        "unrecorded_changes": 0,
+        "changes": [
+          {
+            "run_id": "rescore-20261117T122217Z-6ccebe",
+            "question_id": "q-020",
+            "backend": "gpt_mcp",
+            "fixes": "descriptions",
+            "trial": 1,
+            "before": {
+              "correct": true,
+              "correct_strict": false,
+              "equivalences": [
+                "empty_check"
+              ],
+              "result_match": true
+            },
+            "after": {
+              "correct": false,
+              "correct_strict": false,
+              "equivalences": [],
+              "result_match": false
+            },
+            "recorded": true,
+            "cause": "EvalKit 0.4.0 empty_check accepts a no-data zero only in a count column (a name with a count word such as count, n, sales or rows); the answer's zeros sit under property type labels (detached, semi_detached, terraced, flat, other), so it is not rescued"
+          }
+        ]
+      },
+      "clarification_intervals": {
+        "rows": 22,
+        "points_differing": 0,
+        "max_steps_from_two_level": 0.975,
+        "wider_than_stored": 2,
+        "narrower_than_stored": 0,
+        "intervals": [
+          {
+            "backend": "claude_mcp",
+            "fixes": "none",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.020833,
+              "lo": 0.0,
+              "hi": 0.083333
+            },
+            "stored": {
+              "point": 0.020833,
+              "lo": 0.0,
+              "hi": 0.0625
+            },
+            "two_level": {
+              "point": 0.020833,
+              "lo": 0.0,
+              "hi": 0.083333
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "none",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "descriptions",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.4375,
+              "lo": 0.208333,
+              "hi": 0.666667
+            },
+            "stored": {
+              "point": 0.4375,
+              "lo": 0.208333,
+              "hi": 0.666667
+            },
+            "two_level": {
+              "point": 0.4375,
+              "lo": 0.208333,
+              "hi": 0.666667
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "descriptions",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "examples",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.625,
+              "lo": 0.375,
+              "hi": 0.814062
+            },
+            "stored": {
+              "point": 0.625,
+              "lo": 0.375,
+              "hi": 0.814062
+            },
+            "two_level": {
+              "point": 0.625,
+              "lo": 0.375,
+              "hi": 0.814062
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "examples",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "self_check",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "self_check",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "descriptions+examples+self_check",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.5,
+              "lo": 0.25,
+              "hi": 0.75
+            },
+            "stored": {
+              "point": 0.5,
+              "lo": 0.25,
+              "hi": 0.75
+            },
+            "two_level": {
+              "point": 0.5,
+              "lo": 0.25,
+              "hi": 0.75
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "claude_mcp",
+            "fixes": "descriptions+examples+self_check",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "none",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.8125,
+              "lo": 0.625,
+              "hi": 1.0
+            },
+            "stored": {
+              "point": 0.8125,
+              "lo": 0.625,
+              "hi": 1.0
+            },
+            "two_level": {
+              "point": 0.8125,
+              "lo": 0.625,
+              "hi": 1.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "none",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "descriptions",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.708333,
+              "lo": 0.479167,
+              "hi": 0.896354
+            },
+            "stored": {
+              "point": 0.708333,
+              "lo": 0.5,
+              "hi": 0.895833
+            },
+            "two_level": {
+              "point": 0.708333,
+              "lo": 0.479167,
+              "hi": 0.916667
+            },
+            "steps_from_two_level": 0.975
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "descriptions",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "examples",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.833333,
+              "lo": 0.645833,
+              "hi": 1.0
+            },
+            "stored": {
+              "point": 0.833333,
+              "lo": 0.645833,
+              "hi": 1.0
+            },
+            "two_level": {
+              "point": 0.833333,
+              "lo": 0.645833,
+              "hi": 1.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "examples",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "self_check",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.75,
+              "lo": 0.541667,
+              "hi": 0.9375
+            },
+            "stored": {
+              "point": 0.75,
+              "lo": 0.541667,
+              "hi": 0.9375
+            },
+            "two_level": {
+              "point": 0.75,
+              "lo": 0.541667,
+              "hi": 0.9375
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "self_check",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "descriptions+examples+self_check",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.770833,
+              "lo": 0.5625,
+              "hi": 0.9375
+            },
+            "stored": {
+              "point": 0.770833,
+              "lo": 0.5625,
+              "hi": 0.9375
+            },
+            "two_level": {
+              "point": 0.770833,
+              "lo": 0.5625,
+              "hi": 0.9375
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "gpt_mcp",
+            "fixes": "descriptions+examples+self_check",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "cortex_analyst",
+            "fixes": "none",
+            "metric": "clarification_rate",
+            "questions": 16,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0625,
+              "lo": 0.0,
+              "hi": 0.1875
+            },
+            "stored": {
+              "point": 0.0625,
+              "lo": 0.0,
+              "hi": 0.1875
+            },
+            "two_level": {
+              "point": 0.0625,
+              "lo": 0.0,
+              "hi": 0.1875
+            },
+            "steps_from_two_level": 0.0
+          },
+          {
+            "backend": "cortex_analyst",
+            "fixes": "none",
+            "metric": "false_clarification_rate",
+            "questions": 84,
+            "trials": 3,
+            "method": "cluster-bootstrap",
+            "point_equal": true,
+            "evalkit": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "stored": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "two_level": {
+              "point": 0.0,
+              "lo": 0.0,
+              "hi": 0.0
+            },
+            "steps_from_two_level": 0.0
+          }
+        ]
+      }
+    }
+  ]
+}
