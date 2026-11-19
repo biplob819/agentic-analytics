@@ -122,3 +122,4 @@ Format: `[TYPE] [NODE] — summary`. Types: FEAT, FIX, DOCS, HARNESS, MEASURE.
 - [MEASURE] [B3.3] — REL-05: the results dashboard deployed on GitHub Pages by the hand-run pages workflow (run 44296912477, build and deploy jobs green) from the committed published record; https://biplob819.github.io/agentic-analytics/ returns 200 with the OGL credit, the region caveat and no per-answer traces
 - [FIX] [B3.3] — the onboarding test's network guard keeps loopback open (Windows builds asyncio's socketpair over 127.0.0.1) and still refuses every other address; a safety test pins both
 - [HARNESS] [B3.3] — owner setup recorded: private vulnerability reporting on, DATA_CARD licence confirmed; the PyPI pending publisher and the demo deploy remain
+- [DOCS] [B3.3] — README status: the results dashboard is live on GitHub Pages (was "not deployed yet"), linked with its deploy record
