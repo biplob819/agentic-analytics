@@ -109,7 +109,7 @@ class _FakePlaywright:
     """A stand-in for `playwright.sync_api` (no browser, no network): every page step moves a
     fake clock by a set amount and is logged, so the measured time can be checked exactly."""
 
-    LOAD_S, FILL_S, ANSWER_S = 40.0, 1.0, 2.5
+    LOAD_S, FILL_S, ANSWER_S, OWNER_LINE_S = 40.0, 1.0, 2.5, 0.7
 
     def __init__(self, text: str) -> None:
         self.now = 0.0
@@ -117,6 +117,8 @@ class _FakePlaywright:
         self.text = text
         self.closed: list[str] = []
         self.fail_on: str | None = None
+        self.waits = 0
+        self.owner_line_never = False
 
     # playwright.sync_api
     def sync_playwright(self):
@@ -146,6 +148,7 @@ class _FakePlaywright:
 
     # page
     def goto(self, url, **kw):
+        self.waits = 0  # a fresh page per ask
         self.log.append(f"goto {url}")
         self.now += self.LOAD_S
 
@@ -159,8 +162,15 @@ class _FakePlaywright:
         return _Locator(self, f"{role} {name}")
 
     def wait_for_function(self, js, **kw):
-        self.log.append("wait")
-        self.now += self.ANSWER_S
+        self.waits += 1
+        if self.waits == 1:  # the answer: the cost line or a refusal
+            self.log.append("wait")
+            self.now += self.ANSWER_S
+            return
+        self.log.append("wait owner line")  # Streamlit draws the owner line after the cost line
+        self.now += self.OWNER_LINE_S
+        if self.owner_line_never:
+            raise TimeoutError("Timeout 10000ms exceeded.")
 
     def inner_text(self, selector):
         return self.text
@@ -207,7 +217,7 @@ def test_page_mode_times_each_ask_from_submit_to_the_answer(monkeypatch):
     assert out.owner_budget and len(out) == 2 and all(p.ok for p in out)
     assert pw.log == ["goto https://demo.example", "click text Ask your own (passcode)",
                       "fill label Passcode exact", "fill label Your question exact",
-                      "click button Ask both backends", "wait"]  # fmt: skip
+                      "click button Ask both backends", "wait", "wait owner line"]  # fmt: skip
     r = M.run(mode="page", config=CFG, questions=["q"], ask_one=ask_one, target="https://d",
               commit="abc", hold_usd=0.5)  # fmt: skip
     assert r["p95_ms"] == 2_500 and r["owner_budget_asks"] == 20 and r["passed"]
@@ -281,4 +291,38 @@ def test_a_failed_page_step_never_carries_what_was_typed(monkeypatch, field):
     assert err.__cause__ is None and err.__suppress_context__
     assert isinstance(err, ValueError)  # main prints it and exits 3, with no traceback
     assert "context-or-browser" in pw.closed  # the browser session is still closed
+    ask_one.close()  # type: ignore[attr-defined]
+
+
+def test_page_mode_reads_the_owner_line_drawn_after_the_cost_line(monkeypatch):
+    """DEM-15 live: Streamlit draws the owner line after the cost line, so the driver waits for
+    it before reading the page; the time still ends when the answer is shown."""
+    pw = _fake_playwright(monkeypatch, ANSWERED)
+    ask_one = M.page_asker("https://demo.example", "owner-pass", 2)
+    out = ask_one("How many sales?")
+    assert out.owner_budget and pw.log[-2:] == ["wait", "wait owner line"]
+    assert out.elapsed_s == pytest.approx(_FakePlaywright.ANSWER_S)  # not the extra wait
+    ask_one.close()  # type: ignore[attr-defined]
+
+
+def test_a_page_without_the_owner_line_is_not_owner_paid(monkeypatch):
+    """The owner line never comes (a visitor-budget ask): no error, the ask is not owner-paid,
+    and the run does not pass (OWNER D-53)."""
+    pw = _fake_playwright(monkeypatch, ANSWERED.replace("{owner}", ""))
+    pw.owner_line_never = True
+    ask_one = M.page_asker("https://demo.example", "owner-pass", 2)
+    out = ask_one("How many sales?")
+    assert not out.owner_budget and len(out) == 2
+    assert out.elapsed_s == pytest.approx(_FakePlaywright.ANSWER_S)
+    r = M.run(mode="page", config=CFG, questions=["q"], ask_one=ask_one, target="https://d",
+              commit="abc", hold_usd=0.5)  # fmt: skip
+    assert r["owner_budget_asks"] == 0 and not r["passed"]
+    ask_one.close()  # type: ignore[attr-defined]
+
+
+def test_a_refusal_page_does_not_wait_for_the_owner_line(monkeypatch):
+    pw = _fake_playwright(monkeypatch, "Wrong passcode.")
+    ask_one = M.page_asker("https://demo.example", "owner-pass", 2)
+    ask_one("q")
+    assert pw.log[-1] == "wait" and pw.waits == 1
     ask_one.close()  # type: ignore[attr-defined]

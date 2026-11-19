@@ -124,3 +124,4 @@ Format: `[TYPE] [NODE] — summary`. Types: FEAT, FIX, DOCS, HARNESS, MEASURE.
 - [HARNESS] [B3.3] — owner setup recorded: private vulnerability reporting on, DATA_CARD licence confirmed; the PyPI pending publisher and the demo deploy remain
 - [DOCS] [B3.3] — README status: the results dashboard is live on GitHub Pages (was "not deployed yet"), linked with its deploy record
 - [FIX] [B3.3] — DEM-15 page driver: opens the app itself on Streamlit Community Cloud (`/~/+/`), matches the passcode field exactly, and never lets a browser error carry a typed value (D-122, L-13); owner passcode rotated
+- [FIX] [B3.3] — DEM-15 page driver waits for the owner-budget line Streamlit draws after the cost line (timing unchanged); secrets helper says a changed secret needs an app reboot (D-122)

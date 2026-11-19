@@ -2,7 +2,9 @@
 
     uv run python scripts/streamlit_secrets.py | pbcopy
 
-then paste into the Streamlit Community Cloud app's Settings > Secrets. The output holds exactly
+then paste into the Streamlit Community Cloud app's Settings > Secrets, save, and reboot the
+app (its menu > Reboot app): the page builds its passcode guards once per server process, so a
+saved change to a passcode takes effect only after a reboot (D-122). The output holds exactly
 the variables the hosted demo reads: the page's `SECRETS` list with a value in `.env`, where
 `SNOWFLAKE_RO_PRIVATE_KEY` is the PEM text read from the file named by
 `SNOWFLAKE_RO_PRIVATE_KEY_PATH` (the host has no key file), as a TOML multi-line string. Never an

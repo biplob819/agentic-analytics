@@ -38,6 +38,7 @@ paid by the owner budget.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import platform
 import re
@@ -82,6 +83,8 @@ BUDGETS = {
     "in-process": "none: unguarded on the measuring machine, capped by --max-cost only",
 }
 PAGE_TIMEOUT_MS = 90_000
+OWNER_WAIT_MS = 10_000  # the owner line follows the cost line; a page without it is not owner-paid
+COST_MARKER = "This question cost $"
 STREAMLIT_CLOUD_SUFFIX = ".streamlit.app"
 STREAMLIT_APP_PATH = "/~/+/"  # Community Cloud serves the app itself here, inside its wrapper
 
@@ -110,7 +113,7 @@ COST_RE = re.compile(r"This question cost \$(\d+(?:\.\d+)?)")
 TIMEOUT_TEXT = "Timed out after"
 COMPUTE_OFF_MARKER = "Live compute is off"  # demo.ask.COMPUTE_OFF: nothing was asked
 DONE_MARKERS = (  # page text that ends one ask: the cost line or a refusal shown instead
-    "This question cost $",
+    COST_MARKER,
     COMPUTE_OFF_MARKER,
     "Wrong passcode.",
     "No session.",
@@ -220,6 +223,14 @@ def page_asker(url: str, passcode: str, n_panels: int) -> Callable[[str], TimedP
                     ".some(m => t.includes(m)); }",
                     timeout=PAGE_TIMEOUT_MS,
                 )
+                elapsed = time.perf_counter() - t0  # the answer is shown: the visitor's wait ends
+                step = "read the answer"
+                if COST_MARKER in page.inner_text("body"):
+                    with contextlib.suppress(Exception):  # Streamlit draws it after the cost line
+                        page.wait_for_function(
+                            f"() => document.body.innerText.includes({json.dumps(OWNER_MARKER)})",
+                            timeout=OWNER_WAIT_MS,
+                        )
                 text = page.inner_text("body")
             except Exception as exc:  # never chained: its message holds the typed values
                 raise PageDriverError(f"page step failed: {step} ({type(exc).__name__})") from None
@@ -228,7 +239,7 @@ def page_asker(url: str, passcode: str, n_panels: int) -> Callable[[str], TimedP
                     f"the page says live compute is off; set {LIVE_BACKENDS_VAR} on the host"
                 )
             out = TimedPanels(panels_from_page_text(text, n_panels) or [])
-            out.elapsed_s = time.perf_counter() - t0
+            out.elapsed_s = elapsed
             out.owner_budget = OWNER_MARKER in text
             return out
         finally:
