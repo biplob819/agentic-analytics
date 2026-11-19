@@ -82,6 +82,30 @@ BUDGETS = {
     "in-process": "none: unguarded on the measuring machine, capped by --max-cost only",
 }
 PAGE_TIMEOUT_MS = 90_000
+STREAMLIT_CLOUD_SUFFIX = ".streamlit.app"
+STREAMLIT_APP_PATH = "/~/+/"  # Community Cloud serves the app itself here, inside its wrapper
+
+
+class PageDriverError(ValueError):
+    """A browser step on the deployed page failed. The message names the step and the error
+    type only: Playwright's own message logs the values it typed, the owner passcode among them."""
+
+
+def app_url(url: str) -> str:
+    """The URL the driver opens: on Streamlit Community Cloud (`*.streamlit.app`) the app itself
+    is served at `/~/+/` and the site root is only a wrapper page holding it in an iframe, so
+    the root is mapped there; any other URL is used as given."""
+    from urllib.parse import urlsplit, urlunsplit
+
+    parts = urlsplit(url)
+    host = (parts.hostname or "").lower()
+    if not host.endswith(STREAMLIT_CLOUD_SUFFIX) or parts.path.startswith(STREAMLIT_APP_PATH):
+        return url
+    if parts.path not in ("", "/"):
+        return url
+    return urlunsplit((parts.scheme, parts.netloc, STREAMLIT_APP_PATH, "", ""))
+
+
 COST_RE = re.compile(r"This question cost \$(\d+(?:\.\d+)?)")
 TIMEOUT_TEXT = "Timed out after"
 COMPUTE_OFF_MARKER = "Live compute is off"  # demo.ask.COMPUTE_OFF: nothing was asked
@@ -172,23 +196,33 @@ def page_asker(url: str, passcode: str, n_panels: int) -> Callable[[str], TimedP
     sync_api = importlib.import_module("playwright.sync_api")
     pw = sync_api.sync_playwright().start()
     browser = pw.chromium.launch()
+    target = app_url(url)
 
     def ask_one(question: str) -> TimedPanels:
         context = browser.new_context()
         try:
-            page = context.new_page()
-            page.goto(url, wait_until="networkidle", timeout=PAGE_TIMEOUT_MS)
-            page.get_by_text("Ask your own (passcode)").click()
-            page.get_by_label("Passcode").fill(passcode)
-            page.get_by_label("Your question").fill(question)
-            t0 = time.perf_counter()  # the visitor's view: from submit to the answer
-            page.get_by_role("button", name="Ask both backends").click()
-            page.wait_for_function(  # the request's cost line, or a refusal (no panels)
-                f"() => {{ const t = document.body.innerText; return {DONE_MARKERS_JS}"
-                ".some(m => t.includes(m)); }",
-                timeout=PAGE_TIMEOUT_MS,
-            )
-            text = page.inner_text("body")
+            step = "open the page"
+            try:
+                page = context.new_page()
+                page.goto(target, wait_until="networkidle", timeout=PAGE_TIMEOUT_MS)
+                step = "choose live mode"
+                page.get_by_text("Ask your own (passcode)").click()
+                step = "type the passcode"  # exact: the mode radio's label also says passcode
+                page.get_by_label("Passcode", exact=True).fill(passcode)
+                step = "type the question"
+                page.get_by_label("Your question", exact=True).fill(question)
+                step = "submit"
+                t0 = time.perf_counter()  # the visitor's view: from submit to the answer
+                page.get_by_role("button", name="Ask both backends").click()
+                step = "wait for the answer"
+                page.wait_for_function(  # the request's cost line, or a refusal (no panels)
+                    f"() => {{ const t = document.body.innerText; return {DONE_MARKERS_JS}"
+                    ".some(m => t.includes(m)); }",
+                    timeout=PAGE_TIMEOUT_MS,
+                )
+                text = page.inner_text("body")
+            except Exception as exc:  # never chained: its message holds the typed values
+                raise PageDriverError(f"page step failed: {step} ({type(exc).__name__})") from None
             if COMPUTE_OFF_MARKER in text:  # the host has this backend switched off
                 raise ValueError(
                     f"the page says live compute is off; set {LIVE_BACKENDS_VAR} on the host"

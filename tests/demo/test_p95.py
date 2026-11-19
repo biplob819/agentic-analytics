@@ -116,6 +116,7 @@ class _FakePlaywright:
         self.log: list[str] = []
         self.text = text
         self.closed: list[str] = []
+        self.fail_on: str | None = None
 
     # playwright.sync_api
     def sync_playwright(self):
@@ -151,8 +152,8 @@ class _FakePlaywright:
     def get_by_text(self, text):
         return _Locator(self, f"text {text}")
 
-    def get_by_label(self, label):
-        return _Locator(self, f"label {label}")
+    def get_by_label(self, label, exact=False):
+        return _Locator(self, f"label {label}" + (" exact" if exact else ""))
 
     def get_by_role(self, role, name):
         return _Locator(self, f"{role} {name}")
@@ -173,6 +174,8 @@ class _Locator:
         self.pw.log.append(f"click {self.what}")
 
     def fill(self, value):
+        if self.pw.fail_on and self.pw.fail_on in self.what:  # Playwright logs what it typed
+            raise TimeoutError(f'Locator.fill: Timeout exceeded.\n  - fill("{value}")')
         self.pw.log.append(f"fill {self.what}")
         self.pw.now += self.pw.FILL_S
 
@@ -203,7 +206,7 @@ def test_page_mode_times_each_ask_from_submit_to_the_answer(monkeypatch):
     assert out.elapsed_s == pytest.approx(_FakePlaywright.ANSWER_S)
     assert out.owner_budget and len(out) == 2 and all(p.ok for p in out)
     assert pw.log == ["goto https://demo.example", "click text Ask your own (passcode)",
-                      "fill label Passcode", "fill label Your question",
+                      "fill label Passcode exact", "fill label Your question exact",
                       "click button Ask both backends", "wait"]  # fmt: skip
     r = M.run(mode="page", config=CFG, questions=["q"], ask_one=ask_one, target="https://d",
               commit="abc", hold_usd=0.5)  # fmt: skip
@@ -229,3 +232,53 @@ def test_main_refuses_the_synthetic_example_and_a_page_run_without_url(
     capsys.readouterr()
     assert M.main(["--mode", "page", "--url", "http://demo.example"], environ={}) == 2
     assert "--url https://" in capsys.readouterr().err  # DEM-15 measures the page over HTTPS
+
+
+@pytest.mark.parametrize(
+    ("url", "opened"),
+    [
+        (
+            "https://agenticanalytics12.streamlit.app/",
+            "https://agenticanalytics12.streamlit.app/~/+/",
+        ),
+        ("https://Demo.Streamlit.App", "https://Demo.Streamlit.App/~/+/"),
+        ("https://demo.streamlit.app/~/+/", "https://demo.streamlit.app/~/+/"),
+        ("https://demo.streamlit.app/other", "https://demo.streamlit.app/other"),
+        ("https://demo.example/", "https://demo.example/"),
+        ("https://streamlit.app.evil.example/", "https://streamlit.app.evil.example/"),
+    ],
+)
+def test_page_mode_opens_the_app_itself_on_streamlit_cloud(url, opened):
+    """DEM-15: Community Cloud serves the app at /~/+/ inside a wrapper page; the driver opens
+    the app itself there, and any other URL as given."""
+    assert M.app_url(url) == opened
+
+
+def test_page_mode_goes_to_the_app_frame_and_keeps_the_given_target(monkeypatch):
+    pw = _fake_playwright(monkeypatch, ANSWERED)
+    ask_one = M.page_asker("https://demo.streamlit.app/", "owner-pass", 2)
+    ask_one("How many sales?")
+    assert pw.log[0] == "goto https://demo.streamlit.app/~/+/"
+    r = M.run(mode="page", config=CFG, questions=["q"], ask_one=ask_one,
+              target="https://demo.streamlit.app/", commit="abc", hold_usd=0.5)  # fmt: skip
+    assert r["target"] == "https://demo.streamlit.app/"
+    ask_one.close()  # type: ignore[attr-defined]
+
+
+@pytest.mark.safety
+@pytest.mark.parametrize("field", ["Passcode", "Your question"])
+def test_a_failed_page_step_never_carries_what_was_typed(monkeypatch, field):
+    """DEM-15 safety: Playwright's error message logs the values it filled, the owner passcode
+    among them; the driver's error names the step and the error type only, unchained."""
+    pw = _fake_playwright(monkeypatch, ANSWERED)
+    pw.fail_on = f"label {field}"
+    ask_one = M.page_asker("https://demo.example", "owner-pass-SECRET", 2)
+    with pytest.raises(M.PageDriverError) as info:
+        ask_one("the question text")
+    err = info.value
+    assert "owner-pass-SECRET" not in str(err) and "the question text" not in str(err)
+    assert "TimeoutError" in str(err) and "type the" in str(err)
+    assert err.__cause__ is None and err.__suppress_context__
+    assert isinstance(err, ValueError)  # main prints it and exits 3, with no traceback
+    assert "context-or-browser" in pw.closed  # the browser session is still closed
+    ask_one.close()  # type: ignore[attr-defined]
