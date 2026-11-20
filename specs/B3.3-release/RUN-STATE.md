@@ -36,3 +36,15 @@ The EvalKit v0.4.0 work is node V5.1 "v0.1.1 on EvalKit v0.4.0" (depends on B3.3
 - **D-112 (OWNER, at the release):** turn the weekly monitor schedule on once the `monitoring` secrets are in place and a first hand-run passes (follows OWNER D-103; about $1.20 a month plus about 3.5 Snowflake trial credits).
 - **D-113 (V5.1, at EvalKit v0.4.0):** pin `evalkit-harness==0.4.0` exactly; MON-07 on B5.7's ledger and `evalkit history`; MON-08 B5.15 equivalences (0 verdict changes, parity record committed); MON-09 clustered clarification intervals (OWNER D-100), each with its parity test.
 - 2026-11-18 — owner steps: Pages source = GitHub Actions and the `pypi` environment (tags `v*`, required reviewer) set by the owner; private vulnerability reporting enabled through the GitHub API at the owner's request; DATA_CARD licence wording confirmed by the owner against the HM Land Registry page. Still open: the PyPI pending publisher and the Streamlit deploy (DEM-15).
+
+## Resume point (paused 2026-11-20 at the owner's request: Claude account change)
+Nothing in flight: no paid or model run, no background job, no wakeup; main = 66f560b plus this note, CI green 9/9 on 66f560b; worktrees idle (`scratchpad/dem15` at 66f560b; `aa-lane-V5.1` at d8ed9fe on branch `v5.1-pending`). `results/` in the main tree is untracked run output, not an edit.
+Done since the steps above: REL-05 Pages live (`docs/measurements/pages-deploy-2026-11-18.json`); demo deployed at `AA_DEMO_URL` (in `.env`) with `DEMO_LIVE_BACKENDS=claude_mcp,cortex_analyst`; PyPI pending publisher added; the p95 page driver fixed (D-122, L-13) and the owner budget confirmed on the host.
+Blocker: the Anthropic API key in `.env` returns "credit balance is too low" (checked 2026-11-20); every Claude panel fails, so DEM-15 cannot run. After an account change, put the new account's key in `.env` and in the Streamlit Secrets, then reboot the app (guards are built once per process).
+Next steps, in order:
+1. One cheap API call to confirm the key works.
+2. DEM-15 smoke: `uv run --with playwright --env-file .env python -m agentic_analytics.demo.p95 --mode page --url $AA_DEMO_URL --n 1 --max-cost 2 --out <scratchpad>` (expect owner_budget_asks 1, errored_panels 0). Anthropic: ~$0.04, at most $0.49.
+3. DEM-15 full: `AA_LIVE=1 uv run --with playwright pytest -m live tests/demo/test_live.py -k p95` → commit `docs/measurements/demo-p95-<date>-page.json`; ledger the spend by hand (the host's ledger is ephemeral); README line "The hosted demo is built but not deployed" → live at the URL; independent verifier. Anthropic: ~$0.85, at most $9.73 (run capped at $15 with Snowflake). Don't edit the main tree during the run (L-12).
+4. Owner: delete `DEMO_OWNER_PASSCODE` from Streamlit Secrets and reboot; then remove `~/streamlit-secrets.env` and `~/demo-owner-passcode.env`.
+5. Step 8 above (version 0.1.0, tag); approve the `pypi` environment deployment (owner-approved); watch publish and the 3-OS smoke; mark OSS, DEM-15, REL-05, B3.3 green (OWNER D-110).
+6. V5.1: rebase `v5.1-pending` onto main, converge, verifier, tag v0.1.1 (no model calls); tell the portfolio session (−4.7 → −5.0).
