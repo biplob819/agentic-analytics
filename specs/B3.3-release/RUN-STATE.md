@@ -39,9 +39,9 @@ The EvalKit v0.4.0 work is node V5.1 "v0.1.1 on EvalKit v0.4.0" (depends on B3.3
 
 - 2026-11-20 — resumed after the account change; the Anthropic key works after the owner's top-up. DEM-15 smoke (1 ask, 24.6 s) then the 20-ask p95 on the deployed page: p95 14063 ms, 0 timed-out or errored panels, $4.25 (D-123); record and offline tests committed with the 0.1.0 bump.
 
+- 2026-11-20 — v0.1.0 released (D-124): CI green on d2a2c93, tag pushed, `pypi` environment approved, publish and the 3-OS smoke passed; a clean `pip install agentic-analytics==0.1.0` runs `--version`, `pack check` and `report --example`. OSS-01..07, DEM-15, REL-05 green; B3.3 green.
+
 ## Resume point
-The pause (2026-11-20, the owner's account change) is over; DEM-15 is measured (D-123) and v0.1.0 is bumped. Remaining, in order:
-1. Push the bump commit, green CI on 3 OSes × 3.11–3.13, then `git tag v0.1.0 && git push origin v0.1.0`; approve the `pypi` environment deployment (owner-approved); watch publish and the 3-OS smoke. If publish fails, revert the README's "On PyPI as v0.1.0" line.
-2. Mark OSS-01..07, DEM-15, REL-05 and B3.3 green (OWNER D-110) and converge B3.3.
-3. Owner: delete `DEMO_OWNER_PASSCODE` from Streamlit Secrets and reboot; then remove `~/streamlit-secrets.env` and `~/demo-owner-passcode.env`.
-4. V5.1: rebase `v5.1-pending` onto main, converge, verifier, tag v0.1.1 (no model calls); tell the portfolio session (−4.7 → −5.0).
+B3.3 is done. Remaining after it:
+1. Owner: delete `DEMO_OWNER_PASSCODE` from Streamlit Secrets and reboot; then remove `~/streamlit-secrets.env` and `~/demo-owner-passcode.env`.
+2. V5.1: rebase `v5.1-pending` onto main, converge, verifier, tag v0.1.1 (no model calls); tell the portfolio session (−4.7 → −5.0).

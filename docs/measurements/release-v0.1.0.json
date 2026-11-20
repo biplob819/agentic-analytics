@@ -1,0 +1,37 @@
+{
+  "criterion": "B3.3 (OWNER D-110)",
+  "tag": "v0.1.0",
+  "commit": "d2a2c9393339b4ffd2e16980224b7f2fbc28d530",
+  "workflow": "release.yml",
+  "workflow_run_id": 44745125161,
+  "workflow_run_url": "https://github.com/biplob819/agentic-analytics/actions/runs/44745125161",
+  "event": "push",
+  "conclusion": "success",
+  "jobs": {
+    "checks": "success",
+    "build": "success",
+    "publish": "success",
+    "smoke (macos-latest)": "success",
+    "smoke (ubuntu-latest)": "success",
+    "smoke (windows-latest)": "success"
+  },
+  "pypi": {
+    "project": "agentic-analytics",
+    "version": "0.1.0",
+    "url": "https://pypi.org/project/agentic-analytics/0.1.0/",
+    "files": [
+      {
+        "filename": "agentic_analytics-0.1.0-py3-none-any.whl",
+        "sha256": "94bdd3eedf0caf6bfee919f7537a12dc4d2991500959e0af1aa3f30b1276e392",
+        "packagetype": "bdist_wheel"
+      },
+      {
+        "filename": "agentic_analytics-0.1.0.tar.gz",
+        "sha256": "3f9b277dcbc3847fa8d597f74e4d517934601e3a7d631d397bed1adc8d8685f6",
+        "packagetype": "sdist"
+      }
+    ],
+    "requires_python": ">=3.11"
+  },
+  "publishing": "trusted publishing from release.yml job publish in environment pypi, approved by the owner"
+}
