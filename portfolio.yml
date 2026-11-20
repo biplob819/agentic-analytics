@@ -28,3 +28,52 @@ images:
   cli_doctor: docs/assets/cli-doctor.png
 tech: [Python, uv, Anthropic API, OpenAI API, MCP, ClickHouse Cloud, Snowflake Cortex Analyst, sqlglot, Pydantic, Streamlit, Postgres, EvalKit, GitHub Actions]
 status: draft  # the owner approves
+priorities:  # the portfolio page's "Scope: built, cut and later" toggle
+  - item: "A 100-question UK house-price benchmark with gold SQL checked on both engines"
+    call: built
+    why: "Every question's gold result must agree on ClickHouse and Snowflake before any run, so the comparison is fair."
+    source: "Agentic Analytics PRD.md"
+  - item: "Claude and GPT agents over ClickHouse's MCP server against Snowflake Cortex Analyst"
+    call: built
+    why: "The same agent loop runs on both models, scored against gold SQL with no LLM judge."
+    source: "Agentic Analytics PRD.md"
+  - item: "Three fixes, each measured alone against one frozen baseline"
+    call: built
+    why: "Fix content was frozen and hashed before the first baseline run, so fixes cannot overfit its failures."
+    source: "OWNER D-13"
+  - item: "A results dashboard on GitHub Pages built from the published record"
+    call: built
+    why: "The public page has every figure, rebuilt from the committed published-run record."
+    source: "docs/measurements/pages-deploy-2026-11-18.json"
+  - item: "A hosted demo with saved answers and a passcode-gated live mode"
+    call: built
+    why: "Live answers measured a p95 of 14.1 seconds over 20 timed questions."
+    source: "docs/measurements/demo-p95-2026-11-20-page.json"
+  - item: "A command-line tool on PyPI, with run history and drift flags"
+    call: built
+    why: "Released by trusted publishing and install-tested on Linux, macOS and Windows."
+    source: "docs/measurements/release-v0.1.1.json"
+  - item: "Live answers by default on the public demo"
+    call: cut
+    why: "Saved answers are the default so the demo costs nothing at rest; live compute is switched on per request."
+    source: "OWNER D-59"
+  - item: "Per-answer records and traces on the public dashboard"
+    call: cut
+    why: "Nothing large or per-answer lands in the repository; the full dashboard comes from a local run."
+    source: "OWNER D-111"
+  - item: "\"Area\" as a synonym for district in the semantic layer"
+    call: cut
+    why: "It would pre-empt an ambiguous benchmark question that should be answered by town."
+    source: "OWNER D-67"
+  - item: "Carrying a stopped run's history into its resumed run"
+    call: cut
+    why: "It could count answers twice, so a stopped run records nothing instead."
+    source: "D-121"
+  - item: "Cortex Agents as a third approach"
+    call: later
+    why: "The PRD names it as the next step after the agent and Cortex Analyst comparison."
+    source: "Agentic Analytics PRD.md"
+  - item: "A weekly scheduled monitoring run"
+    call: later
+    why: "Recurring spend needs the owner's approval; the 12-question smoke runs by hand until then."
+    source: "OWNER D-103"

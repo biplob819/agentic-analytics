@@ -162,3 +162,24 @@ def test_walkthrough_files_hold_no_secret_local_path_or_email():
         assert not LOCAL.findall(f.read_text(encoding="utf-8")), f.name
     raw = GIF.read_bytes()  # no metadata naming a local path
     assert not LOCAL.findall(raw.decode("latin-1"))
+
+
+def test_portfolio_priorities_cite_real_sources():
+    """The portfolio page's scope toggle: built, cut and later items, each one plain sentence
+    citing a repo file or a logged decision (no new claims)."""
+    entry = yaml.safe_load(PORTFOLIO.read_text(encoding="utf-8"))
+    items = entry["priorities"]
+    calls = [i["call"] for i in items]
+    assert set(calls) == {"built", "cut", "later"}
+    assert 4 <= calls.count("built") <= 7 and 2 <= calls.count("cut") <= 5
+    assert 2 <= calls.count("later") <= 5
+    decisions = (ROOT / "docs/decisions.md").read_text(encoding="utf-8")
+    for i in items:
+        assert set(i) == {"item", "call", "why", "source"}, i
+        assert len(i["item"].split()) <= 15 and i["why"].endswith(".")
+        assert not re.search(r"\b(?:OWNER )?D-\d+\b|\b[A-Z]{2,4}-\d{2}\b", i["item"] + i["why"])
+        src = i["source"]
+        if re.fullmatch(r"(?:OWNER )?D-\d+", src):
+            assert f"| {src} |" in decisions, src
+        else:
+            assert (ROOT / src).is_file(), src
