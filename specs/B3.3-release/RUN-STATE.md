@@ -44,4 +44,4 @@ The EvalKit v0.4.0 work is node V5.1 "v0.1.1 on EvalKit v0.4.0" (depends on B3.3
 ## Resume point
 B3.3 is done. Remaining after it:
 1. Owner: delete `DEMO_OWNER_PASSCODE` from Streamlit Secrets and reboot; then remove `~/streamlit-secrets.env` and `~/demo-owner-passcode.env`.
-2. V5.1: rebase `v5.1-pending` onto main, converge, verifier, tag v0.1.1 (no model calls); tell the portfolio session (−4.7 → −5.0).
+2. Done: V5.1 released as v0.1.1 (D-126).

@@ -1,6 +1,6 @@
 # V5.1 run state
 
-**Now:** BUILT 2026-11-20: verifier round 7 GREEN; committed on c783823 as v0.1.1. Next: CI, tag v0.1.1, publish, release record, MON-07/08/09 and V5.1 green.
+**Now:** GREEN 2026-11-20: v0.1.1 on PyPI (D-126); MON-07, MON-08, MON-09 green.
 
 ## Owner rulings (2026-11-18)
 - OWNER D-118: EvalKit 0.4.0's stricter `empty_check` is accepted; the one moved verdict (fix runs, q-020, GPT + descriptions, trial 1) is recorded, MON-08's row reads "1 verdict, recorded", and v0.1.1's published record moves with it (v0.1.0's is unaffected).
@@ -15,3 +15,4 @@
 - 2026-11-20 — verifier round 5 NOT GREEN (R5-M1: rule (a) silenced full runs sharing the smoke's cache and contradicted the seed; S1: a second reconcile added a second cost point). D-125 rewritten: cache entries store the asking run's scope; same-scope or unscoped cached answers block a point; reconcile recorded once; seed invariant tested.
 - 2026-11-20 — verifier round 6 NOT GREEN (R6-M1: a configuration served wholly from other-scope cache entries added a point on every repeat; a rescore could too). Fixed: a configuration also needs one answer asked in this run (test fails on the old rule); criterion and D-125 say so, and one run per answer cache is assumed.
 - 2026-11-20 — verifier round 7 GREEN (scenarios A–H re-run: no configuration gets two points in one scope; full suite 4183 passed).
+- 2026-11-20 — CI green on 61eec63; v0.1.1 tagged, `pypi` approved, publish and 3-OS smoke passed (run 44754585729); clean install runs on EvalKit 0.4.0; release record committed; V5.1 green (D-126).
