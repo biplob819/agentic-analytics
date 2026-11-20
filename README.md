@@ -25,9 +25,9 @@ Every question has gold SQL for both engines, and the two results must agree bef
 
 Built and measured. The baseline and the fix runs are done and scored; the baseline was hand-checked by the builder and the fix runs were checked by an independent verifier. The headline, the results tables and the charts are generated from the committed [published run summary](https://github.com/biplob819/agentic-analytics/blob/main/docs/results/summary.json), and each bullet below cites the record it comes from. Where the release node (B3.3) stands, and one item after it:
 
-- **Not on PyPI yet.** Install from a clone (below) until v0.1.0 is published.
+- **On PyPI as v0.1.0:** `pip install agentic-analytics` ([release workflow](https://github.com/biplob819/agentic-analytics/blob/main/.github/workflows/release.yml): trusted publishing, then an install smoke on Linux, macOS and Windows).
 - **The results dashboard is live at [biplob819.github.io/agentic-analytics](https://biplob819.github.io/agentic-analytics/)** ([deploy record](https://github.com/biplob819/agentic-analytics/blob/main/docs/measurements/pages-deploy-2026-11-18.json)). The hand-run Pages workflow builds the dashboard from the committed published-run record, so the public page has every figure but no per-answer records or traces (its failure explorer is empty; the full dashboard comes from `agentic-analytics report` on a run folder).
-- **The hosted demo is built but not deployed.** It replays saved answers by default; the live, passcode-gated mode waits for the deploy and its latency check (DEM-15).
+- **The hosted demo is live at [agenticanalytics12.streamlit.app](https://agenticanalytics12.streamlit.app/)** on Streamlit Community Cloud. It replays saved answers by default; the live, passcode-gated mode answered 20 timed questions with a p95 of 14.1 s and no timed-out or errored panel ([latency record](https://github.com/biplob819/agentic-analytics/blob/main/docs/measurements/demo-p95-2026-11-20-page.json), DEM-15).
 - **Monitoring runs by hand.** The 12-question smoke run with its accuracy gate is a hand-run workflow; its schedule stays off until the owner turns it on (OWNER D-103).
 - **Run history, trend and drift wait for EvalKit v0.4.0 (v0.1.1).** v0.1.0 ships on EvalKit 0.3.0; the trend page and drift flags come from EvalKit's run ledger in the release after it (MON-07, OWNER D-115).
 
@@ -96,7 +96,13 @@ The passcode and own-key fields are always shown. Live answers need the owner's 
 
 ## Step-by-step guide
 
-**1. Install.** Python 3.11 or newer. Until v0.1.0 is on PyPI, from a clone with [uv](https://docs.astral.sh/uv/):
+**1. Install.** Python 3.11 or newer:
+
+```bash
+pip install agentic-analytics
+```
+
+Or from a clone with [uv](https://docs.astral.sh/uv/), to change the code or run the tests:
 
 ```bash
 git clone https://github.com/biplob819/agentic-analytics
@@ -104,7 +110,7 @@ cd agentic-analytics
 uv sync
 ```
 
-The command is `agentic-analytics`, with the short alias `aa` (prefix with `uv run` inside the clone). After the release: `pip install agentic-analytics`.
+The command is `agentic-analytics`, with the short alias `aa` (prefix with `uv run` inside the clone).
 
 **2. Look around with no keys.**
 

@@ -1,6 +1,6 @@
 [project]
 name = "agentic-analytics"
-version = "0.0.1"
+version = "0.1.0"
 description = "A benchmark harness for text-to-SQL agents: scores analytics agents against gold SQL over dataset packs, without an LLM judge, with a bundled UK house-price pack."
 readme = { file = "README.md", content-type = "text/markdown" }
 license = "MIT"

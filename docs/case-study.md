@@ -21,7 +21,7 @@ I wrote the product requirements and owned every ruling that shaped the benchmar
 and the as-of date, the Snowflake region (kept in Thailand, with a latency caveat), a sign-off on
 all 140 questions and probes, the scoring rulings after the baseline hand check, and each paid
 run's budget. I set up the ClickHouse Cloud and Snowflake accounts, approved every push, and own
-the demo deploy, which is not live yet.
+the demo deploy on Streamlit Community Cloud.
 
 Claude Code built the code, tests, runs and documents under EvalKit's node harness: tests first,
 clean convergence runs, and a fresh skeptical verifier per node that tried to disprove each

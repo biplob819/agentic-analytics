@@ -11,9 +11,9 @@ pip install agentic-analytics
 agentic-analytics --version
 ```
 
-The package is published from v0.1.0 onwards; until then, install from a clone with
-`git clone https://github.com/biplob819/agentic-analytics` and `uv sync`, and put `uv run` in
-front of each command below. The command has a short alias, `aa`.
+To work from a clone instead, run `git clone https://github.com/biplob819/agentic-analytics`
+and `uv sync`, and put `uv run` in front of each command below. The command has a short alias,
+`aa`.
 
 ## 2. Scaffold a folder
 
