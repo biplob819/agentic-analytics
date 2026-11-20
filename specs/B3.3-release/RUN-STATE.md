@@ -43,5 +43,5 @@ The EvalKit v0.4.0 work is node V5.1 "v0.1.1 on EvalKit v0.4.0" (depends on B3.3
 
 ## Resume point
 B3.3 is done. Remaining after it:
-1. Owner: delete `DEMO_OWNER_PASSCODE` from Streamlit Secrets and reboot; then remove `~/streamlit-secrets.env` and `~/demo-owner-passcode.env`.
+1. Done 2026-11-20: the owner removed `DEMO_OWNER_PASSCODE` from Streamlit Secrets and rebooted; checked on the page: saved answers shown, the former owner passcode refused, a visitor-passcode ask answered on the visitor budget ($0.2089, ledgered). Owner: delete `~/streamlit-secrets.env` and `~/demo-owner-passcode.env` (they hold secrets, outside the repo).
 2. Done: V5.1 released as v0.1.1 (D-126).
